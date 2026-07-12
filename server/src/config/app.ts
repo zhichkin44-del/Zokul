@@ -21,5 +21,4 @@ export const config = {
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
   vapidPublicKey: safeEnv('VAPID_PUBLIC_KEY', 'REDACTED'),
   vapidPrivateKey: safeEnv('VAPID_PRIVATE_KEY', 'REDACTED'),
-  inviteCode: safeEnv('INVITE_CODE', 'dev-invite-123'),
 };
