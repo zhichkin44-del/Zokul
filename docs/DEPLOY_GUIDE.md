@@ -103,3 +103,33 @@ curl.exe -s -o /dev/null -w "%{http_code}" https://zokul.example.com
 И в браузере без VPN: `https://zokul.example.com` загружается, логин/регистрация работают.
 
 Прямой `443` остаётся как fallback (работает с VPN). Закрывать его не нужно.
+
+## PWA_SWITCH — выбор реализации Service Worker (PWA-PROPER-001)
+
+Service Worker выбирается на этапе сборки. Две реализации:
+
+- `client/sw.kill.ts` — **emergency-killer** (network-only fetch + удаление всех кэшей + unregister). Очищает старые Safari/iPhone кэши. **Это production-default**, пока стабильность не подтверждена.
+- `client/sw.pwa.ts` — **proper PWA** (precache только hashed assets через `precacheAndRoute(self.__WB_MANIFEST)`, network-only для navigation/`/api/*`/`/socket.io/*`/`/uploads/*`, versioned cache cleanup на activate). НЕ агрессивный offline-кэш.
+
+Скрипт `client/scripts/select-sw.mjs` копирует нужную реализацию в `client/sw.ts` по аргументу `kill`/`proper`.
+
+### Emergency deploy (по умолчанию)
+
+```powershell
+cd D:\zokul\client
+npm run build:kill   # = sw:kill + vite build
+```
+
+### Proper PWA deploy (только после ручной проверки Safari/iPhone)
+
+```powershell
+cd D:\zokul\client
+npm run build:proper # = sw:proper + vite build
+```
+
+> `vite.config.ts` остаётся с `filename: 'sw.ts'` — select-sw подменяет содержимое перед билдом.
+> nginx `no-store` для `/sw.js`, `/registerSW.js`, `/manifest.webmanifest` сохраняется в обоих вариантах (см. `client/nginx.conf`).
+
+### Когда переключать на proper
+
+Только после того, как emergency-killer простоял 1-2 production-деплоя и ручная проверка на iPhone/Safari подтвердила: первый заход, reload (без вечной загрузки), закрыть/открыть, login/logout, socket reconnect — всё ок. Тогда собрать `build:proper` и задеплоить.
