@@ -12,6 +12,7 @@ import AgentsModal, { BotIcon } from './agents/AgentsModal';
 import SearchPanel from './chat/SearchPanel';
 import ChatInfoModal from './chat/ChatInfoModal';
 import { formatLastSeen } from '../utils/format';
+import { BellOffIcon } from './common/Icons';
 import { usePushSubscription } from '../hooks/usePushSubscription';
 import { useDraft } from '../hooks/useDraft';
 import { ChatProvider } from '../contexts/ChatContext';
@@ -223,7 +224,7 @@ function HomePageInner() {
   return (
     <AppLayout>
       <div className="flex h-full">
-        <aside className={`${showSidebar ? 'flex' : 'hidden'} md:flex w-full md:w-80 flex-col bg-[#E8EFF7] dark:bg-gray-900 border-r border-[#C9D6E4] dark:border-gray-800`}>
+        <aside className={`${showSidebar ? 'flex' : 'hidden'} md:flex w-full md:w-80 flex-col bg-gray-100 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800`}>
           <div className="px-4 pt-3 pb-3">
             <button
               onClick={() => setShowProfile(true)}
@@ -231,7 +232,7 @@ function HomePageInner() {
             >
               <div className="relative shrink-0">
                 <Avatar name={user?.name || 'User'} size={40} url={user?.avatarUrl} />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#E8EFF7] dark:border-gray-900 rounded-full" />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-100 dark:border-gray-900 rounded-full" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
@@ -239,10 +240,10 @@ function HomePageInner() {
                 </div>
                 <div className="text-[11px] text-green-500 font-medium">Online</div>
               </div>
-              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-600 tracking-wider uppercase shrink-0 hidden min-[360px]:inline">Zokul</span>
+              <span className="shrink-0 hidden min-[360px]:inline-flex items-center gap-1.5"><span className="w-6 h-6 rounded-lg bg-primary text-on-primary text-xs font-semibold flex items-center justify-center" aria-hidden="true">Z</span><span className="font-display text-[15px] font-semibold text-gray-900 dark:text-gray-100">Zokul</span></span>
             </button>
           </div>
-          <div className="mx-4 border-t border-[#C9D6E4] dark:border-gray-800" />
+          <div className="mx-4 border-t border-gray-200 dark:border-gray-800" />
           {pushStatus === 'default' && (
             <button
               onClick={enablePush}
@@ -265,14 +266,14 @@ function HomePageInner() {
             error={chatsError}
             unreadCount={unreadCount}
           />
-          <div className="border-t border-[#C9D6E4] dark:border-gray-800 px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom,0.625rem))] flex items-center justify-around gap-1">
+          <div className="border-t border-gray-200 dark:border-gray-800 px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom,0.625rem))] flex items-center justify-around gap-1">
             <div className="relative">
               <button
                 onClick={() => setShowCreateMenu((v) => !v)}
                 className={`w-11 h-11 flex items-center justify-center transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                   showCreateMenu
-                    ? 'text-primary bg-[#D7E6F6] dark:bg-gray-800'
-                    : 'text-gray-500 hover:text-primary dark:hover:text-primary hover:bg-[#D7E6F6] dark:hover:bg-gray-800'
+                    ? 'text-primary bg-gray-200 dark:bg-gray-800'
+                    : 'text-gray-500 hover:text-primary dark:hover:text-primary hover:bg-gray-200 dark:hover:bg-gray-800'
                 }`}
                 title="New Chat"
                 aria-label="New Chat"
@@ -284,12 +285,12 @@ function HomePageInner() {
               {showCreateMenu && (
                 <div
                   ref={createMenuRef}
-                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-[#F8FAFD] dark:bg-gray-800 border border-[#D5DEE9] dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-20"
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-20"
                   role="menu"
                 >
                   <button
                     onClick={() => { setShowCreateMenu(false); setShowCreate(true); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#DFEAF5] dark:hover:bg-gray-700 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left"
                     role="menuitem"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5 text-gray-500 shrink-0">
@@ -298,10 +299,10 @@ function HomePageInner() {
                     </svg>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Personal chat</span>
                   </button>
-                  <div className="border-t border-[#D5DEE9] dark:border-gray-700/50" />
+                  <div className="border-t border-gray-200 dark:border-gray-700/50" />
                   <button
                     onClick={() => { setShowCreateMenu(false); setShowGroup(true); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#DFEAF5] dark:hover:bg-gray-700 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left"
                     role="menuitem"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5 text-gray-500 shrink-0">
@@ -317,7 +318,7 @@ function HomePageInner() {
             </div>
             <button
               onClick={() => setShowAgents(true)}
-              className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-[#D7E6F6] dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               title="AI agents"
               aria-label="AI agents"
             >
@@ -325,7 +326,7 @@ function HomePageInner() {
             </button>
             <button
               onClick={toggleTheme}
-              className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-[#D7E6F6] dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
               aria-label="Toggle theme"
             >
@@ -341,7 +342,7 @@ function HomePageInner() {
             </button>
             <button
               onClick={logout}
-              className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors rounded-lg hover:bg-[#D7E6F6] dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               title="Log out"
               aria-label="Log out"
             >
@@ -353,10 +354,10 @@ function HomePageInner() {
             </button>
           </div>
         </aside>
-        <section className={`${!showSidebar || selectedChat ? 'flex' : 'hidden'} md:flex flex-1 flex-col bg-[#EAF1F8] dark:bg-gray-900`}>
+        <section className={`${!showSidebar || selectedChat ? 'flex' : 'hidden'} md:flex flex-1 flex-col bg-gray-100 dark:bg-gray-900`}>
           {selectedChat ? (
             <>
-              <div className="px-4 py-3 border-b border-[#C9D6E4] dark:border-gray-700 flex items-center gap-3 bg-[#E6EEF7] dark:bg-gray-900">
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 bg-gray-100 dark:bg-gray-900">
                 <button
                   onClick={handleBack}
                   className="md:hidden w-8 h-8 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex items-center justify-center"
@@ -377,9 +378,9 @@ function HomePageInner() {
                   {!isGroupChat && !otherUser?.isAgent && <OnlineDot online={otherOnline} />}
                 </div>
                 <button type="button" onClick={() => setShowInfo(true)} className="flex-1 min-w-0 text-left" aria-label={isGroupChat ? 'Group info' : 'Profile'}>
-                  <div className="font-medium text-sm truncate">
+                  <div className="font-display font-semibold text-[15px] truncate">
                     {displayChatName}
-                    {selectedChat.muted && <span className="ml-1 text-gray-400" title="Notifications off">🔕</span>}
+                    {selectedChat.muted && <span className="ml-1.5 inline-flex align-middle text-gray-400" title="Notifications off"><BellOffIcon /></span>}
                   </div>
                   <div className="text-xs text-gray-400 truncate">
                     {isGroupChat
@@ -389,7 +390,7 @@ function HomePageInner() {
                 </button>
                 <button
                   onClick={() => setShowSearch((v) => !v)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-[#C9D6E4] dark:hover:bg-gray-700/50"
+                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700/50"
                   title="Search in chat"
                   aria-label="Search in chat"
                 >
@@ -398,7 +399,7 @@ function HomePageInner() {
                 <div className="relative" ref={chatActionsRef}>
                   <button
                     onClick={() => setShowChatActions((v) => !v)}
-                    className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-[#C9D6E4] dark:hover:bg-gray-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     title="Chat actions"
                     aria-label="Chat actions"
                   >
@@ -409,8 +410,8 @@ function HomePageInner() {
                     </svg>
                   </button>
                   {showChatActions && (
-                    <div className="absolute right-0 top-full mt-1 w-52 bg-[#F8FAFD] dark:bg-gray-800 border border-[#D5DEE9] dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-20">
-                      <button onClick={() => { setShowChatActions(false); setShowInfo(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#DFEAF5] dark:hover:bg-gray-700 transition-colors text-left" role="menuitem">
+                    <div className="absolute right-0 top-full mt-1 w-52 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-20">
+                      <button onClick={() => { setShowChatActions(false); setShowInfo(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left" role="menuitem">
                         <span className="text-sm font-medium">{isGroupChat ? 'Group info' : 'Profile'}</span>
                       </button>
                       <button
@@ -419,7 +420,7 @@ function HomePageInner() {
                           await api.patch(`/chats/${selectedChat.id}/mute`, { muted: !selectedChat.muted }).catch(() => undefined);
                           reloadChats();
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#DFEAF5] dark:hover:bg-gray-700 transition-colors text-left"
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left"
                         role="menuitem"
                       >
                         <span className="text-sm font-medium">{selectedChat.muted ? 'Turn notifications on' : 'Mute notifications'}</span>
@@ -427,7 +428,7 @@ function HomePageInner() {
                       {canDeleteChat && (
                       <button
                         onClick={() => { setShowChatActions(false); setDeleteConfirmChatId(selectedChat?.id || null); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#DFEAF5] dark:hover:bg-gray-700 transition-colors text-left"
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left"
                         role="menuitem"
                       >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5 text-red-500 shrink-0">
@@ -520,7 +521,7 @@ function HomePageInner() {
       )}
       {deleteConfirmChatId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setDeleteConfirmChatId(null)}>
-          <div className="bg-[#F8FAFD] dark:bg-gray-800 border border-[#D5DEE9] dark:border-gray-700 rounded-xl shadow-xl p-5 w-72" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-5 w-72" onClick={(e) => e.stopPropagation()}>
             <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Delete chat?</p>
             <p className="text-xs text-gray-500 mb-4">This cannot be undone.</p>
             <div className="flex gap-2 justify-end">

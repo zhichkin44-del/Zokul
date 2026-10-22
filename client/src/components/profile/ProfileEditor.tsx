@@ -64,7 +64,7 @@ export default function ProfileEditor({ open, onClose }: ProfileEditorProps) {
           <button
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="absolute bottom-0 right-0 bg-primary text-white rounded-full w-6 h-6 text-xs flex items-center justify-center shadow-md disabled:opacity-50"
+            className="absolute bottom-0 right-0 bg-primary text-on-primary rounded-full w-6 h-6 text-xs flex items-center justify-center shadow-md disabled:opacity-50"
           >
             +
           </button>
@@ -91,7 +91,7 @@ export default function ProfileEditor({ open, onClose }: ProfileEditorProps) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-2 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-50"
+          className="w-full py-2 bg-primary text-on-primary rounded-xl text-sm font-medium disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save'}
         </button>

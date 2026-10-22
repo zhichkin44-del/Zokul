@@ -66,7 +66,7 @@ export default function ChatInfoModal({ chat, currentUserId, isOnline, lastSeenO
             isCreator ? (
               <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); run(() => api.patch(`/chats/${chat.id}`, { name }), 'Could not rename'); }}>
                 <input value={name} onChange={(e) => setName(e.target.value)} maxLength={100} className="flex-1 min-w-0 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" aria-label="Group name" />
-                <button type="submit" disabled={!name.trim() || name === chat.name} className="px-3 py-2 rounded-lg bg-primary text-white text-sm font-medium disabled:opacity-40">Rename</button>
+                <button type="submit" disabled={!name.trim() || name === chat.name} className="px-3 py-2 rounded-lg bg-primary text-on-primary text-sm font-medium disabled:opacity-40">Rename</button>
               </form>
             ) : (
               <div className="text-lg font-semibold">{chat.name}</div>

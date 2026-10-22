@@ -167,7 +167,7 @@ export default function CreateGroupModal({ open, onClose, onCreated, socket }: C
           <button
             onClick={handleCreate}
             disabled={!canCreate || creating}
-            className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+            className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
           >
             {creating ? 'Creating...' : `Create Group (${selected.length})`}
           </button>

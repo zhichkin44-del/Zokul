@@ -2,6 +2,7 @@ import { usePresence } from '../../hooks/usePresence';
 import { Chat } from '../../types';
 import Avatar from '../common/Avatar';
 import OnlineDot from './OnlineDot';
+import { BellOffIcon } from '../common/Icons';
 
 interface ChatListProps {
   chats: Chat[];
@@ -42,10 +43,10 @@ function LoadingSkeleton() {
       <div className="animate-pulse space-y-3">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-center gap-3 px-4 py-2.5">
-            <div className="w-[42px] h-[42px] rounded-full bg-[#D5DEE9] dark:bg-gray-800 shrink-0" />
+            <div className="w-[42px] h-[42px] rounded-full bg-gray-200 dark:bg-gray-800 shrink-0" />
             <div className="flex-1 space-y-2">
-              <div className="h-3 bg-[#D5DEE9] dark:bg-gray-800 rounded w-2/3" />
-              <div className="h-2.5 bg-[#D5DEE9] dark:bg-gray-800 rounded w-1/2" />
+              <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-2/3" />
+              <div className="h-2.5 bg-gray-200 dark:bg-gray-800 rounded w-1/2" />
             </div>
           </div>
         ))}
@@ -58,7 +59,7 @@ function EmptyState() {
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-8">
       <div className="text-center">
-        <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-[#DFEAF5] dark:bg-gray-800/50 flex items-center justify-center">
+        <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gray-200 dark:bg-gray-800/50 flex items-center justify-center">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-7 h-7 text-gray-400">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
@@ -92,9 +93,11 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
   if (error) return <ErrorState message={error} />;
   if (chats.length === 0) return <EmptyState />;
 
-  return (
-    <div className="flex-1 overflow-y-auto">
-      {chats.map((chat) => {
+  const isAgentChat = (chat: Chat) => !chat.isGroup && chat.participants.some((p) => p.id !== currentUserId && p.isAgent);
+  const agentChats = chats.filter(isAgentChat);
+  const otherChats = chats.filter((c) => !isAgentChat(c));
+
+  const renderChat = (chat: Chat) => {
         const isGroup = chat.isGroup;
         const other = chat.participants.find((p) => p.id !== currentUserId) || chat.participants[0];
         const online = isOnline(other?.id || '');
@@ -110,19 +113,19 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
               onClick={() => onSelect(chat)}
               className={`w-full flex items-center gap-3 px-4 py-2.5 border-l-[3px] transition-colors text-left ${
                 isSelected
-                  ? 'border-primary bg-[#D7E6F6] dark:bg-gray-800/60'
-                  : 'border-transparent hover:bg-[#DFEAF5] dark:hover:bg-gray-800/30'
+                  ? 'border-primary bg-gray-200 dark:bg-gray-800/60'
+                  : 'border-transparent hover:bg-gray-200 dark:hover:bg-gray-800/30'
               }`}
             >
               <div className="relative shrink-0">
-                <Avatar name={displayName} size={42} url={isGroup ? undefined : other?.avatarUrl} />
+                <Avatar name={displayName} size={42} url={isGroup ? undefined : other?.avatarUrl} square={isGroup || other?.isAgent} />
                 {!isGroup && count === 0 && !other?.isAgent && <OnlineDot online={online} />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <span className={`text-sm truncate ${count > 0 ? 'font-bold text-gray-900 dark:text-white' : 'font-medium text-gray-900 dark:text-gray-100'}`}>
                     {displayName}
-                    {chat.muted && <span className="ml-1 text-xs text-gray-400" title="Notifications off">🔕</span>}
+                    {chat.muted && <span className="ml-1 inline-flex align-middle text-gray-400" title="Notifications off"><BellOffIcon /></span>}
                   </span>
                   {lastMsg && (
                     <span className="text-[11px] text-gray-400 ml-2 shrink-0 whitespace-nowrap leading-none">
@@ -135,7 +138,7 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
                     {isGroup && sender ? `${sender.name}: ` : ''}{preview || (other?.isAgent ? 'AI agent' : other?.email ? other.email.split('@')[0] : '')}
                   </span>
                   {count > 0 && (
-                    <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center leading-none">
+                    <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center leading-none">
                       {count > 99 ? '99+' : count}
                     </span>
                   )}
@@ -144,7 +147,18 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
             </button>
           </div>
         );
-      })}
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto pb-2">
+      {agentChats.length > 0 && <SectionLabel>Agents</SectionLabel>}
+      {agentChats.map(renderChat)}
+      {agentChats.length > 0 && otherChats.length > 0 && <SectionLabel>Rooms and people</SectionLabel>}
+      {otherChats.map(renderChat)}
     </div>
   );
+}
+
+function SectionLabel({ children }: { children: string }) {
+  return <div className="px-4 pt-4 pb-1.5 text-[11px] font-mono uppercase tracking-[0.08em] text-gray-500">{children}</div>;
 }

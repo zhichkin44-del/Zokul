@@ -1,6 +1,81 @@
+@import '@fontsource-variable/inter/index.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/source-serif-4/500.css';
+@import '@fontsource/source-serif-4/600.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Two themes, one token set. Light = "Paper" (warm ink on paper, terracotta),
+ * dark = "Graphite" (cool near-black, mint). The gray scale keeps its
+ * direction in both (50 = lightest, 950 = darkest), so existing light/dark
+ * classes keep working; only the tint and the accent change.
+ */
+:root {
+  --gray-50: 251 249 244;
+  --gray-100: 244 240 232;
+  --gray-200: 232 226 214;
+  --gray-300: 216 207 191;
+  --gray-400: 167 158 144;
+  --gray-500: 133 124 110;
+  --gray-600: 92 83 70;
+  --gray-700: 58 52 44;
+  --gray-800: 42 37 31;
+  --gray-900: 30 27 23;
+  --gray-950: 19 17 14;
+  --primary: 200 85 47;
+  --primary-light: 222 120 86;
+  --primary-dark: 164 64 32;
+  --on-primary: 255 248 243;
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --surface: 255 255 255;
+}
+
+.dark {
+  --gray-50: 243 245 247;
+  --gray-100: 231 234 238;
+  --gray-200: 201 207 216;
+  --gray-300: 174 182 194;
+  --gray-400: 138 147 160;
+  --gray-500: 107 116 128;
+  --gray-600: 59 65 74;
+  --gray-700: 33 38 45;
+  --gray-800: 19 23 28;
+  --gray-900: 11 13 16;
+  --gray-950: 7 8 10;
+  --primary: 126 226 184;
+  --primary-light: 166 240 207;
+  --primary-dark: 94 199 156;
+  --on-primary: 6 17 12;
+  --font-display: 'Inter Variable', Inter, system-ui, sans-serif;
+  --surface: 17 21 26;
+}
+
+html {
+  font-family: 'Inter Variable', Inter, system-ui, sans-serif;
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+/* Avatar tints: soft background, same-hue dark text (light) / light text (dark). */
+.avatar-tint-0 { background: #F0D9CC; color: #8E3518; }
+.avatar-tint-1 { background: #DCE6DA; color: #3D5A3F; }
+.avatar-tint-2 { background: #E3DEEF; color: #4A3F73; }
+.avatar-tint-3 { background: #F2E3C4; color: #7A5410; }
+.avatar-tint-4 { background: #D7E4EC; color: #2F5367; }
+.avatar-tint-5 { background: #EED8E2; color: #7A3352; }
+.dark .avatar-tint-0 { background: #12241C; color: #7EE2B8; }
+.dark .avatar-tint-1 { background: #1A2433; color: #9CCBF0; }
+.dark .avatar-tint-2 { background: #221D33; color: #C4B8FF; }
+.dark .avatar-tint-3 { background: #2A2215; color: #F2C14E; }
+.dark .avatar-tint-4 { background: #2A1A22; color: #F0A7C8; }
+.dark .avatar-tint-5 { background: #1E2526; color: #AEC9C8; }
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
 
 .safe-area-top {
   padding-top: env(safe-area-inset-top, 12px);
@@ -21,6 +96,6 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(var(--gray-500) / 0.35);
   border-radius: 2px;
 }

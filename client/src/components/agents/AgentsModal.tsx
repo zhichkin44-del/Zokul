@@ -110,7 +110,7 @@ export default function AgentsModal({ open, onClose, onOpenChat, onChanged }: Ag
                 maxLength={60}
                 className="flex-1 min-w-0 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
               />
-              <button type="submit" disabled={!name.trim() || busy} className="px-4 py-2 rounded-lg bg-primary text-white font-medium disabled:opacity-50">
+              <button type="submit" disabled={!name.trim() || busy} className="px-4 py-2 rounded-lg bg-primary text-on-primary font-medium disabled:opacity-50">
                 Add
               </button>
             </form>
@@ -122,7 +122,7 @@ export default function AgentsModal({ open, onClose, onOpenChat, onChanged }: Ag
               <p className="text-sm text-gray-500">No agents yet. Add one, then connect Claude Code, Codex, Cursor or any CLI agent with its token.</p>
             )}
             {agents.map((agent) => (
-              <div key={agent.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#F1F5FA] dark:bg-gray-800">
+              <div key={agent.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800">
                 <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0" aria-hidden>
                   <BotIcon />
                 </div>
@@ -163,7 +163,7 @@ function TokenPanel({ issued, onDone }: { issued: Issued; onDone: () => void }) 
       <CopyBlock label="2. Connect it once on this computer" value={connect} />
       <CopyBlock label="3a. Claude Code (terminal) / any MCP client" value={claude} />
       <CopyBlock label="3b. Any agent or script (CLI)" value={cli} />
-      <button onClick={onDone} className="w-full py-2 rounded-lg bg-primary text-white font-medium">Done</button>
+      <button onClick={onDone} className="w-full py-2 rounded-lg bg-primary text-on-primary font-medium">Done</button>
     </div>
   );
 }

@@ -211,7 +211,7 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[#DFEAF5] dark:bg-gray-800 flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-8 h-8 text-gray-400">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
@@ -264,8 +264,8 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                     <div
                       className={`px-3 py-2 text-sm leading-relaxed cursor-pointer ${isNew ? 'animate-message-appear' : ''} ${
                         isMine
-                          ? 'bg-primary text-white rounded-[18px] rounded-br-[6px]'
-                          : 'bg-[#DDE8F3] dark:bg-gray-800 rounded-[18px] rounded-bl-[6px]'
+                          ? 'bg-primary text-on-primary rounded-[18px] rounded-br-[6px]'
+                          : 'bg-gray-200 dark:bg-gray-800 rounded-[18px] rounded-bl-[6px]'
                       }`}
                       onClick={() => handleActions(msg.id)}
                       onContextMenu={(e) => { e.preventDefault(); handleActions(msg.id); }}
@@ -298,14 +298,14 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                           onClick={(e) => e.stopPropagation()}
                           className={`flex items-center gap-2.5 py-1 min-w-[180px] ${msg.text ? 'mb-1.5' : ''}`}
                         >
-                          <span className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isMine ? 'bg-white/20' : 'bg-primary/10 text-primary'}`}>
+                          <span className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isMine ? 'bg-on-primary/15' : 'bg-primary/10 text-primary'}`}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="w-5 h-5">
                               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
                             </svg>
                           </span>
                           <span className="min-w-0">
                             <span className="block font-medium truncate">{msg.file.name}</span>
-                            <span className={`block text-xs ${isMine ? 'text-white/70' : 'text-gray-500'}`}>{formatFileSize(msg.file.size)} · Download</span>
+                            <span className={`block text-xs ${isMine ? 'text-on-primary/70' : 'text-gray-500'}`}>{formatFileSize(msg.file.size)} · Download</span>
                           </span>
                         </a>
                       )}

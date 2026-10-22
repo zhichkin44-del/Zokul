@@ -316,7 +316,7 @@ export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages
   const showTouchRecorderBar = voiceState !== 'idle';
 
   return (
-    <form onSubmit={handleSubmit} className="relative flex flex-col border-t border-[#C9D6E4] dark:border-gray-700 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
+    <form onSubmit={handleSubmit} className="relative flex flex-col border-t border-gray-200 dark:border-gray-700 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
       {replyTo && !editingMessage && (
         <div className="absolute bottom-full left-0 right-0 z-10 px-3">
           <ReplyQuote reply={replyTo} onCancel={() => setReplyTo(null)} />
@@ -399,9 +399,9 @@ export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages
         <input ref={fileRef} type="file" accept={`image/*,${DOCUMENT_TYPES}`} multiple onChange={handleFiles} className="hidden" />
         <div ref={emojiRef} className="relative flex-1">
           {showEmoji && !showVoiceRecorder && !showTouchRecorderBar && (
-            <div className="absolute bottom-full left-0 mb-2 p-2 bg-[#F8FAFD] dark:bg-gray-800 rounded-xl shadow-lg border border-[#D5DEE9] dark:border-gray-700 grid grid-cols-10 gap-1 max-h-72 overflow-y-auto z-10">
+            <div className="absolute bottom-full left-0 mb-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 grid grid-cols-10 gap-1 max-h-72 overflow-y-auto z-10">
               {EMOJIS.map((e) => (
-                <button key={e} type="button" onClick={() => pickEmoji(e)} className="w-8 h-8 hover:bg-[#DFEAF5] dark:hover:bg-gray-700 rounded-lg text-lg flex items-center justify-center">
+                <button key={e} type="button" onClick={() => pickEmoji(e)} className="w-8 h-8 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-lg flex items-center justify-center">
                   {e}
                 </button>
               ))}
@@ -409,7 +409,7 @@ export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages
           )}
           {showTouchRecorderBar ? (
             voiceState === 'error' ? (
-              <div className="flex items-center gap-2 bg-[#E1EAF4] dark:bg-gray-800 rounded-2xl px-4 py-2">
+              <div className="flex items-center gap-2 bg-gray-200 dark:bg-gray-800 rounded-2xl px-4 py-2">
                 <span className="text-xs text-red-500 flex-1">{voiceError}</span>
                 <button type="button" onClick={() => { setVoiceState('idle'); setVoiceError(''); }} className="text-gray-400 hover:text-gray-600 shrink-0">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
@@ -418,12 +418,12 @@ export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages
                 </button>
               </div>
             ) : voiceState === 'uploading' ? (
-              <div className="flex items-center gap-2 bg-[#E1EAF4] dark:bg-gray-800 rounded-2xl px-4 py-2">
+              <div className="flex items-center gap-2 bg-gray-200 dark:bg-gray-800 rounded-2xl px-4 py-2">
                 <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                 <span className="text-sm text-gray-500">Uploading...</span>
               </div>
             ) : (
-              <div className="flex items-center gap-3 bg-[#E1EAF4] dark:bg-gray-800 rounded-2xl px-4 py-2 select-none">
+              <div className="flex items-center gap-3 bg-gray-200 dark:bg-gray-800 rounded-2xl px-4 py-2 select-none">
                 <button type="button" onClick={cancelTouchRecording} className="text-gray-400 hover:text-gray-600 shrink-0" aria-label="Cancel recording">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
                     <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -433,7 +433,7 @@ export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages
                 <span className="text-sm font-medium tabular-nums">
                   {Math.floor(touchDuration / 60)}:{(touchDuration % 60).toString().padStart(2, '0')}
                 </span>
-                <div className="flex-1 h-1 bg-[#C9D6E4] dark:bg-gray-600 rounded-full overflow-hidden">
+                <div className="flex-1 h-1 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                   <div className="h-full rounded-full transition-all bg-primary w-1/2 animate-pulse" />
                 </div>
                 <span className="text-[10px] whitespace-nowrap text-gray-400">
@@ -450,7 +450,7 @@ export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages
               onCancel={() => setShowVoiceRecorder(false)}
             />
           ) : (
-            <div className="flex items-center gap-2 bg-[#E1EAF4] dark:bg-gray-800 rounded-3xl px-4 py-1" onClick={() => inputRef.current?.focus()}>
+            <div className="flex items-center gap-2 bg-gray-200 dark:bg-gray-800 rounded-3xl px-4 py-1" onClick={() => inputRef.current?.focus()}>
               <input
                 ref={inputRef}
                 type="text"
@@ -476,7 +476,7 @@ export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages
               <button
                 type="submit"
                 disabled={!hasContent && !text.trim()}
-                className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center disabled:opacity-40 transition-opacity shrink-0"
+                className="w-8 h-8 bg-primary text-on-primary rounded-full flex items-center justify-center disabled:opacity-40 transition-opacity shrink-0"
                 aria-label="Send message"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">

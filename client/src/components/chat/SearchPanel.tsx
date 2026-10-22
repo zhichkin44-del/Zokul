@@ -41,7 +41,7 @@ export default function SearchPanel({ chatId, participants, onPick, onClose }: S
   const nameOf = (id: string) => participants.find((p) => p.id === id)?.name ?? '';
 
   return (
-    <div className="border-b border-[#C9D6E4] dark:border-gray-800 bg-[#E8EFF7] dark:bg-gray-900">
+    <div className="border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-900">
       <div className="flex items-center gap-2 px-3 py-2">
         <input
           autoFocus
@@ -61,7 +61,7 @@ export default function SearchPanel({ chatId, participants, onPick, onClose }: S
             <button
               key={m.id}
               onClick={() => onPick(m.id)}
-              className="w-full text-left px-4 py-2 hover:bg-[#DFEAF5] dark:hover:bg-gray-800"
+              className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800"
             >
               <div className="flex justify-between gap-2 text-[11px] text-gray-400">
                 <span className="truncate">{nameOf(m.senderId)}</span>

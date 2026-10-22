@@ -1,26 +1,25 @@
 import { useState, useEffect } from 'react';
 
-const AVATAR_COLORS = [
-  '#007AFF', '#E5534B', '#38A169', '#DD6B20', '#7C3AED',
-  '#14B8A6', '#EC4899', '#8B5CF6', '#D69E2E', '#10B981',
-  '#3B82F6', '#F97316',
-];
+// Muted tints defined per theme in index.css (.avatar-tint-0 … -5).
+const TINTS = 6;
 
-function getColorForName(name: string): string {
+function getTintForName(name: string): string {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+  return `avatar-tint-${Math.abs(hash) % TINTS}`;
 }
 
 interface AvatarProps {
   name: string;
   url?: string;
   size?: number;
+  // Agents and rooms are drawn as rounded squares, people as circles.
+  square?: boolean;
 }
 
-export default function Avatar({ name, url, size = 40 }: AvatarProps) {
+export default function Avatar({ name, url, size = 40, square = false }: AvatarProps) {
   const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
@@ -33,8 +32,8 @@ export default function Avatar({ name, url, size = 40 }: AvatarProps) {
   }
   return (
     <div
-      className="rounded-full text-white flex items-center justify-center font-semibold shrink-0"
-      style={{ width: size, height: size, fontSize: size * 0.4, backgroundColor: getColorForName(name) }}
+      className={`${square ? 'rounded-[30%]' : 'rounded-full'} ${getTintForName(name)} flex items-center justify-center font-semibold shrink-0`}
+      style={{ width: size, height: size, fontSize: size * 0.36 }}
     >
       {initials}
     </div>
