@@ -15,15 +15,19 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
   }
   try {
     const decoded = verifyToken(token);
+    // Fail closed: if revocation cannot be checked, the session is not trusted.
+    let version: number | null;
     try {
-      const version = await getTokenVersion(decoded.userId);
-      if (decoded.tokenVersion !== undefined && decoded.tokenVersion < version) {
-        logger(`Token revoked for user ${decoded.userId}`, 'warn');
-        res.status(401).json({ error: 'Token revoked' });
-        return;
-      }
+      version = await getTokenVersion(decoded.userId);
     } catch {
       logger(`Failed to check token version for ${decoded.userId}`, 'warn');
+      res.status(503).json({ error: 'Try again shortly' });
+      return;
+    }
+    if (version === null || decoded.tokenVersion === undefined || decoded.tokenVersion < version) {
+      logger(`Token revoked for user ${decoded.userId}`, 'warn');
+      res.status(401).json({ error: 'Token revoked' });
+      return;
     }
     req.userId = decoded.userId;
     next();

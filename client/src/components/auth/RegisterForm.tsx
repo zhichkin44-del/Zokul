@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function RegisterForm() {
@@ -7,17 +7,20 @@ export default function RegisterForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  // Joining is invite-only: the link from the admin carries ?invite=…
+  const [params] = useSearchParams();
+  const [invite, setInvite] = useState(params.get('invite') ?? '');
   const { register, loading } = useAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
       return;
     }
     try {
-      await register(email, password, name);
+      await register(email, password, name, invite.trim() || undefined);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { error?: string } } };
       setError(axiosErr.response?.data?.error || 'Registration failed');
@@ -28,6 +31,16 @@ export default function RegisterForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-2xl font-bold text-center">Create Account</h2>
       {error && <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm">{error}</div>}
+      <input
+        type="text"
+        placeholder="Invite code"
+        aria-label="Invite code"
+        value={invite}
+        onChange={(e) => setInvite(e.target.value)}
+        autoComplete="off"
+        className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
+      />
+      <p className="text-xs text-gray-500 -mt-2">Zokul is invite-only. Use the link you were sent, or paste its code.</p>
       <input
         type="text"
         placeholder="Your Name"
@@ -51,7 +64,7 @@ export default function RegisterForm() {
         onChange={(e) => setPassword(e.target.value)}
         className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
         required
-        minLength={6}
+        minLength={8}
       />
       <button
         type="submit"

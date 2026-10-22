@@ -29,7 +29,7 @@ services:
       PORT: '3001'
       NODE_ENV: production
       DATABASE_URL: postgresql://zokul:zokul@postgres:5432/zokul
-      JWT_SECRET: local-dev-secret
+      JWT_SECRET: REDACTED
       CORS_ORIGIN: http://localhost
       REDIS_URL: redis://redis:6379
       UPLOAD_DIR: /app/uploads

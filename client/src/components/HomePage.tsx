@@ -8,6 +8,7 @@ import { usePagination } from '../hooks/usePagination';
 import { useTyping } from '../hooks/useTyping';
 import { usePresence } from '../hooks/usePresence';
 import api from '../services/api';
+import { Link } from 'react-router-dom';
 import AgentsModal, { BotIcon } from './agents/AgentsModal';
 import SearchPanel from './chat/SearchPanel';
 import ChatInfoModal from './chat/ChatInfoModal';
@@ -204,6 +205,14 @@ function HomePageInner() {
   const otherOnline = isOnline(otherUser?.id || '');
   const canDeleteChat = !isGroupChat || selectedChat?.creatorId === user?.id;
 
+  // Blocked by an admin (or signed out elsewhere): leave immediately.
+  useEffect(() => {
+    if (!socket) return;
+    const onRevoked = () => { logout(); };
+    socket.on('session:revoked', onRevoked);
+    return () => { socket.off('session:revoked', onRevoked); };
+  }, [socket, logout]);
+
   // Keep the open chat in sync with the reloaded list (rename, members, mute).
   useEffect(() => {
     if (!selectedChat) return;
@@ -324,6 +333,16 @@ function HomePageInner() {
             >
               <BotIcon />
             </button>
+            {user?.role === 'admin' && (
+              <Link
+                to="/admin"
+                className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                title="Admin panel"
+                aria-label="Admin panel"
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" /><path d="m9 12 2 2 4-4" /></svg>
+              </Link>
+            )}
             <button
               onClick={toggleTheme}
               className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"

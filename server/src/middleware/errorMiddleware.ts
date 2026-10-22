@@ -3,6 +3,8 @@ import { logger } from '../utils/logger';
 import { AgentInputError } from '../services/agentService';
 import { FileError } from '../services/fileService';
 import { GroupError } from '../services/groupService';
+import { InviteError } from '../services/inviteService';
+import { AdminError } from '../services/adminService';
 
 export function errorMiddleware(err: Error, _req: Request, res: Response, _next: NextFunction): void {
   logger(err.message, 'error');
@@ -12,11 +14,19 @@ export function errorMiddleware(err: Error, _req: Request, res: Response, _next:
     res.status(400).json({ error: 'Invalid id' });
     return;
   }
-  if (err instanceof GroupError) {
+  if (err instanceof GroupError || err instanceof AdminError) {
     res.status(err.status).json({ error: err.message });
     return;
   }
-  if (err instanceof AgentInputError || err instanceof FileError) {
+  if (err.message === 'Current password is incorrect') {
+    res.status(400).json({ error: err.message });
+    return;
+  }
+  if (err.message === 'This account is blocked') {
+    res.status(403).json({ error: err.message });
+    return;
+  }
+  if (err instanceof AgentInputError || err instanceof FileError || err instanceof InviteError) {
     res.status(400).json({ error: err.message });
     return;
   }
@@ -32,7 +42,7 @@ export function errorMiddleware(err: Error, _req: Request, res: Response, _next:
     res.status(400).json({ error: err.message });
     return;
   }
-  if (err.message === 'Password must be at least 6 characters') {
+  if (err.message === 'Password must be at least 8 characters' || err.message === 'Password is too long') {
     res.status(400).json({ error: err.message });
     return;
   }

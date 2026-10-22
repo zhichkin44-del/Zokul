@@ -6,6 +6,7 @@ export interface User {
   createdAt: string;
   isAgent?: boolean;
   lastSeenAt?: string;
+  role?: 'admin' | 'user';
 }
 
 export interface AuthResponse {

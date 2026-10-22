@@ -6,6 +6,7 @@ import * as messageService from './messageService';
 import { emitToChat, joinUserToChat } from '../socket';
 import { Message } from '../types';
 import { logger } from '../utils/logger';
+import { logEvent } from './auditService';
 
 export type AgentRecord = AgentModel.AgentRecord;
 
@@ -52,6 +53,7 @@ export async function createAgent(ownerId: string, rawName: unknown) {
   joinUserToChat(ownerId, chat.id);
   const token = await issueToken(agent.id);
   logger(`Agent ${agent.id} created by ${ownerId}`);
+  await logEvent(ownerId, 'agent_created', { name });
   return { agent, chatId: chat.id, token };
 }
 
@@ -64,6 +66,7 @@ export async function issueToken(agentId: string): Promise<string> {
 export async function rotateToken(ownerId: string, agentId: string): Promise<string | null> {
   const agent = await AgentModel.findOwned(agentId, ownerId);
   if (!agent) return null;
+  await logEvent(ownerId, 'agent_token_rotated', { name: agent.name });
   return issueToken(agent.id);
 }
 
@@ -78,6 +81,7 @@ export async function deleteAgent(ownerId: string, agentId: string): Promise<boo
   if (!agent) return false;
   const chat = await ChatModel.findExistingChat(ownerId, agentId);
   if (chat) await ChatModel.removeChat(chat.id);
+  await logEvent(ownerId, 'agent_deleted', { name: agent.name });
   return AgentModel.deleteAgent(agentId, ownerId);
 }
 

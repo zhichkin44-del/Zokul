@@ -9,19 +9,20 @@ function toUser(row: UserRow): User {
     avatarUrl: row.avatar_url || undefined,
     createdAt: row.created_at,
     isAgent: row.is_agent || undefined,
+    role: row.role,
   };
 }
 
-export async function findByEmail(email: string): Promise<(User & { passwordHash: string; tokenVersion: number }) | null> {
-  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+export async function findByEmail(email: string): Promise<(User & { passwordHash: string; tokenVersion: number; blocked: boolean }) | null> {
+  const result = await pool.query('SELECT * FROM users WHERE lower(email) = lower($1)', [email]);
   const row: UserRow | undefined = result.rows[0];
   if (!row) return null;
-  return { ...toUser(row), passwordHash: row.password_hash, tokenVersion: row.token_version };
+  return { ...toUser(row), passwordHash: row.password_hash, tokenVersion: row.token_version, blocked: row.blocked === true };
 }
 
 export async function findById(id: string): Promise<User | null> {
   const result = await pool.query(
-    'SELECT id, email, name, avatar_url, created_at, is_agent, last_seen_at FROM users WHERE id = $1',
+    'SELECT id, email, name, avatar_url, created_at, is_agent, last_seen_at, role FROM users WHERE id = $1',
     [id]
   );
   const row = result.rows[0] as UserRow | undefined;
@@ -31,6 +32,7 @@ export async function findById(id: string): Promise<User | null> {
     avatarUrl: row.avatar_url || undefined, createdAt: row.created_at,
     isAgent: row.is_agent || undefined,
     lastSeenAt: row.last_seen_at || undefined,
+    role: row.role,
   };
 }
 
@@ -106,7 +108,8 @@ export async function updateProfile(
 
 export async function findByIdWithPassword(id: string): Promise<{ passwordHash: string } | null> {
   const result = await pool.query('SELECT password_hash FROM users WHERE id = $1', [id]);
-  return result.rows[0] ?? null;
+  const row = result.rows[0];
+  return row ? { passwordHash: row.password_hash } : null;
 }
 
 export async function updatePassword(userId: string, passwordHash: string): Promise<void> {
@@ -116,7 +119,15 @@ export async function updatePassword(userId: string, passwordHash: string): Prom
   );
 }
 
-export async function getTokenVersion(userId: string): Promise<number> {
-  const result = await pool.query('SELECT token_version FROM users WHERE id = $1', [userId]);
-  return result.rows[0]?.token_version ?? 0;
+// null when the account no longer exists or is blocked: its sessions are dead.
+export async function getTokenVersion(userId: string): Promise<number | null> {
+  const result = await pool.query('SELECT token_version, blocked FROM users WHERE id = $1', [userId]);
+  const row = result.rows[0];
+  if (!row || row.blocked) return null;
+  return row.token_version ?? 0;
+}
+
+export async function isAdmin(userId: string): Promise<boolean> {
+  const result = await pool.query("SELECT 1 FROM users WHERE id = $1 AND role = 'admin' AND blocked = false", [userId]);
+  return result.rows.length > 0;
 }

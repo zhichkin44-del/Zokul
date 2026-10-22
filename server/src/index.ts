@@ -20,9 +20,11 @@ import userRoutes from './routes/userRoutes';
 import pushRoutes from './routes/pushRoutes';
 import agentRoutes from './routes/agentRoutes';
 import agentApiRoutes from './routes/agentApiRoutes';
+import adminRoutes from './routes/adminRoutes';
 import { uploadMiddleware } from './middleware/uploadMiddleware';
 import { processImage, processAvatar } from './middleware/processImage';
 import { fileUpload, describeUpload } from './services/fileService';
+import { uploadAccessMiddleware } from './middleware/uploadAccessMiddleware';
 import { authMiddleware, AuthRequest } from './middleware/authMiddleware';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import { uploadLimiter } from './middleware/rateLimit';
@@ -53,7 +55,7 @@ app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
   }
   next(err);
 });
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'), {
+app.use('/uploads', authMiddleware, uploadAccessMiddleware, express.static(path.join(__dirname, '..', 'uploads'), {
   // Shared documents are always downloaded, never rendered by the browser,
   // so an uploaded HTML/JS-looking file cannot run in Zokul's origin.
   setHeaders: (res, filePath) => {
@@ -73,6 +75,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/push', pushRoutes);
 app.use('/api/agents', agentRoutes);
 app.use('/api/agent', agentApiRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.post('/api/upload', uploadLimiter, authMiddleware, (req, res, next) => {
   uploadMiddleware(req, res, async (err) => {

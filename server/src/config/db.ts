@@ -143,6 +143,39 @@ export async function migrate(): Promise<void> {
       UPDATE messages SET text_search_vector = to_tsvector('simple', COALESCE(text, '') || ' ' || COALESCE(file_name, ''))
       WHERE text_search_vector IS DISTINCT FROM to_tsvector('simple', COALESCE(text, '') || ' ' || COALESCE(file_name, ''))
     `);
+    // v1.0 security: roles, blocking, invite-only registration, audit log
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'user'`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS blocked BOOLEAN NOT NULL DEFAULT false`);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS invites (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        code_hash CHAR(64) UNIQUE NOT NULL,
+        label VARCHAR(100) NOT NULL,
+        created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        max_uses INTEGER NOT NULL,
+        uses INTEGER NOT NULL DEFAULT 0,
+        expires_at TIMESTAMPTZ NOT NULL,
+        revoked BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS invite_id UUID REFERENCES invites(id) ON DELETE SET NULL`);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS audit_log (
+        id BIGSERIAL PRIMARY KEY,
+        at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        actor_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        action VARCHAR(40) NOT NULL,
+        details JSONB
+      );
+      CREATE INDEX IF NOT EXISTS idx_audit_log_at ON audit_log(at DESC);
+    `);
+    // The oldest person becomes admin when a server has none yet.
+    await client.query(`
+      UPDATE users SET role = 'admin'
+      WHERE id = (SELECT id FROM users WHERE is_agent IS NOT TRUE ORDER BY created_at LIMIT 1)
+        AND NOT EXISTS (SELECT 1 FROM users WHERE role = 'admin')
+    `);
     console.log('Migration completed successfully');
   } finally {
     client.release();

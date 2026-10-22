@@ -6,6 +6,7 @@ export interface User {
   createdAt: string;
   isAgent?: boolean;
   lastSeenAt?: string;
+  role?: 'admin' | 'user';
 }
 
 export interface UserRow {
@@ -18,6 +19,8 @@ export interface UserRow {
   token_version: number;
   is_agent?: boolean;
   last_seen_at?: string | null;
+  role?: 'admin' | 'user';
+  blocked?: boolean;
 }
 
 export interface AuthResponse {

@@ -54,6 +54,17 @@ const CONNECT_RATE_LIMIT_WINDOW = 10 * 1000;
 const CONNECT_RATE_LIMIT_MAX = 30;
 const connectRateLimits = new Map<string, number[]>();
 
+// Drop rate-limit entries nobody used in the last minute, so these maps cannot
+// grow without bound (one entry per IP / user ever seen).
+setInterval(() => {
+  const cutoff = Date.now() - 60_000;
+  for (const map of [messageRateLimits, connectRateLimits]) {
+    for (const [key, stamps] of map) {
+      if (!stamps.some((t) => t > cutoff)) map.delete(key);
+    }
+  }
+}, 60_000).unref();
+
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const timestamps = messageRateLimits.get(userId) || [];
@@ -111,6 +122,11 @@ export function setupSocket(httpServer: HTTPServer): Server {
       const user = await UserModel.findById(decoded.userId);
       if (!user) {
         return next(new Error('User not found'));
+      }
+      // A password change or logout-everywhere bumps token_version.
+      const version = await UserModel.getTokenVersion(decoded.userId);
+      if (version === null || decoded.tokenVersion === undefined || decoded.tokenVersion < version) {
+        return next(new Error('Session revoked'));
       }
       (socket as AuthSocket).userId = decoded.userId;
       (socket as AuthSocket).userName = user.name;

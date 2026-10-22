@@ -16,12 +16,12 @@ function cookieOptions(req: AuthRequest) {
 
 export async function register(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, inviteCode } = req.body;
     if (!email || !password || !name) {
       res.status(400).json({ error: 'Email, password and name are required' });
       return;
     }
-    const result = await authService.register(email, password, name);
+    const result = await authService.register(email, password, name, inviteCode);
     res.cookie('token', result.token, cookieOptions(req));
     res.status(201).json({ user: result.user });
   } catch (err) {

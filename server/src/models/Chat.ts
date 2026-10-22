@@ -4,7 +4,8 @@ import { ChatWithUsers, ChatRow, Message, User } from '../types';
 function toUser(row: ChatRow): User {
   return {
     id: row.user_id,
-    email: row.user_email,
+    // Other members' emails are private; the client never needs them.
+    email: '',
     name: row.user_name,
     avatarUrl: row.user_avatar_url || undefined,
     createdAt: row.user_created_at,
