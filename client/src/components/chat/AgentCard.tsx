@@ -25,10 +25,10 @@ const STATE_STYLE: Record<StatusPayload['state'], { label: string; dot: string }
 function StatusCard({ text, payload }: { text?: string; payload: StatusPayload }) {
   const style = STATE_STYLE[payload?.state] ?? STATE_STYLE.info;
   return (
-    <div className="px-3.5 py-2.5 rounded-2xl bg-surface/70 border border-gray-200 dark:border-white/[0.07] text-sm">
+    <div className="px-3.5 py-2.5 rounded-2xl bg-surface/70 border border-gray-200 dark:border-gray-700 text-sm">
       <div className="flex items-center gap-2">
         <span className={`w-2 h-2 rounded-full shrink-0 ${style.dot}`} />
-        <span className="text-[11px] font-mono font-medium uppercase tracking-[0.06em] text-gray-500">{style.label}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{style.label}</span>
       </div>
       {text && <p className="mt-1 whitespace-pre-wrap break-words">{text}</p>}
     </div>
@@ -56,9 +56,9 @@ function QuestionCard({ message, onAnswer }: AgentCardProps) {
   };
 
   return (
-    <div className={`rounded-2xl border bg-surface overflow-hidden text-sm shadow-sm ${answered || withdrawn ? 'border-gray-200 dark:border-white/[0.07]' : 'border-primary/40 dark:ring-4 dark:ring-primary/5'} dark:shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_12px_32px_rgba(0,0,0,0.35)]`}>
+    <div className={`rounded-2xl border bg-surface overflow-hidden text-sm shadow-sm ${answered || withdrawn ? 'border-gray-200 dark:border-gray-700' : 'border-primary/40 '} dark:shadow-none`}>
       <div className="px-3 pt-2.5 pb-2">
-        <div className={`text-[11px] font-mono font-medium uppercase tracking-[0.06em] mb-1 ${withdrawn ? 'text-gray-400' : 'text-primary'}`}>
+        <div className={`text-[11px] font-semibold uppercase tracking-[0.05em] mb-1 ${withdrawn ? 'text-gray-400' : 'text-primary'}`}>
           {withdrawn ? 'Withdrawn by agent' : answered ? 'Answered' : 'Needs your answer'}
         </div>
         <p className="whitespace-pre-wrap break-words font-medium">{payload.question}</p>
@@ -135,10 +135,10 @@ function HandoffCard({ payload }: { payload: HandoffPayload }) {
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 dark:border-white/[0.07] bg-surface overflow-hidden text-sm shadow-sm dark:shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_12px_32px_rgba(0,0,0,0.35)]">
+    <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-surface overflow-hidden text-sm shadow-sm dark:shadow-none">
       <div className="px-3 pt-2.5 pb-2 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-mono font-medium uppercase tracking-[0.06em] text-gray-500">Handoff</span>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">Handoff</span>
           <span className={`text-[11px] font-medium ${payload.claimedBy ? 'text-green-600' : 'text-amber-600'}`}>
             {payload.claimedBy ? `Picked up by ${payload.claimedBy}` : 'Open'}
           </span>
@@ -151,7 +151,7 @@ function HandoffCard({ payload }: { payload: HandoffPayload }) {
         <HandoffList title="Next" items={payload.next} marker="→" />
         {payload.files.length > 0 && (
           <div>
-            <div className="text-[11px] font-mono font-medium uppercase tracking-[0.06em] text-gray-400">Files</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-400">Files</div>
             <div className="flex flex-wrap gap-1 mt-1">
               {payload.files.map((f) => (
                 <code key={f} className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-900 text-[12px] break-all">{f}</code>
@@ -181,7 +181,7 @@ function HandoffList({ title, items, marker }: { title: string; items: string[];
   if (!items.length) return null;
   return (
     <div>
-      <div className="text-[11px] font-mono font-medium uppercase tracking-[0.06em] text-gray-400">{title}</div>
+      <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-400">{title}</div>
       <ul className="mt-1 space-y-0.5">
         {items.map((item, i) => (
           <li key={i} className="flex gap-1.5 break-words">

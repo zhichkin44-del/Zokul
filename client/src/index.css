@@ -34,23 +34,24 @@
 }
 
 .dark {
-  --gray-50: 243 245 247;
-  --gray-100: 231 234 238;
-  --gray-200: 201 207 216;
-  --gray-300: 174 182 194;
-  --gray-400: 138 147 160;
-  --gray-500: 107 116 128;
-  --gray-600: 59 65 74;
-  --gray-700: 33 38 45;
-  --gray-800: 19 23 28;
-  --gray-900: 11 13 16;
-  --gray-950: 7 8 10;
-  --primary: 126 226 184;
-  --primary-light: 166 240 207;
-  --primary-dark: 94 199 156;
-  --on-primary: 6 17 12;
-  --font-display: 'Inter Variable', Inter, system-ui, sans-serif;
-  --surface: 17 21 26;
+  /* "Paper at night": warm charcoal, not black. */
+  --gray-50: 246 242 236;
+  --gray-100: 236 231 223;
+  --gray-200: 222 216 207;
+  --gray-300: 200 194 184;
+  --gray-400: 170 163 152;
+  --gray-500: 145 138 128;
+  --gray-600: 104 98 90;
+  --gray-700: 72 68 62;
+  --gray-800: 50 47 43;
+  --gray-900: 38 36 33;
+  --gray-950: 30 28 26;
+  --primary: 224 138 99;
+  --primary-light: 236 166 132;
+  --primary-dark: 200 110 72;
+  --on-primary: 30 27 23;
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --surface: 50 47 43;
 }
 
 html {
@@ -65,12 +66,12 @@ html {
 .avatar-tint-3 { background: #F2E3C4; color: #7A5410; }
 .avatar-tint-4 { background: #D7E4EC; color: #2F5367; }
 .avatar-tint-5 { background: #EED8E2; color: #7A3352; }
-.dark .avatar-tint-0 { background: #12241C; color: #7EE2B8; }
-.dark .avatar-tint-1 { background: #1A2433; color: #9CCBF0; }
-.dark .avatar-tint-2 { background: #221D33; color: #C4B8FF; }
-.dark .avatar-tint-3 { background: #2A2215; color: #F2C14E; }
-.dark .avatar-tint-4 { background: #2A1A22; color: #F0A7C8; }
-.dark .avatar-tint-5 { background: #1E2526; color: #AEC9C8; }
+.dark .avatar-tint-0 { background: #4A3328; color: #F2C3AC; }
+.dark .avatar-tint-1 { background: #34402F; color: #C5DDBE; }
+.dark .avatar-tint-2 { background: #3A3448; color: #D6CCF2; }
+.dark .avatar-tint-3 { background: #463B25; color: #F0D79E; }
+.dark .avatar-tint-4 { background: #2F3D45; color: #BCD6E4; }
+.dark .avatar-tint-5 { background: #45303A; color: #F0C2D4; }
 
 .font-display {
   font-family: var(--font-display);

@@ -160,5 +160,5 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
 }
 
 function SectionLabel({ children }: { children: string }) {
-  return <div className="px-4 pt-4 pb-1.5 text-[11px] font-mono uppercase tracking-[0.08em] text-gray-500">{children}</div>;
+  return <div className="px-4 pt-4 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-gray-500">{children}</div>;
 }

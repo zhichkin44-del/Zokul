@@ -22,7 +22,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gray-100 dark:bg-gray-950">
-      <div className="w-full max-w-sm rounded-3xl bg-surface border border-gray-200 dark:border-white/[0.07] px-7 py-9 shadow-sm dark:shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
+      <div className="w-full max-w-sm rounded-3xl bg-surface border border-gray-200 dark:border-gray-700 px-7 py-9 shadow-sm">
         <div className="text-center mb-8 select-none">
           <div className="mx-auto mb-4 w-12 h-12 rounded-2xl bg-primary text-on-primary text-2xl font-semibold flex items-center justify-center" aria-hidden="true">Z</div>
           <div className="font-display text-4xl font-semibold text-gray-900 dark:text-gray-100">Zokul</div>
