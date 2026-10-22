@@ -223,16 +223,19 @@ export function setupSocket(httpServer: HTTPServer): Server {
     });
 
     // A person answers an agent's question card (button or typed reply).
-    socket.on('question:answer', async (data: { messageId: string; answer: string }) => {
+    // The optional ack tells the client whether the answer was accepted.
+    socket.on('question:answer', async (data: { messageId: string; answer: string }, ack?: (r: { ok: boolean; error?: string }) => void) => {
+      const reply = typeof ack === 'function' ? ack : () => undefined;
       try {
         if (!checkRateLimit(userId)) {
-          socket.emit('error', { message: 'Too many messages' });
+          reply({ ok: false, error: 'Too many messages' });
           return;
         }
         const updated = await agentService.answerQuestion(userId, data?.messageId, data?.answer);
         emitToChat(updated.chatId, 'message:updated', updated);
+        reply({ ok: true });
       } catch (err: unknown) {
-        socket.emit('error', { message: err instanceof Error ? err.message : String(err) });
+        reply({ ok: false, error: err instanceof Error ? err.message : String(err) });
       }
     });
 

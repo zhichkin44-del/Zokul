@@ -83,19 +83,20 @@ export async function softDelete(messageId: string): Promise<boolean> {
 }
 
 // Replaces the structured payload of an agent card (question answered,
-// handoff claimed). With `guard`, the update only applies while that payload
-// key is still empty, so two people answering at once cannot overwrite each other.
+// handoff claimed). With `guard`, the update only applies while all those
+// payload keys are still empty (missing or null), so two people answering at
+// once, or answering a withdrawn question, cannot overwrite each other.
 export async function updatePayload(
   messageId: string,
   payload: Record<string, unknown>,
-  guard?: { key: string }
+  guard?: { keys: string[] }
 ): Promise<Message | null> {
   const result = await pool.query(
     `UPDATE messages SET payload = $1
      WHERE id = $2 AND deleted_at IS NULL
-       AND ($3::text IS NULL OR payload->>$3 IS NULL)
+       AND ($3::text[] IS NULL OR NOT (jsonb_strip_nulls(payload) ?| $3::text[]))
      RETURNING id, chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, is_edited, created_at, kind, payload`,
-    [JSON.stringify(payload), messageId, guard?.key ?? null]
+    [JSON.stringify(payload), messageId, guard?.keys ?? null]
   );
   if (result.rows.length === 0) return null;
   return mapMessage(result.rows[0]);

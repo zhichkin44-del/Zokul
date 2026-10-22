@@ -31,9 +31,11 @@ export async function createMessage(
   const message = await MessageModel.create(chatId, senderId, text, imageUrl, voiceUrl, voiceDuration, replyToId, imageUrls, kind, payload);
   logger(`Message created in chat ${chatId}`);
 
+  const state = (payload as { state?: string } | undefined)?.state;
+  const silent = kind === 'status' && (state === 'working' || state === 'info');
   try {
-    const chat = await ChatModel.findChatById(chatId);
-    const sender = await UserModel.findById(senderId);
+    const chat = silent ? null : await ChatModel.findChatById(chatId);
+    const sender = silent ? null : await UserModel.findById(senderId);
     if (chat && sender) {
       const body = text || (imageUrl ? 'Photo' : voiceUrl ? 'Voice' : '');
       for (const pid of chat.participantIds) {

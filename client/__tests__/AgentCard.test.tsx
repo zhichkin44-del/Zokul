@@ -14,21 +14,41 @@ const question = (answer: string | null): Message => ({
 });
 
 describe('AgentCard', () => {
-  it('answers a question once with an option button', () => {
-    const onAnswer = vi.fn();
+  it('answers a question once with an option button', async () => {
+    const onAnswer = vi.fn().mockResolvedValue(null);
     render(<AgentCard message={question(null)} onAnswer={onAnswer} />);
 
     fireEvent.click(screen.getByText('Yes'));
 
     expect(onAnswer).toHaveBeenCalledWith('q1', 'Yes');
-    expect(screen.getByText('Answered')).toBeTruthy();
+    expect(await screen.findByText('Answered')).toBeTruthy();
     expect(screen.queryByText('No')).toBeNull();
+  });
+
+  it('goes back to asking when the server rejects the answer', async () => {
+    const onAnswer = vi.fn().mockResolvedValue('This question is already answered or was withdrawn');
+    render(<AgentCard message={question(null)} onAnswer={onAnswer} />);
+
+    fireEvent.click(screen.getByText('Yes'));
+
+    expect(await screen.findByText(/already answered or was withdrawn/)).toBeTruthy();
+    expect(screen.getByText('Needs your answer')).toBeTruthy();
+    expect(screen.getByText('Yes')).toBeTruthy();
   });
 
   it('shows the stored answer and no buttons for an answered question', () => {
     render(<AgentCard message={question('No')} onAnswer={vi.fn()} />);
     expect(screen.getByText('No')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Yes' })).toBeNull();
+  });
+
+  it('shows a withdrawn question without answer controls', () => {
+    const msg = question(null);
+    msg.payload = { ...(msg.payload as object), cancelled: true } as Message['payload'];
+    render(<AgentCard message={msg} onAnswer={vi.fn()} />);
+    expect(screen.getByText('Withdrawn by agent')).toBeTruthy();
+    expect(screen.queryByText('Yes')).toBeNull();
+    expect(screen.queryByPlaceholderText(/answer/i)).toBeNull();
   });
 
   it('turns a handoff into a prompt another agent can follow', () => {

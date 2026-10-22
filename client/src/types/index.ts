@@ -40,6 +40,7 @@ export interface QuestionPayload {
   answer: string | null;
   answeredBy?: string;
   answeredAt?: string;
+  cancelled?: boolean;
 }
 
 export interface HandoffPayload {

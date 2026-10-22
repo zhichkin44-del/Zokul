@@ -139,11 +139,26 @@ export async function getAnswer(agent: AgentRecord, messageId: string, waitSecon
   for (;;) {
     const msg = await findOwnCard(agent, messageId, 'question');
     if (!msg) return null;
-    const p = msg.payload as { answer?: string | null; answeredBy?: string; answeredAt?: string };
+    const p = msg.payload as { answer?: string | null; answeredBy?: string; answeredAt?: string; cancelled?: boolean };
     if (p.answer) return { status: 'answered' as const, answer: p.answer, answeredBy: p.answeredBy, answeredAt: p.answeredAt };
+    if (p.cancelled) return { status: 'cancelled' as const };
     if (Date.now() >= deadline) return { status: 'pending' as const };
     await sleep(1500);
   }
+}
+
+// The agent no longer needs the answer: the card stops asking on the phone.
+export async function cancelQuestion(agent: AgentRecord, messageId: string) {
+  const msg = await findOwnCard(agent, messageId, 'question');
+  if (!msg) return { error: 'not_found' as const };
+  const updated = await MessageModel.updatePayload(
+    messageId,
+    { ...msg.payload, cancelled: true, cancelledAt: new Date().toISOString() },
+    { keys: ['answer', 'cancelled'] }
+  );
+  if (!updated) return { error: 'closed' as const };
+  emitToChat(updated.chatId, 'message:updated', updated);
+  return { ok: true as const };
 }
 
 export async function createHandoff(agent: AgentRecord, raw: Record<string, unknown>) {
@@ -174,7 +189,7 @@ export async function claimHandoff(agent: AgentRecord, messageId: string) {
   const updated = await MessageModel.updatePayload(
     messageId,
     { ...msg.payload, claimedBy: agent.name, claimedById: agent.id, claimedAt: new Date().toISOString() },
-    { key: 'claimedBy' }
+    { keys: ['claimedBy'] }
   );
   if (!updated) {
     const takenBy = (msg.payload as { claimedBy?: string } | undefined)?.claimedBy;
@@ -196,8 +211,8 @@ export async function answerQuestion(userId: string, messageId: string, rawAnswe
   const updated = await MessageModel.updatePayload(
     messageId,
     { ...msg.payload, answer, answeredBy: userId, answeredAt: new Date().toISOString() },
-    { key: 'answer' }
+    { keys: ['answer', 'cancelled'] }
   );
-  if (!updated) throw new AgentInputError('Already answered');
+  if (!updated) throw new AgentInputError('This question is already answered or was withdrawn');
   return updated;
 }

@@ -68,7 +68,7 @@ describe('agentService', () => {
 
       const [, payload, guard] = (MessageModel.updatePayload as jest.Mock).mock.calls[0];
       expect(payload).toMatchObject({ answer: 'Yes', answeredBy: 'owner1' });
-      expect(guard).toEqual({ key: 'answer' });
+      expect(guard).toEqual({ keys: ['answer', 'cancelled'] });
     });
 
     it('refuses people outside the chat', async () => {
@@ -84,7 +84,7 @@ describe('agentService', () => {
       (MessageModel.isParticipant as jest.Mock).mockResolvedValue(true);
       (MessageModel.updatePayload as jest.Mock).mockResolvedValue(null);
 
-      await expect(agentService.answerQuestion('owner1', 'q1', 'No')).rejects.toThrow('Already answered');
+      await expect(agentService.answerQuestion('owner1', 'q1', 'No')).rejects.toThrow('already answered or was withdrawn');
     });
   });
 
@@ -96,6 +96,22 @@ describe('agentService', () => {
 
     // another agent cannot read it
     expect(await agentService.getAnswer({ ...agent, id: 'agent2' }, 'q1')).toBeNull();
+  });
+
+  it('lets the asking agent withdraw its question, and reports it as cancelled', async () => {
+    const q = { id: 'q1', chatId: 'chat1', senderId: 'agent1', kind: 'question', payload: { question: 'q', options: [], answer: null } };
+    (MessageModel.findById as jest.Mock).mockResolvedValue(q);
+    (MessageModel.updatePayload as jest.Mock).mockResolvedValue({ ...q, payload: { ...q.payload, cancelled: true } });
+
+    expect(await agentService.cancelQuestion(agent, 'q1')).toEqual({ ok: true });
+    expect((MessageModel.updatePayload as jest.Mock).mock.calls[0][2]).toEqual({ keys: ['answer', 'cancelled'] });
+    expect(emitToChat).toHaveBeenCalledWith('chat1', 'message:updated', expect.anything());
+
+    (MessageModel.findById as jest.Mock).mockResolvedValue({ ...q, payload: { ...q.payload, cancelled: true } });
+    expect(await agentService.getAnswer(agent, 'q1')).toEqual({ status: 'cancelled' });
+
+    // another agent cannot withdraw it
+    expect(await agentService.cancelQuestion({ ...agent, id: 'agent2' }, 'q1')).toEqual({ error: 'not_found' });
   });
 
   it('does not let an agent claim a handoff of another owner', async () => {

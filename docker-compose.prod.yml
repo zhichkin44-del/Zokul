@@ -3,7 +3,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: zokul
-      POSTGRES_PASSWORD: zokul
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: zokul
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -32,7 +32,7 @@ services:
     environment:
       PORT: '3001'
       NODE_ENV: production
-      DATABASE_URL: postgresql://zokul:zokul@postgres:5432/zokul
+      DATABASE_URL: postgresql://zokul:${POSTGRES_PASSWORD}@postgres:5432/zokul
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGIN: https://zokul.example.com
       REDIS_URL: redis://redis:6379

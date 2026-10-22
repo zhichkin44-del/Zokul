@@ -10,6 +10,7 @@
 //   say <text>                                 post a plain message
 //   ask <question> [--options A,B] [--wait S]  ask and wait for the answer (default 600 s, 0 = do not wait)
 //   answer <question-id> [--wait S]            check / wait for an answer later
+//   cancel <question-id>                       withdraw a question you no longer need
 //   handoff --title T [--summary S] [--done "a;b"] [--next "a;b"] [--files "a,b"] [--notes N]
 //   handoff --json <file|->                    same, from a JSON file or stdin
 //   handoffs [--all] [--json]                  list handoffs from your agents
@@ -27,21 +28,40 @@ import { createInterface } from 'node:readline';
 
 const VERSION = '1.0.0';
 
+const VALUE_FLAGS = new Set(['options', 'wait', 'title', 'summary', 'done', 'next', 'files', 'notes', 'url', 'token']);
+const BOOLEAN_FLAGS = new Set(['all', 'help']);
+
+// Only known flags are flags: anything else that starts with "--" is text
+// (`say deploy --force failed` keeps every word). `--` ends flag parsing.
 function parseArgs(argv) {
   const positional = [];
   const flags = {};
+  const command = argv.find((a) => !a.startsWith('--'));
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
-    if (arg.startsWith('--')) {
-      const key = arg.slice(2);
-      const next = argv[i + 1];
-      if (next === undefined || next.startsWith('--')) flags[key] = true;
-      else { flags[key] = next; i++; }
+    if (arg === '--') { positional.push(...argv.slice(i + 1)); break; }
+    const key = arg.startsWith('--') ? arg.slice(2) : null;
+    // --json takes a file (or "-") for `handoff`, and is a switch elsewhere.
+    const takesValue = key !== null && (VALUE_FLAGS.has(key) || (key === 'json' && command === 'handoff'));
+    if (takesValue) {
+      const value = argv[i + 1];
+      if (value === undefined || (value.startsWith('--') && value !== '-')) throw new Error(`--${key} needs a value`);
+      flags[key] = value;
+      i++;
+    } else if (key !== null && (BOOLEAN_FLAGS.has(key) || key === 'json')) {
+      flags[key] = true;
     } else {
       positional.push(arg);
     }
   }
   return { positional, flags };
+}
+
+function waitSeconds(value, fallback) {
+  if (value === undefined) return fallback;
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) throw new Error(`--wait must be a number of seconds, got "${value}"`);
+  return n;
 }
 
 // Saved by `connect` so MCP configs and scripts need no secrets in them.
@@ -61,32 +81,71 @@ function config(flags = {}) {
   return { url, token };
 }
 
+class ApiError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.status = status;
+  }
+}
+
+// Network failures, timeouts, 429 and 5xx (proxy hiccup, server restart).
+const isTransient = (err) => !(err instanceof ApiError) || err.status === 429 || err.status >= 500;
+
 async function api(cfg, method, path, body) {
-  const res = await fetch(`${cfg.url}/api/agent${path}`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${cfg.token}`,
-      ...(body ? { 'Content-Type': 'application/json' } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let res;
+  try {
+    res = await fetch(`${cfg.url}/api/agent${path}`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${cfg.token}`,
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      // The server holds long-polls for at most 50 s.
+      signal: AbortSignal.timeout(70_000),
+    });
+  } catch (err) {
+    throw new Error(`cannot reach ${cfg.url} (${err.cause?.code || err.name})`);
+  }
   const text = await res.text();
   let data;
-  try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text }; }
-  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text.slice(0, 200) }; }
+  if (!res.ok) throw new ApiError(data.error || `HTTP ${res.status}`, res.status);
   return data;
 }
 
 const splitList = (value, sep) =>
   typeof value === 'string' ? value.split(sep).map((s) => s.trim()).filter(Boolean) : Array.isArray(value) ? value : [];
 
-// Long-polls in ≤50 s slices until answered or `totalSeconds` passed.
+const path = (id) => encodeURIComponent(String(id));
+
+function requireArg(value, usage) {
+  if (!value) throw new Error(`Usage: ${usage}`);
+  return value;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Long-polls in ≤50 s slices until answered, cancelled or `totalSeconds`
+// passed. Transient errors are retried until the deadline, so one dropped
+// request does not make the agent lose (and re-ask) its question.
 async function waitForAnswer(cfg, id, totalSeconds) {
   const deadline = Date.now() + totalSeconds * 1000;
+  let failures = 0;
   for (;;) {
     const left = Math.ceil((deadline - Date.now()) / 1000);
-    const result = await api(cfg, 'GET', `/questions/${id}?wait=${Math.max(0, Math.min(50, left))}`);
-    if (result.status === 'answered' || Date.now() >= deadline) return result;
+    try {
+      const result = await api(cfg, 'GET', `/questions/${path(id)}?wait=${Math.max(0, Math.min(50, left))}`);
+      failures = 0;
+      if (result.status !== 'pending' || Date.now() >= deadline) return result;
+    } catch (err) {
+      failures++;
+      if (!isTransient(err) || Date.now() >= deadline) {
+        err.message = `${err.message} (question_id: ${id})`;
+        throw err;
+      }
+      await sleep(Math.min(30_000, 1000 * 2 ** failures));
+    }
   }
 }
 
@@ -159,22 +218,30 @@ async function cli(argv) {
       return 0;
     }
     case 'ask': {
+      // Validate before posting, so a typo does not leave a stray question.
+      const wait = waitSeconds(flags.wait, 600);
       const options = splitList(flags.options, ',');
       const q = await api(cfg, 'POST', '/questions', { question: rest.join(' '), options });
-      const wait = flags.wait === undefined ? 600 : Number(flags.wait);
       if (!wait) { console.log(q.id); return 0; }
       const result = await waitForAnswer(cfg, q.id, wait);
       if (result.status !== 'answered') {
-        console.error(`No answer within ${wait}s. Check later: zokul-agent answer ${q.id}`);
+        console.error(`No answer within ${wait}s. Check later: zokul-agent answer ${q.id} (or cancel ${q.id})`);
         return 2;
       }
       console.log(result.answer);
       return 0;
     }
     case 'answer': {
-      const result = await waitForAnswer(cfg, rest[0], Number(flags.wait) || 0);
+      const id = requireArg(rest[0], 'answer <question-id> [--wait S]');
+      const result = await waitForAnswer(cfg, id, waitSeconds(flags.wait, 0));
+      if (result.status === 'cancelled') { console.error('Question was cancelled'); return 2; }
       if (result.status !== 'answered') { console.error('Not answered yet'); return 2; }
       console.log(result.answer);
+      return 0;
+    }
+    case 'cancel': {
+      const id = requireArg(rest[0], 'cancel <question-id>');
+      await api(cfg, 'POST', `/questions/${path(id)}/cancel`);
       return 0;
     }
     case 'handoff': {
@@ -197,7 +264,8 @@ async function cli(argv) {
       return 0;
     }
     case 'claim': {
-      const h = await api(cfg, 'POST', `/handoffs/${rest[0]}/claim`);
+      const id = requireArg(rest[0], 'claim <handoff-id>');
+      const h = await api(cfg, 'POST', `/handoffs/${path(id)}/claim`);
       console.log(handoffAsPrompt(h));
       return 0;
     }
@@ -248,6 +316,15 @@ const TOOLS = [
     },
   },
   {
+    name: 'zokul_cancel_question',
+    description: 'Withdraw a question you asked with zokul_ask_human when it is no longer needed (you decided yourself, or the human answered elsewhere). It stops showing as waiting on their phone.',
+    inputSchema: {
+      type: 'object',
+      properties: { question_id: { type: 'string' } },
+      required: ['question_id'],
+    },
+  },
+  {
     name: 'zokul_create_handoff',
     description: 'Leave a handoff card at the end of a session so the next agent (any vendor) or a person can continue without re-explaining. Be concrete: what was done, what is next, which files matter, gotchas.',
     inputSchema: {
@@ -293,6 +370,12 @@ const INSTRUCTIONS = 'Zokul connects you to your human\'s messenger. At the star
 
 const clampWait = (value, fallback) => Math.max(0, Math.min(900, Number(value ?? fallback) || 0));
 
+function describeAnswer(result, id) {
+  if (result.status === 'answered') return `Human answered: ${result.answer}`;
+  if (result.status === 'cancelled') return `Question ${id} was withdrawn.`;
+  return `No answer yet (question_id: ${id}). Continue with other work if you can, then call zokul_check_answer, or zokul_cancel_question if you no longer need it.`;
+}
+
 async function callTool(cfg, name, args = {}) {
   switch (name) {
     case 'zokul_post_status':
@@ -304,13 +387,16 @@ async function callTool(cfg, name, args = {}) {
     case 'zokul_ask_human': {
       const q = await api(cfg, 'POST', '/questions', { question: args.question, options: args.options || [] });
       const result = await waitForAnswer(cfg, q.id, clampWait(args.wait_seconds, 120));
-      return result.status === 'answered'
-        ? `Human answered: ${result.answer}`
-        : `No answer yet (question_id: ${q.id}). Continue with other work if you can, then call zokul_check_answer.`;
+      return describeAnswer(result, q.id);
     }
     case 'zokul_check_answer': {
-      const result = await waitForAnswer(cfg, args.question_id, clampWait(args.wait_seconds, 0));
-      return result.status === 'answered' ? `Human answered: ${result.answer}` : 'Not answered yet.';
+      const id = requireArg(args.question_id, 'question_id is required');
+      return describeAnswer(await waitForAnswer(cfg, id, clampWait(args.wait_seconds, 0)), id);
+    }
+    case 'zokul_cancel_question': {
+      const id = requireArg(args.question_id, 'question_id is required');
+      await api(cfg, 'POST', `/questions/${path(id)}/cancel`);
+      return 'Question withdrawn.';
     }
     case 'zokul_create_handoff': {
       const h = await api(cfg, 'POST', '/handoffs', {
@@ -323,7 +409,8 @@ async function callTool(cfg, name, args = {}) {
       return list.length ? list.map(handoffLine).join('\n') : 'No open handoffs.';
     }
     case 'zokul_claim_handoff': {
-      const h = await api(cfg, 'POST', `/handoffs/${args.handoff_id}/claim`);
+      const id = requireArg(args.handoff_id, 'handoff_id is required');
+      const h = await api(cfg, 'POST', `/handoffs/${path(id)}/claim`);
       return handoffAsPrompt(h);
     }
     default:
@@ -332,7 +419,10 @@ async function callTool(cfg, name, args = {}) {
 }
 
 async function mcpServer(flags) {
-  const cfg = config(flags);
+  // Resolved per call: if the tool is not connected yet the server still
+  // starts, and each tool call explains how to connect instead of the
+  // client seeing a crashed server.
+  const cfgFor = () => config(flags);
   const send = (msg) => process.stdout.write(`${JSON.stringify(msg)}\n`);
   const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
   const pending = new Set();
@@ -355,7 +445,7 @@ async function mcpServer(flags) {
         return reply({ tools: TOOLS });
       case 'tools/call':
         try {
-          const text = await callTool(cfg, params?.name, params?.arguments);
+          const text = await callTool(cfgFor(), params?.name, params?.arguments ?? {});
           return reply({ content: [{ type: 'text', text }] });
         } catch (err) {
           return reply({ content: [{ type: 'text', text: `Zokul error: ${err.message}` }], isError: true });
@@ -370,7 +460,10 @@ async function mcpServer(flags) {
     if (!line.trim()) return;
     let msg;
     try { msg = JSON.parse(line); } catch { return send({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } }); }
-    const p = handle(msg).catch((err) => send({ jsonrpc: '2.0', id: msg.id ?? null, error: { code: -32603, message: err.message } }));
+    if (!msg || typeof msg !== 'object' || Array.isArray(msg)) {
+      return send({ jsonrpc: '2.0', id: null, error: { code: -32600, message: 'Invalid request' } });
+    }
+    const p = handle(msg).catch((err) => send({ jsonrpc: '2.0', id: msg.id ?? null, error: { code: -32603, message: String(err?.message ?? err) } }));
     pending.add(p);
     p.finally(() => pending.delete(p));
   });

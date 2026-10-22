@@ -4,6 +4,12 @@ import { AgentInputError } from '../services/agentService';
 
 export function errorMiddleware(err: Error, _req: Request, res: Response, _next: NextFunction): void {
   logger(err.message, 'error');
+  // Postgres "invalid input syntax" (e.g. a non-UUID id in the URL) is a bad
+  // request from the client, not a server failure.
+  if ((err as { code?: string }).code === '22P02') {
+    res.status(400).json({ error: 'Invalid id' });
+    return;
+  }
   if (err instanceof AgentInputError) {
     res.status(400).json({ error: err.message });
     return;

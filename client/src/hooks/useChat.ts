@@ -178,9 +178,14 @@ export function useMessages(chatId: string | null) {
     };
   }, [socket, chatId]);
 
-  const answerQuestion = useCallback((messageId: string, answer: string) => {
-    socket?.emit('question:answer', { messageId, answer });
-  }, [socket]);
+  // Resolves with an error message, or null when the server accepted the answer.
+  const answerQuestion = useCallback((messageId: string, answer: string) => new Promise<string | null>((resolve) => {
+    if (!socket?.connected) { resolve('Not connected, try again'); return; }
+    socket.timeout(10000).emit('question:answer', { messageId, answer }, (err: Error | null, res?: { ok: boolean; error?: string }) => {
+      if (err) resolve('No response from server, try again');
+      else resolve(res?.ok ? null : res?.error || 'Could not send the answer');
+    });
+  }), [socket]);
 
   const sendMessage = useCallback((text: string) => {
     if (!socket || !chatId) return;

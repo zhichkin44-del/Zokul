@@ -24,7 +24,7 @@ interface ChatViewProps {
   onLoadMore?: () => void;
   onMessageEdit?: (messageId: string, text: string, chatId: string) => void;
   onMessageDelete?: (messageId: string, chatId: string) => void;
-  onAnswerQuestion?: (messageId: string, answer: string) => void;
+  onAnswerQuestion?: (messageId: string, answer: string) => Promise<string | null>;
 }
 
 function formatTime(date: Date) {
@@ -256,7 +256,7 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                 <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} ${msg.kind ? 'w-[min(85%,440px)]' : 'max-w-[min(75%,400px)]'}`}>
                   {msg.kind ? (
                     <div className={`w-full ${isNew ? 'animate-message-appear' : ''}`}>
-                      <AgentCard message={msg} onAnswer={(id, answer) => onAnswerQuestion?.(id, answer)} />
+                      <AgentCard message={msg} onAnswer={(id, answer) => onAnswerQuestion ? onAnswerQuestion(id, answer) : Promise.resolve('Unavailable')} />
                     </div>
                   ) : (
                   <div className="relative">

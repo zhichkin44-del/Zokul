@@ -48,6 +48,16 @@ router.get('/questions/:id', wrap(async (req, res) => {
   res.json(result);
 }));
 
+router.post('/questions/:id/cancel', wrap(async (req, res) => {
+  const result = await agentService.cancelQuestion(req.agent!, req.params.id);
+  if ('error' in result) {
+    if (result.error === 'not_found') res.status(404).json({ error: 'Question not found' });
+    else res.status(409).json({ error: 'Question is already answered or withdrawn' });
+    return;
+  }
+  res.json({ status: 'cancelled' });
+}));
+
 router.post('/handoffs', wrap(async (req, res) => {
   const msg = await agentService.createHandoff(req.agent!, req.body ?? {});
   res.status(201).json({ id: msg.id });

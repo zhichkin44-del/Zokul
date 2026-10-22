@@ -3,7 +3,8 @@ import { HandoffPayload, Message, QuestionPayload, StatusPayload } from '../../t
 
 interface AgentCardProps {
   message: Message;
-  onAnswer: (messageId: string, answer: string) => void;
+  // Resolves with an error message, or null when the answer was accepted.
+  onAnswer: (messageId: string, answer: string) => Promise<string | null>;
 }
 
 // Rich rendering for messages posted by AI agents (status / question / handoff).
@@ -38,24 +39,31 @@ function QuestionCard({ message, onAnswer }: AgentCardProps) {
   const payload = message.payload as QuestionPayload;
   const [custom, setCustom] = useState('');
   const [sent, setSent] = useState<string | null>(null);
+  const [error, setError] = useState('');
   const answered = payload.answer ?? sent;
+  const withdrawn = !payload.answer && payload.cancelled;
 
-  const submit = (answer: string) => {
+  const submit = async (answer: string) => {
     const value = answer.trim();
     if (!value || answered) return;
     setSent(value);
-    onAnswer(message.id, value);
+    setError('');
+    const failure = await onAnswer(message.id, value);
+    if (failure) {
+      setSent(null);
+      setError(failure);
+    }
   };
 
   return (
     <div className="rounded-2xl border border-primary/40 bg-white dark:bg-gray-800 overflow-hidden text-sm shadow-sm">
       <div className="px-3 pt-2.5 pb-2">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-primary mb-1">
-          {answered ? 'Answered' : 'Needs your answer'}
+        <div className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${withdrawn ? 'text-gray-400' : 'text-primary'}`}>
+          {withdrawn ? 'Withdrawn by agent' : answered ? 'Answered' : 'Needs your answer'}
         </div>
         <p className="whitespace-pre-wrap break-words font-medium">{payload.question}</p>
       </div>
-      {answered ? (
+      {withdrawn ? null : answered ? (
         <div className="px-3 py-2 border-t border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300">
           <span className="text-gray-400">Answer: </span>
           <span className="font-medium">{answered}</span>
@@ -76,6 +84,7 @@ function QuestionCard({ message, onAnswer }: AgentCardProps) {
               ))}
             </div>
           )}
+          {error && <p className="text-xs text-red-500">{error}</p>}
           <form
             className="flex gap-2"
             onSubmit={(e) => { e.preventDefault(); submit(custom); }}
