@@ -5,6 +5,7 @@ import { Message, ReplyPreview, User } from '../../types';
 import Avatar from '../common/Avatar';
 import TypingIndicator from './TypingIndicator';
 import MessageActions from './MessageActions';
+import AgentCard from './AgentCard';
 import ReplyQuote from './ReplyQuote';
 import VoicePlayer from './VoicePlayer';
 import ImageViewer from './ImageViewer';
@@ -23,6 +24,7 @@ interface ChatViewProps {
   onLoadMore?: () => void;
   onMessageEdit?: (messageId: string, text: string, chatId: string) => void;
   onMessageDelete?: (messageId: string, chatId: string) => void;
+  onAnswerQuestion?: (messageId: string, answer: string) => void;
 }
 
 function formatTime(date: Date) {
@@ -44,7 +46,7 @@ function DaySeparator({ date }: { date: Date }) {
   );
 }
 
-export default function ChatView({ messages, currentUserId, currentUserName, participants, chatId, loading, error, hasMore, loadingMore, onLoadMore, onMessageEdit, onMessageDelete }: ChatViewProps) {
+export default function ChatView({ messages, currentUserId, currentUserName, participants, chatId, loading, error, hasMore, loadingMore, onLoadMore, onMessageEdit, onMessageDelete, onAnswerQuestion }: ChatViewProps) {
   const [typingUsers, setTypingUsers] = useState<Map<string, { userId: string; userName: string }>>(new Map());
   const [actionsMsg, setActionsMsg] = useState<string | null>(null);
   const [viewerUrl, setViewerUrl] = useState<string | null>(null);
@@ -251,7 +253,12 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                     <Avatar name={sender?.name || msg.senderId} size={32} url={sender?.avatarUrl} />
                   )}
                 </div>
-                <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} max-w-[min(75%,400px)]`}>
+                <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} ${msg.kind ? 'w-[min(85%,440px)]' : 'max-w-[min(75%,400px)]'}`}>
+                  {msg.kind ? (
+                    <div className={`w-full ${isNew ? 'animate-message-appear' : ''}`}>
+                      <AgentCard message={msg} onAnswer={(id, answer) => onAnswerQuestion?.(id, answer)} />
+                    </div>
+                  ) : (
                   <div className="relative">
                     <div
                       className={`px-3 py-2 text-sm leading-relaxed cursor-pointer ${isNew ? 'animate-message-appear' : ''} ${
@@ -296,6 +303,7 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                       />
                     )}
                   </div>
+                  )}
                   <span className="text-[10px] text-gray-400 mt-0.5 px-1 flex items-center gap-1">
                     {isMine && (
                       msg.readBy && msg.readBy.length > 0 ? (

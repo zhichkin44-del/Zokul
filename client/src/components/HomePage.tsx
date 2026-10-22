@@ -7,6 +7,7 @@ import { useChats, useUnread, useMessages } from '../hooks/useChat';
 import { usePagination } from '../hooks/usePagination';
 import { useTyping } from '../hooks/useTyping';
 import { usePresence } from '../hooks/usePresence';
+import AgentsModal, { BotIcon } from './agents/AgentsModal';
 import { usePushSubscription } from '../hooks/usePushSubscription';
 import { useDraft } from '../hooks/useDraft';
 import { ChatProvider } from '../contexts/ChatContext';
@@ -29,6 +30,7 @@ function HomePageInner() {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showGroup, setShowGroup] = useState(false);
+  const [showAgents, setShowAgents] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
@@ -38,7 +40,7 @@ function HomePageInner() {
   const createMenuRef = useRef<HTMLDivElement>(null);
   const chatActionsRef = useRef<HTMLDivElement>(null);
   const { chats, loading: chatsLoading, error: chatsError, reload: reloadChats } = useChats();
-  const { messages, loading: msgsLoading, error: msgsError, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages } = useMessages(selectedChat?.id || null);
+  const { messages, loading: msgsLoading, error: msgsError, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion } = useMessages(selectedChat?.id || null);
   const { loadMore, loadingMore, hasMore, reset: resetPagination } = usePagination(selectedChat?.id || null);
   const { handleTyping } = useTyping(selectedChat?.id || null);
   const { isOnline } = usePresence(user?.id);
@@ -290,6 +292,14 @@ function HomePageInner() {
               )}
             </div>
             <button
+              onClick={() => setShowAgents(true)}
+              className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-[#D7E6F6] dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              title="AI agents"
+              aria-label="AI agents"
+            >
+              <BotIcon />
+            </button>
+            <button
               onClick={toggleTheme}
               className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-[#D7E6F6] dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
@@ -340,14 +350,14 @@ function HomePageInner() {
                   ) : (
                     <Avatar name={displayChatName} size={36} url={!isGroupChat ? otherUser?.avatarUrl : undefined} />
                   )}
-                  {!isGroupChat && <OnlineDot online={otherOnline} />}
+                  {!isGroupChat && !otherUser?.isAgent && <OnlineDot online={otherOnline} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-sm truncate">
                     {displayChatName}
                   </div>
                   <div className="text-xs text-gray-400">
-                    {isGroupChat ? `${selectedChat.participants.length} members` : (otherOnline ? 'Online' : 'Offline')}
+                    {isGroupChat ? `${selectedChat.participants.length} members` : otherUser?.isAgent ? 'AI agent' : (otherOnline ? 'Online' : 'Offline')}
                   </div>
                 </div>
                 <div className="relative" ref={chatActionsRef}>
@@ -392,6 +402,7 @@ function HomePageInner() {
                 onLoadMore={handleLoadMore}
                 onMessageEdit={handleMessageEdit}
                 onMessageDelete={handleMessageDelete}
+                onAnswerQuestion={answerQuestion}
               />
               <MessageInput
                 onSend={sendMessage}
@@ -419,6 +430,15 @@ function HomePageInner() {
         onClose={() => setShowCreate(false)}
         onCreated={handleChatCreated}
         socket={socket}
+      />
+      <AgentsModal
+        open={showAgents}
+        onClose={() => setShowAgents(false)}
+        onChanged={reloadChats}
+        onOpenChat={(chatId) => {
+          const chat = chats.find((c) => c.id === chatId);
+          if (chat) handleSelectChat(chat);
+        }}
       />
       <CreateGroupModal
         open={showGroup}

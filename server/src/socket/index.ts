@@ -7,11 +7,26 @@ import * as chatService from '../services/chatService';
 import * as chatModel from '../models/Chat';
 import * as UserModel from '../models/User';
 import * as presenceService from '../services/presenceService';
+import * as agentService from '../services/agentService';
 import { logger } from '../utils/logger';
 import { config } from '../config/app';
 import { getRedisPubSub } from '../config/redis';
 
 const HEARTBEAT_TIMEOUT = 35000;
+let ioInstance: Server | null = null;
+
+// For messages created outside a socket handler (agent REST API).
+export function emitToChat(chatId: string, event: string, data: unknown): void {
+  ioInstance?.to(`chat:${chatId}`).emit(event, data);
+}
+
+// A chat created over REST (e.g. a new agent): put the user's open sockets
+// into its room so they receive its messages without reconnecting.
+export function joinUserToChat(userId: string, chatId: string): void {
+  for (const socketId of userSockets.get(userId) ?? []) {
+    ioInstance?.in(socketId).socketsJoin(`chat:${chatId}`);
+  }
+}
 const userSockets = new Map<string, Set<string>>();
 const messageRateLimits = new Map<string, number[]>();
 const RATE_LIMIT_WINDOW = 1000;
@@ -47,6 +62,7 @@ export function setupSocket(httpServer: HTTPServer): Server {
     pingTimeout: HEARTBEAT_TIMEOUT,
     adapter: createAdapter(pubClient, subClient),
   });
+  ioInstance = io;
 
   io.use((socket: Socket, next) => {
     const ip = socket.handshake.address;
@@ -204,6 +220,20 @@ export function setupSocket(httpServer: HTTPServer): Server {
         userId,
         userName,
       });
+    });
+
+    // A person answers an agent's question card (button or typed reply).
+    socket.on('question:answer', async (data: { messageId: string; answer: string }) => {
+      try {
+        if (!checkRateLimit(userId)) {
+          socket.emit('error', { message: 'Too many messages' });
+          return;
+        }
+        const updated = await agentService.answerQuestion(userId, data?.messageId, data?.answer);
+        emitToChat(updated.chatId, 'message:updated', updated);
+      } catch (err: unknown) {
+        socket.emit('error', { message: err instanceof Error ? err.message : String(err) });
+      }
     });
 
     socket.on('chat:read', async (data: { chatId: string }) => {

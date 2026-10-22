@@ -4,6 +4,7 @@ export interface User {
   name: string;
   avatarUrl?: string;
   createdAt: string;
+  isAgent?: boolean;
 }
 
 export interface UserRow {
@@ -14,6 +15,7 @@ export interface UserRow {
   avatar_url: string | null;
   created_at: string;
   token_version: number;
+  is_agent?: boolean;
 }
 
 export interface AuthResponse {
@@ -62,6 +64,7 @@ export interface ChatRow {
   user_name: string;
   user_avatar_url: string | null;
   user_created_at: string;
+  user_is_agent?: boolean;
 }
 
 export interface Message {
@@ -76,7 +79,12 @@ export interface Message {
   replyTo?: ReplyPreview;
   isEdited?: boolean;
   createdAt: string;
+  kind?: MessageKind;
+  payload?: Record<string, unknown>;
 }
+
+// 'text' is a normal chat message; the others are cards posted by AI agents.
+export type MessageKind = 'text' | 'status' | 'question' | 'handoff';
 
 export interface ReplyPreview {
   messageId: string;

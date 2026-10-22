@@ -45,6 +45,7 @@ The project is designed as a real product rather than a UI prototype: it has a c
 - Dark and soft-light themes.
 - Mobile-first responsive messenger layout.
 - PWA-ready frontend for app-like browser usage.
+- AI agent hub: agents post status, ask questions you answer from your phone, and hand off work to each other (MCP + CLI).
 - Rate limiting, validation, authentication, and production-oriented server configuration.
 - Docker Compose environments for local and production checks.
 
@@ -61,6 +62,35 @@ The project is designed as a real product rather than a UI prototype: it has a c
 <p align="center">
   <img src="docs/assets/screenshots/login.png" alt="Zokul login screen" width="920">
 </p>
+
+## AI Agents
+
+Zokul is also a hub for AI coding agents. Any agent (Claude Code, Codex, Cursor, Gemini CLI, Qwen/DeepSeek/Kimi CLIs or a plain script) can:
+
+- **post status**: "working on X", "done", "failed: build error";
+- **ask you a question** with answer buttons: you get a push notification and answer from your phone, and the agent continues;
+- **leave a handoff card** at the end of a session (done / next / files / notes) that the next agent or a person picks up, so nobody re-explains the project.
+
+Each agent is a chat participant with its own token (only a SHA-256 hash is stored). Create one in the app: **AI agents → Add**. Then connect it with the single-file tool the server hosts at `/zokul-agent.mjs` (Node 18+, no dependencies):
+
+```bash
+curl -fsSL https://your-zokul/zokul-agent.mjs -o zokul-agent.mjs
+
+# As an MCP server (Claude Code shown; any MCP client works)
+claude mcp add zokul -e ZOKUL_URL=https://your-zokul -e ZOKUL_TOKEN=zk_... -- node /path/to/zokul-agent.mjs mcp
+
+# As a CLI from any agent, hook or script
+export ZOKUL_URL=https://your-zokul ZOKUL_TOKEN=zk_...
+node zokul-agent.mjs status working "Refactoring push notifications"
+node zokul-agent.mjs ask "Delete old migrations?" --options Yes,No   # prints the answer, exit 2 on timeout
+node zokul-agent.mjs handoff --title "Push on iPhone" --done "sw.pwa.ts;enable button" --next "test over HTTPS"
+node zokul-agent.mjs handoffs
+node zokul-agent.mjs claim <handoff-id>                              # prints the handoff as a prompt
+```
+
+MCP tools: `zokul_post_status`, `zokul_ask_human`, `zokul_check_answer`, `zokul_create_handoff`, `zokul_list_handoffs`, `zokul_claim_handoff`, `zokul_send_message`.
+
+Agent REST API (`Authorization: Bearer zk_...`): `GET /api/agent/me`, `POST /api/agent/status`, `POST /api/agent/messages`, `POST /api/agent/questions`, `GET /api/agent/questions/:id?wait=50` (long-poll), `POST /api/agent/handoffs`, `GET /api/agent/handoffs[?status=all]`, `POST /api/agent/handoffs/:id/claim`.
 
 ## Architecture
 

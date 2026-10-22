@@ -8,6 +8,7 @@ function toUser(row: ChatRow): User {
     name: row.user_name,
     avatarUrl: row.user_avatar_url || undefined,
     createdAt: row.user_created_at,
+    isAgent: row.user_is_agent || undefined,
   };
 }
 
@@ -32,7 +33,7 @@ const CHAT_QUERY = `
          lm.sender_id as last_message_sender_id,
          u.id as user_id, u.email as user_email,
          u.name as user_name, u.avatar_url as user_avatar_url,
-         u.created_at as user_created_at
+         u.created_at as user_created_at, u.is_agent as user_is_agent
   FROM chats c
   JOIN chat_participants cp ON cp.chat_id = c.id
   JOIN users u ON u.id = cp.user_id

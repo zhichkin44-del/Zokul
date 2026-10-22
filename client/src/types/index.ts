@@ -4,6 +4,7 @@ export interface User {
   name: string;
   avatarUrl?: string;
   createdAt: string;
+  isAgent?: boolean;
 }
 
 export interface AuthResponse {
@@ -24,6 +25,40 @@ export interface Message {
   isEdited?: boolean;
   readBy?: string[];
   createdAt: string;
+  // Cards posted by AI agents; absent for normal messages.
+  kind?: 'status' | 'question' | 'handoff';
+  payload?: StatusPayload | QuestionPayload | HandoffPayload;
+}
+
+export interface StatusPayload {
+  state: 'working' | 'done' | 'failed' | 'info';
+}
+
+export interface QuestionPayload {
+  question: string;
+  options: string[];
+  answer: string | null;
+  answeredBy?: string;
+  answeredAt?: string;
+}
+
+export interface HandoffPayload {
+  title: string;
+  summary?: string;
+  done: string[];
+  next: string[];
+  files: string[];
+  notes?: string;
+  claimedBy: string | null;
+  claimedAt?: string;
+}
+
+export interface Agent {
+  id: string;
+  name: string;
+  chatId?: string;
+  createdAt: string;
+  lastUsedAt?: string;
 }
 
 export interface ReplyPreview {

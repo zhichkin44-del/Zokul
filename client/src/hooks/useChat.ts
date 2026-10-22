@@ -141,6 +141,12 @@ export function useMessages(chatId: string | null) {
         setMessages((prev) => prev.map((m) => m.id === msg.id ? { ...m, text: msg.text, isEdited: true } : m));
       }
     };
+    // Agent cards change in place: question answered, handoff claimed.
+    const onUpdated = (msg: Message) => {
+      if (msg.chatId === chatId) {
+        setMessages((prev) => prev.map((m) => m.id === msg.id ? { ...m, payload: msg.payload } : m));
+      }
+    };
     const onDeleted = (data: { messageId: string; chatId: string }) => {
       if (data.chatId === chatId) {
         setMessages((prev) => prev.filter((m) => m.id !== data.messageId));
@@ -160,15 +166,21 @@ export function useMessages(chatId: string | null) {
     };
     socket.on('message:new', onNew);
     socket.on('message:edited', onEdited);
+    socket.on('message:updated', onUpdated);
     socket.on('message:deleted', onDeleted);
     socket.on('message:read', onRead);
     return () => {
       socket.off('message:new', onNew);
       socket.off('message:edited', onEdited);
+      socket.off('message:updated', onUpdated);
       socket.off('message:deleted', onDeleted);
       socket.off('message:read', onRead);
     };
   }, [socket, chatId]);
+
+  const answerQuestion = useCallback((messageId: string, answer: string) => {
+    socket?.emit('question:answer', { messageId, answer });
+  }, [socket]);
 
   const sendMessage = useCallback((text: string) => {
     if (!socket || !chatId) return;
@@ -204,7 +216,7 @@ export function useMessages(chatId: string | null) {
     setMessages((prev) => [...older, ...prev]);
   }, []);
 
-  return { messages, loading, error, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages };
+  return { messages, loading, error, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion };
 }
 
 export function useSearchUsers() {

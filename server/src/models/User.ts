@@ -8,6 +8,7 @@ function toUser(row: UserRow): User {
     name: row.name,
     avatarUrl: row.avatar_url || undefined,
     createdAt: row.created_at,
+    isAgent: row.is_agent || undefined,
   };
 }
 
@@ -20,7 +21,7 @@ export async function findByEmail(email: string): Promise<(User & { passwordHash
 
 export async function findById(id: string): Promise<User | null> {
   const result = await pool.query(
-    'SELECT id, email, name, avatar_url, created_at FROM users WHERE id = $1',
+    'SELECT id, email, name, avatar_url, created_at, is_agent FROM users WHERE id = $1',
     [id]
   );
   const row = result.rows[0] as UserRow | undefined;
@@ -28,13 +29,14 @@ export async function findById(id: string): Promise<User | null> {
   return {
     id: row.id, email: row.email, name: row.name,
     avatarUrl: row.avatar_url || undefined, createdAt: row.created_at,
+    isAgent: row.is_agent || undefined,
   };
 }
 
 export async function search(query: string, excludeUserId: string, limit: number = 10): Promise<{ id: string; name: string; avatarUrl?: string }[]> {
   const result = await pool.query(
     `SELECT id, name, avatar_url FROM users
-     WHERE (email ILIKE $1 OR name ILIKE $1) AND id != $2
+     WHERE (email ILIKE $1 OR name ILIKE $1) AND id != $2 AND is_agent IS NOT TRUE
      LIMIT $3`,
     [`%${query}%`, excludeUserId, limit]
   );

@@ -103,6 +103,24 @@ export async function migrate(): Promise<void> {
       EXCEPTION WHEN duplicate_object THEN NULL;
       END $$;
     `);
+    // AI agents: a user row with is_agent, owned by a human, authenticated
+    // with API tokens (only the SHA-256 hash is stored).
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_agent BOOLEAN DEFAULT false`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS owner_id UUID REFERENCES users(id) ON DELETE CASCADE`);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS agent_tokens (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        agent_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+        token_hash CHAR(64) UNIQUE NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        last_used_at TIMESTAMPTZ
+      );
+    `);
+    await client.query(`ALTER TABLE messages ADD COLUMN IF NOT EXISTS kind VARCHAR(20) NOT NULL DEFAULT 'text'`);
+    await client.query(`ALTER TABLE messages ADD COLUMN IF NOT EXISTS payload JSONB`);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_messages_handoffs ON messages(created_at) WHERE kind = 'handoff' AND deleted_at IS NULL;
+    `);
     console.log('Migration completed successfully');
   } finally {
     client.release();

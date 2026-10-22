@@ -116,7 +116,7 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
             >
               <div className="relative shrink-0">
                 <Avatar name={displayName} size={42} url={isGroup ? undefined : other?.avatarUrl} />
-                {!isGroup && count === 0 && <OnlineDot online={online} />}
+                {!isGroup && count === 0 && !other?.isAgent && <OnlineDot online={online} />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
@@ -131,7 +131,7 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
                 </div>
                 <div className={`flex items-center justify-between ${lastMsg ? 'mt-0.5' : ''}`}>
                   <span className={`text-xs truncate ${count > 0 ? 'text-gray-600 dark:text-gray-400 font-medium' : 'text-gray-500 dark:text-gray-500'}`}>
-                    {isGroup && sender ? `${sender.name}: ` : ''}{preview || (other?.email ? other.email.split('@')[0] : '')}
+                    {isGroup && sender ? `${sender.name}: ` : ''}{preview || (other?.isAgent ? 'AI agent' : other?.email ? other.email.split('@')[0] : '')}
                   </span>
                   {count > 0 && (
                     <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center leading-none">

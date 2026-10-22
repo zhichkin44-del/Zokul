@@ -1,8 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/logger';
+import { AgentInputError } from '../services/agentService';
 
 export function errorMiddleware(err: Error, _req: Request, res: Response, _next: NextFunction): void {
   logger(err.message, 'error');
+  if (err instanceof AgentInputError) {
+    res.status(400).json({ error: err.message });
+    return;
+  }
   if (err.message === 'Email already registered') {
     res.status(409).json({ error: err.message });
     return;

@@ -1,7 +1,7 @@
 import * as MessageModel from '../models/Message';
 import * as ChatModel from '../models/Chat';
 import * as UserModel from '../models/User';
-import { Message, ReadReceipt } from '../types';
+import { Message, MessageKind, ReadReceipt } from '../types';
 import { logger } from '../utils/logger';
 import { sendPushNotification } from './notificationService';
 
@@ -21,12 +21,14 @@ export async function createMessage(
   voiceUrl?: string,
   voiceDuration?: number,
   replyToId?: string,
-  imageUrls?: string[]
+  imageUrls?: string[],
+  kind: MessageKind = 'text',
+  payload?: Record<string, unknown>
 ): Promise<Message> {
   if (!text && !imageUrl && !voiceUrl && !imageUrls?.length) {
     throw new Error('Message must have text, image, or voice');
   }
-  const message = await MessageModel.create(chatId, senderId, text, imageUrl, voiceUrl, voiceDuration, replyToId, imageUrls);
+  const message = await MessageModel.create(chatId, senderId, text, imageUrl, voiceUrl, voiceDuration, replyToId, imageUrls, kind, payload);
   logger(`Message created in chat ${chatId}`);
 
   try {

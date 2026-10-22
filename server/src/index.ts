@@ -18,6 +18,8 @@ import groupRoutes from './routes/groupRoutes';
 import messageRoutes from './routes/messageRoutes';
 import userRoutes from './routes/userRoutes';
 import pushRoutes from './routes/pushRoutes';
+import agentRoutes from './routes/agentRoutes';
+import agentApiRoutes from './routes/agentApiRoutes';
 import { uploadMiddleware } from './middleware/uploadMiddleware';
 import { processImage, processAvatar } from './middleware/processImage';
 import { authMiddleware, AuthRequest } from './middleware/authMiddleware';
@@ -59,6 +61,8 @@ app.use('/api/chats', chatRoutes);
 app.use('/api/chats', messageRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/push', pushRoutes);
+app.use('/api/agents', agentRoutes);
+app.use('/api/agent', agentApiRoutes);
 
 app.post('/api/upload', uploadLimiter, authMiddleware, (req, res, next) => {
   uploadMiddleware(req, res, async (err) => {
