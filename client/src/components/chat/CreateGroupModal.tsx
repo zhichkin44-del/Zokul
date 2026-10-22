@@ -18,6 +18,8 @@ export default function CreateGroupModal({ open, onClose, onCreated, socket }: C
   const [selected, setSelected] = useState<User[]>([]);
   const [groupName, setGroupName] = useState('');
   const [searching, setSearching] = useState(false);
+  // Query whose results are on screen; see CreateChatModal.
+  const [searchedQuery, setSearchedQuery] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,9 +49,12 @@ export default function CreateGroupModal({ open, onClose, onCreated, socket }: C
         setResults([]);
       } finally {
         setSearching(false);
+        setSearchedQuery(value);
       }
     }, 300);
   };
+
+  const pending = searching || (query.trim() !== '' && searchedQuery !== query);
 
   const toggleUser = (user: User) => {
     setSelected((prev) => {
@@ -125,10 +130,10 @@ export default function CreateGroupModal({ open, onClose, onCreated, socket }: C
         </div>
 
         <div className="max-h-60 overflow-y-auto">
-          {searching && (
+          {pending && (
             <div className="p-4 text-center text-gray-400 text-sm">Searching...</div>
           )}
-          {!searching && query && results.length === 0 && (
+          {!pending && query && results.length === 0 && (
             <div className="p-4 text-center text-gray-400 text-sm">No users found</div>
           )}
           {results.map((user) => (

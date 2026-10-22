@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '../services/api';
+import { unsubscribePush } from '../utils/push';
 import { User } from '../types';
 
 interface AuthContextType {
@@ -45,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
+    await unsubscribePush();
     try {
       await api.post('/auth/logout');
     } catch {

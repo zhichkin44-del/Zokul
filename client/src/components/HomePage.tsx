@@ -44,7 +44,7 @@ function HomePageInner() {
   const { isOnline } = usePresence(user?.id);
   const { count: unreadCount, markRead } = useUnread(selectedChat?.id || null);
   const { socket } = useSocket();
-  usePushSubscription();
+  const { status: pushStatus, enable: enablePush } = usePushSubscription();
   const { draft, saveDraft, clearDraft } = useDraft(selectedChat?.id || null);
   const prevChatRef = useRef(selectedChat?.id);
 
@@ -176,6 +176,19 @@ function HomePageInner() {
     }
   }, [chats, handleSelectChat]);
 
+  // Notification tapped while Zokul is already open: the service worker
+  // focuses this window and asks it to open the chat.
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+    const onMessage = (event: MessageEvent) => {
+      if (event.data?.type !== 'open-chat') return;
+      const chat = chats.find((c) => c.id === event.data.chatId);
+      if (chat) handleSelectChat(chat);
+    };
+    navigator.serviceWorker.addEventListener('message', onMessage);
+    return () => navigator.serviceWorker.removeEventListener('message', onMessage);
+  }, [chats, handleSelectChat]);
+
   const otherUser = selectedChat?.participants.find((p) => p.id !== user?.id);
   const isGroupChat = selectedChat?.isGroup === true;
   const displayChatName = isGroupChat ? (selectedChat?.name || 'Group') : (otherUser?.name || 'Unknown');
@@ -204,6 +217,19 @@ function HomePageInner() {
             </button>
           </div>
           <div className="mx-4 border-t border-[#C9D6E4] dark:border-gray-800" />
+          {pushStatus === 'default' && (
+            <button
+              onClick={enablePush}
+              className="mx-4 mt-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-xs font-medium text-left hover:bg-primary/15 transition-colors"
+            >
+              Enable notifications to get new messages when Zokul is closed
+            </button>
+          )}
+          {pushStatus === 'needs-install' && (
+            <div className="mx-4 mt-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs">
+              To get notifications on iPhone: Share → Add to Home Screen, then open Zokul from the icon
+            </div>
+          )}
           <ChatList
             chats={chats}
             selectedId={selectedChat?.id}

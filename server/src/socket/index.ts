@@ -96,32 +96,9 @@ export function setupSocket(httpServer: HTTPServer): Server {
     }
     userSockets.get(userId)!.add(socket.id);
 
-    try {
-      await presenceService.setOnline(userId);
-      socket.broadcast.emit('presence:update', { userId, status: 'online' });
-    } catch (err) {
-      logger(`Failed to set online presence for user ${userId}: ${err}`, 'error');
-    }
-
-    try {
-      const onlineIds = await presenceService.getAllOnlineUserIds();
-      for (const id of onlineIds) {
-        if (id !== userId) {
-          socket.emit('presence:update', { userId: id, status: 'online' as const });
-        }
-      }
-    } catch (err) {
-      logger(`Failed to get online users for ${userId}: ${err}`, 'error');
-    }
-
-    try {
-      const chats = await chatModel.findChatsByUserId(userId);
-      for (const chat of chats) {
-        socket.join(`chat:${chat.id}`);
-      }
-    } catch (err) {
-      logger(`Failed to load chats for user ${userId}: ${err}`, 'error');
-    }
+    // Event handlers are registered synchronously below; presence and room
+    // setup runs afterwards (initSocketSession) so that events the client
+    // emits right after connecting (chat:read on resume, etc.) are not lost.
 
     socket.on('heartbeat', async () => {
       await presenceService.setOnline(userId);
@@ -319,7 +296,38 @@ export function setupSocket(httpServer: HTTPServer): Server {
         }
       }
     });
+
+    await initSocketSession(socket, userId);
   });
 
   return io;
+}
+
+async function initSocketSession(socket: Socket, userId: string): Promise<void> {
+  try {
+    await presenceService.setOnline(userId);
+    socket.broadcast.emit('presence:update', { userId, status: 'online' });
+  } catch (err) {
+    logger(`Failed to set online presence for user ${userId}: ${err}`, 'error');
+  }
+
+  try {
+    const onlineIds = await presenceService.getAllOnlineUserIds();
+    for (const id of onlineIds) {
+      if (id !== userId) {
+        socket.emit('presence:update', { userId: id, status: 'online' as const });
+      }
+    }
+  } catch (err) {
+    logger(`Failed to get online users for ${userId}: ${err}`, 'error');
+  }
+
+  try {
+    const chats = await chatModel.findChatsByUserId(userId);
+    for (const chat of chats) {
+      socket.join(`chat:${chat.id}`);
+    }
+  } catch (err) {
+    logger(`Failed to load chats for user ${userId}: ${err}`, 'error');
+  }
 }

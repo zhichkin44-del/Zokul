@@ -26,10 +26,18 @@ export default function CreateChatModal({ open, onClose, onCreated, socket }: Cr
     return () => { clearTimeout(debounceRef.current); };
   }, [open]);
 
+  // Query whose results are on screen; until it matches the input we are
+  // still searching (debounce or request in flight), not "not found".
+  const [searchedQuery, setSearchedQuery] = useState('');
+  const pending = searching || (query.trim() !== '' && searchedQuery !== query);
+
   const handleQuery = (value: string) => {
     setQuery(value);
     clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => search(value), 300);
+    debounceRef.current = setTimeout(async () => {
+      await search(value);
+      setSearchedQuery(value);
+    }, 300);
   };
 
   const handleSelect = async (user: User) => {
@@ -59,13 +67,13 @@ export default function CreateChatModal({ open, onClose, onCreated, socket }: Cr
           />
         </div>
         <div className="max-h-80 overflow-y-auto">
-          {searching && (
+          {pending && (
             <div className="p-4 text-center text-gray-400 text-sm">Searching...</div>
           )}
-          {!searching && query && results.length === 0 && (
+          {!pending && query && results.length === 0 && (
             <div className="p-4 text-center text-gray-400 text-sm">No users found</div>
           )}
-          {!query && !searching && (
+          {!query && !pending && (
             <div className="p-4 text-center text-gray-400 text-sm">Type to search users</div>
           )}
           {results.map((user) => (

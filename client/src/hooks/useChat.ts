@@ -62,6 +62,12 @@ export function useUnread(selectedChatId: string | null) {
 
   useEffect(() => {
     if (!socket) return;
+    const isVisible = () => document.visibilityState === 'visible';
+    const readSelected = () => {
+      if (selectedRef.current && isVisible()) {
+        socket.emit('chat:read', { chatId: selectedRef.current });
+      }
+    };
     const handler = (msg: Message) => {
       if (msg.chatId !== selectedRef.current) {
         setUnread((prev) => {
@@ -69,10 +75,21 @@ export function useUnread(selectedChatId: string | null) {
           next.set(msg.chatId, (next.get(msg.chatId) || 0) + 1);
           return next;
         });
+      } else {
+        // The chat is open: a message seen on screen counts as read.
+        readSelected();
       }
     };
     socket.on('message:new', handler);
-    return () => { socket.off('message:new', handler); };
+    // Returning to the app (phone unlock, tab switch) or reconnecting
+    // marks whatever arrived in the open chat meanwhile as read.
+    socket.on('connect', readSelected);
+    document.addEventListener('visibilitychange', readSelected);
+    return () => {
+      socket.off('message:new', handler);
+      socket.off('connect', readSelected);
+      document.removeEventListener('visibilitychange', readSelected);
+    };
   }, [socket]);
 
   const markRead = useCallback((chatId: string) => {
