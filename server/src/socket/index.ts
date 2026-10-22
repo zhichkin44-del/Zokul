@@ -8,6 +8,7 @@ import * as chatModel from '../models/Chat';
 import * as UserModel from '../models/User';
 import * as presenceService from '../services/presenceService';
 import * as agentService from '../services/agentService';
+import { validateFileRef } from '../services/fileService';
 import { logger } from '../utils/logger';
 import { config } from '../config/app';
 import { getRedisPubSub } from '../config/redis';
@@ -15,9 +16,27 @@ import { getRedisPubSub } from '../config/redis';
 const HEARTBEAT_TIMEOUT = 35000;
 let ioInstance: Server | null = null;
 
-// For messages created outside a socket handler (agent REST API).
-export function emitToChat(chatId: string, event: string, data: unknown): void {
-  ioInstance?.to(`chat:${chatId}`).emit(event, data);
+// For messages created outside a socket handler (agent REST API). Like
+// message:send, it first puts every participant's open sockets into the room:
+// clients leave a chat's room when they switch away from it, and must still
+// get its updates for the chat list and unread counters.
+export async function emitToChat(chatId: string, event: string, data: unknown): Promise<void> {
+  if (!ioInstance) return;
+  const chat = await chatModel.findChatById(chatId);
+  for (const pid of chat?.participantIds ?? []) joinUserToChat(pid, chatId);
+  ioInstance.to(`chat:${chatId}`).emit(event, data);
+}
+
+export function removeUserFromChat(userId: string, chatId: string): void {
+  for (const socketId of userSockets.get(userId) ?? []) {
+    ioInstance?.in(socketId).socketsLeave(`chat:${chatId}`);
+  }
+}
+
+export function emitToUsers(userIds: Iterable<string>, event: string, data: unknown): void {
+  for (const uid of userIds) {
+    for (const socketId of userSockets.get(uid) ?? []) ioInstance?.to(socketId).emit(event, data);
+  }
 }
 
 // A chat created over REST (e.g. a new agent): put the user's open sockets
@@ -130,7 +149,7 @@ export function setupSocket(httpServer: HTTPServer): Server {
       logger(`Socket ${socket.id} joined chat room ${chatId}`);
     });
 
-    socket.on('message:send', async (data: { chatId: string; text?: string; imageUrl?: string; imageUrls?: string[]; voiceUrl?: string; voiceDuration?: number; replyToId?: string }) => {
+    socket.on('message:send', async (data: { chatId: string; text?: string; imageUrl?: string; imageUrls?: string[]; voiceUrl?: string; voiceDuration?: number; replyToId?: string; file?: unknown }) => {
       try {
         if (!checkRateLimit(userId)) {
           socket.emit('error', { message: 'Too many messages' });
@@ -150,7 +169,10 @@ export function setupSocket(httpServer: HTTPServer): Server {
           data.voiceUrl,
           data.voiceDuration,
           data.replyToId,
-          data.imageUrls
+          data.imageUrls,
+          'text',
+          undefined,
+          data.file === undefined || data.file === null ? undefined : validateFileRef(data.file)
         );
         for (const pid of chat.participantIds) {
           if (pid === userId) continue;
@@ -232,7 +254,7 @@ export function setupSocket(httpServer: HTTPServer): Server {
           return;
         }
         const updated = await agentService.answerQuestion(userId, data?.messageId, data?.answer);
-        emitToChat(updated.chatId, 'message:updated', updated);
+        await emitToChat(updated.chatId, 'message:updated', updated);
         reply({ ok: true });
       } catch (err: unknown) {
         reply({ ok: false, error: err instanceof Error ? err.message : String(err) });
@@ -322,7 +344,9 @@ export function setupSocket(httpServer: HTTPServer): Server {
           userSockets.delete(userId);
           try {
             await presenceService.setOffline(userId);
-            socket.broadcast.emit('presence:update', { userId, status: 'offline' });
+            const lastSeenAt = await UserModel.setLastSeen(userId);
+            // Only people who share a chat with this user see their presence.
+            emitToUsers(await UserModel.findContactIds(userId), 'presence:update', { userId, status: 'offline', lastSeenAt });
           } catch (err) {
             logger(`Failed to set offline presence for user ${userId}: ${err}`, 'error');
           }
@@ -337,22 +361,30 @@ export function setupSocket(httpServer: HTTPServer): Server {
 }
 
 async function initSocketSession(socket: Socket, userId: string): Promise<void> {
+  let contacts: string[] = [];
+  try {
+    contacts = await UserModel.findContactIds(userId);
+  } catch (err) {
+    logger(`Failed to load contacts for ${userId}: ${err}`, 'error');
+  }
+
   try {
     await presenceService.setOnline(userId);
-    socket.broadcast.emit('presence:update', { userId, status: 'online' });
+    await UserModel.setLastSeen(userId);
+    emitToUsers(contacts, 'presence:update', { userId, status: 'online' });
   } catch (err) {
     logger(`Failed to set online presence for user ${userId}: ${err}`, 'error');
   }
 
   try {
-    const onlineIds = await presenceService.getAllOnlineUserIds();
-    for (const id of onlineIds) {
-      if (id !== userId) {
-        socket.emit('presence:update', { userId: id, status: 'online' as const });
+    if (contacts.length > 0) {
+      const online = await presenceService.getOnlineUsers(contacts);
+      for (const [id, isOnline] of online) {
+        if (isOnline) socket.emit('presence:update', { userId: id, status: 'online' as const });
       }
     }
   } catch (err) {
-    logger(`Failed to get online users for ${userId}: ${err}`, 'error');
+    logger(`Failed to get online contacts for ${userId}: ${err}`, 'error');
   }
 
   try {

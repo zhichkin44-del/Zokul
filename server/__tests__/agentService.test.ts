@@ -49,6 +49,17 @@ describe('agentService', () => {
     expect(emitToChat).toHaveBeenCalledWith('chat1', 'message:new', expect.objectContaining({ id: 'm1' }));
   });
 
+  it('posts into a project room only when the agent is a member', async () => {
+    (MessageModel.isParticipant as jest.Mock).mockResolvedValue(false);
+    const room = '11111111-2222-3333-4444-555555555555';
+    await expect(agentService.postStatus(agent, { state: 'done', text: 'x', chatId: room })).rejects.toThrow('not a member');
+    expect(messageService.createMessage).not.toHaveBeenCalled();
+
+    (MessageModel.isParticipant as jest.Mock).mockResolvedValue(true);
+    await agentService.postStatus(agent, { state: 'done', text: 'x', chatId: room });
+    expect((messageService.createMessage as jest.Mock).mock.calls[0][0]).toBe(room);
+  });
+
   it('validates agent input', async () => {
     await expect(agentService.postStatus(agent, { state: 'exploded', text: 'x' })).rejects.toThrow(agentService.AgentInputError);
     await expect(agentService.askQuestion(agent, { question: '   ' })).rejects.toThrow('question is required');

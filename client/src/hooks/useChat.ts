@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../services/api';
 import { useSocket } from '../contexts/SocketContext';
-import { Chat, Message, User } from '../types';
+import { Chat, Message, User, FileAttachment } from '../types';
 
 export function useChats() {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -28,7 +28,11 @@ export function useChats() {
       load();
     };
     socket.on('chat:new-room', handler);
-    return () => { socket.off('chat:new-room', handler); };
+    socket.on('chat:updated', handler);
+    return () => {
+      socket.off('chat:new-room', handler);
+      socket.off('chat:updated', handler);
+    };
   }, [socket, load]);
 
   useEffect(() => {
@@ -197,6 +201,11 @@ export function useMessages(chatId: string | null) {
     socket.emit('message:send', { chatId, imageUrl });
   }, [socket, chatId]);
 
+  const sendFile = useCallback((file: FileAttachment) => {
+    if (!socket || !chatId) return;
+    socket.emit('message:send', { chatId, file });
+  }, [socket, chatId]);
+
   const sendImages = useCallback((imageUrls: string[]) => {
     if (!socket || !chatId) return;
     socket.emit('message:send', { chatId, imageUrls });
@@ -221,7 +230,7 @@ export function useMessages(chatId: string | null) {
     setMessages((prev) => [...older, ...prev]);
   }, []);
 
-  return { messages, loading, error, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion };
+  return { messages, loading, error, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion, sendFile };
 }
 
 export function useSearchUsers() {

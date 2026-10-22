@@ -21,7 +21,7 @@ export async function findByEmail(email: string): Promise<(User & { passwordHash
 
 export async function findById(id: string): Promise<User | null> {
   const result = await pool.query(
-    'SELECT id, email, name, avatar_url, created_at, is_agent FROM users WHERE id = $1',
+    'SELECT id, email, name, avatar_url, created_at, is_agent, last_seen_at FROM users WHERE id = $1',
     [id]
   );
   const row = result.rows[0] as UserRow | undefined;
@@ -30,6 +30,7 @@ export async function findById(id: string): Promise<User | null> {
     id: row.id, email: row.email, name: row.name,
     avatarUrl: row.avatar_url || undefined, createdAt: row.created_at,
     isAgent: row.is_agent || undefined,
+    lastSeenAt: row.last_seen_at || undefined,
   };
 }
 
@@ -45,6 +46,28 @@ export async function search(query: string, excludeUserId: string, limit: number
     name: row.name,
     avatarUrl: row.avatar_url || undefined,
   }));
+}
+
+export async function setLastSeen(userId: string): Promise<string> {
+  const result = await pool.query('UPDATE users SET last_seen_at = NOW() WHERE id = $1 RETURNING last_seen_at', [userId]);
+  return result.rows[0]?.last_seen_at;
+}
+
+export async function findInvitees(ids: string[]): Promise<{ id: string; isAgent: boolean; ownerId: string | null }[]> {
+  const result = await pool.query('SELECT id, is_agent, owner_id FROM users WHERE id = ANY($1::uuid[])', [ids]);
+  return result.rows.map((r: { id: string; is_agent: boolean; owner_id: string | null }) => ({ id: r.id, isAgent: r.is_agent, ownerId: r.owner_id }));
+}
+
+// People who share at least one chat with this user (presence is only shown to them).
+export async function findContactIds(userId: string): Promise<string[]> {
+  const result = await pool.query(
+    `SELECT DISTINCT cp2.user_id
+     FROM chat_participants cp1
+     JOIN chat_participants cp2 ON cp2.chat_id = cp1.chat_id AND cp2.user_id <> cp1.user_id
+     WHERE cp1.user_id = $1`,
+    [userId]
+  );
+  return result.rows.map((r: { user_id: string }) => r.user_id);
 }
 
 export async function create(email: string, passwordHash: string, name: string): Promise<User> {

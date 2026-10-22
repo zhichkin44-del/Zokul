@@ -23,6 +23,10 @@ router.get('/me', wrap(async (req, res) => {
   res.json({ id: agent.id, name: agent.name, chatId: await agentService.chatIdFor(agent) });
 }));
 
+router.get('/chats', wrap(async (req, res) => {
+  res.json(await agentService.listChats(req.agent!));
+}));
+
 router.post('/messages', wrap(async (req, res) => {
   const msg = await agentService.postMessage(req.agent!, req.body ?? {});
   res.status(201).json({ id: msg.id });

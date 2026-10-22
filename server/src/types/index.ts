@@ -5,6 +5,7 @@ export interface User {
   avatarUrl?: string;
   createdAt: string;
   isAgent?: boolean;
+  lastSeenAt?: string;
 }
 
 export interface UserRow {
@@ -16,6 +17,7 @@ export interface UserRow {
   created_at: string;
   token_version: number;
   is_agent?: boolean;
+  last_seen_at?: string | null;
 }
 
 export interface AuthResponse {
@@ -46,6 +48,8 @@ export interface Chat {
 export interface ChatWithUsers extends Chat {
   participants: User[];
   lastMessage?: Message;
+  // For the user who loaded the chat: notifications off.
+  muted?: boolean;
 }
 
 export interface ChatRow {
@@ -65,6 +69,10 @@ export interface ChatRow {
   user_avatar_url: string | null;
   user_created_at: string;
   user_is_agent?: boolean;
+  user_last_seen_at?: string | null;
+  user_muted?: boolean;
+  last_message_file_name?: string | null;
+  last_message_kind?: string | null;
 }
 
 export interface Message {
@@ -81,6 +89,14 @@ export interface Message {
   createdAt: string;
   kind?: MessageKind;
   payload?: Record<string, unknown>;
+  file?: FileAttachment;
+}
+
+export interface FileAttachment {
+  url: string;
+  name: string;
+  size: number;
+  mime: string;
 }
 
 // 'text' is a normal chat message; the others are cards posted by AI agents.

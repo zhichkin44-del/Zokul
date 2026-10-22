@@ -1,4 +1,5 @@
 import * as ChatModel from '../models/Chat';
+import { assertCanInvite } from './groupService';
 import { ChatWithUsers } from '../types';
 import { logger } from '../utils/logger';
 
@@ -10,6 +11,8 @@ export async function createChat(userId: string, participantId: string): Promise
   if (userId === participantId) {
     throw new Error('Cannot create chat with yourself');
   }
+  // Someone else's AI agent cannot be messaged directly.
+  await assertCanInvite(userId, [participantId]);
   const existing = await ChatModel.findExistingChat(userId, participantId);
   if (existing) {
     return existing;
@@ -25,6 +28,10 @@ export async function createChat(userId: string, participantId: string): Promise
 
 export async function getChatById(chatId: string): Promise<ChatWithUsers | null> {
   return ChatModel.findChatById(chatId);
+}
+
+export function setMuted(chatId: string, userId: string, muted: boolean): Promise<void> {
+  return ChatModel.setMuted(chatId, userId, muted);
 }
 
 export async function deleteChat(chatId: string, userId: string): Promise<void> {

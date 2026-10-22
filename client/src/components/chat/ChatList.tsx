@@ -122,6 +122,7 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
                 <div className="flex items-center justify-between">
                   <span className={`text-sm truncate ${count > 0 ? 'font-bold text-gray-900 dark:text-white' : 'font-medium text-gray-900 dark:text-gray-100'}`}>
                     {displayName}
+                    {chat.muted && <span className="ml-1 text-xs text-gray-400" title="Notifications off">🔕</span>}
                   </span>
                   {lastMsg && (
                     <span className="text-[11px] text-gray-400 ml-2 shrink-0 whitespace-nowrap leading-none">

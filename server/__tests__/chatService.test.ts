@@ -2,6 +2,7 @@ import * as chatService from '../src/services/chatService';
 import * as ChatModel from '../src/models/Chat';
 
 jest.mock('../src/models/Chat');
+jest.mock('../src/services/groupService', () => ({ assertCanInvite: jest.fn() }));
 
 describe('chatService', () => {
   beforeEach(() => {

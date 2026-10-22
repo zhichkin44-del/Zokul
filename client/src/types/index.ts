@@ -5,6 +5,7 @@ export interface User {
   avatarUrl?: string;
   createdAt: string;
   isAgent?: boolean;
+  lastSeenAt?: string;
 }
 
 export interface AuthResponse {
@@ -28,6 +29,14 @@ export interface Message {
   // Cards posted by AI agents; absent for normal messages.
   kind?: 'status' | 'question' | 'handoff';
   payload?: StatusPayload | QuestionPayload | HandoffPayload;
+  file?: FileAttachment;
+}
+
+export interface FileAttachment {
+  url: string;
+  name: string;
+  size: number;
+  mime: string;
 }
 
 export interface StatusPayload {
@@ -80,10 +89,12 @@ export interface Chat {
   id: string;
   name?: string;
   isGroup?: boolean;
+  creatorId?: string;
   participantIds: string[];
   participants: User[];
   lastMessage?: Message;
   unreadCount?: number;
+  muted?: boolean;
   createdAt: string;
 }
 

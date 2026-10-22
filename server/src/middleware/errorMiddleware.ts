@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/logger';
 import { AgentInputError } from '../services/agentService';
+import { FileError } from '../services/fileService';
+import { GroupError } from '../services/groupService';
 
 export function errorMiddleware(err: Error, _req: Request, res: Response, _next: NextFunction): void {
   logger(err.message, 'error');
@@ -10,7 +12,11 @@ export function errorMiddleware(err: Error, _req: Request, res: Response, _next:
     res.status(400).json({ error: 'Invalid id' });
     return;
   }
-  if (err instanceof AgentInputError) {
+  if (err instanceof GroupError) {
+    res.status(err.status).json({ error: err.message });
+    return;
+  }
+  if (err instanceof AgentInputError || err instanceof FileError) {
     res.status(400).json({ error: err.message });
     return;
   }

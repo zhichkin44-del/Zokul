@@ -6,6 +6,7 @@ import Avatar from '../common/Avatar';
 import TypingIndicator from './TypingIndicator';
 import MessageActions from './MessageActions';
 import AgentCard from './AgentCard';
+import { formatFileSize } from '../../utils/format';
 import ReplyQuote from './ReplyQuote';
 import VoicePlayer from './VoicePlayer';
 import ImageViewer from './ImageViewer';
@@ -241,7 +242,7 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
           const showDay = i > 0 && new Date(msg.createdAt).toDateString() !== new Date(sortedMessages[i - 1].createdAt).toDateString();
           const isNew = Date.now() - new Date(msg.createdAt).getTime() < 10000;
           return (
-            <div key={msg.id}>
+            <div key={msg.id} id={`msg-${msg.id}`} className="scroll-mt-16 transition-colors duration-700">
               {(i === 0 || showDay) && <DaySeparator date={new Date(msg.createdAt)} />}
               <div className={`flex gap-2 ${isMine ? 'flex-row-reverse' : ''} ${showAvatar ? 'mt-3' : 'mt-0.5'}`}>
                 <div className={`w-8 shrink-0 ${isMine ? 'hidden' : ''}`}>
@@ -289,6 +290,24 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                         <div onClick={(e) => e.stopPropagation()}>
                           <VoicePlayer voiceUrl={msg.voiceUrl} voiceDuration={msg.voiceDuration} />
                         </div>
+                      )}
+                      {msg.file && (
+                        <a
+                          href={msg.file.url}
+                          download={msg.file.name}
+                          onClick={(e) => e.stopPropagation()}
+                          className={`flex items-center gap-2.5 py-1 min-w-[180px] ${msg.text ? 'mb-1.5' : ''}`}
+                        >
+                          <span className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isMine ? 'bg-white/20' : 'bg-primary/10 text-primary'}`}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="w-5 h-5">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
+                            </svg>
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block font-medium truncate">{msg.file.name}</span>
+                            <span className={`block text-xs ${isMine ? 'text-white/70' : 'text-gray-500'}`}>{formatFileSize(msg.file.size)} · Download</span>
+                          </span>
+                        </a>
                       )}
                       {msg.text && <p className="whitespace-pre-wrap break-words">{msg.text}</p>}
                     </div>

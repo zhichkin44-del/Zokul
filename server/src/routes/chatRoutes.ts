@@ -9,6 +9,7 @@ router.use(authMiddleware);
 router.get('/', chatController.getChats);
 router.get('/:id', checkParticipant, chatController.getChatById);
 router.post('/', chatController.createChat);
+router.patch('/:id/mute', checkParticipant, chatController.setMuted);
 router.delete('/:id', chatController.deleteChat);
 
 export default router;

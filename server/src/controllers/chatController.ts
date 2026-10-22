@@ -38,6 +38,16 @@ export async function createChat(req: AuthRequest, res: Response, next: NextFunc
   }
 }
 
+export async function setMuted(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const muted = req.body?.muted === true;
+    await chatService.setMuted(req.params.id, req.userId!, muted);
+    res.json({ muted });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function deleteChat(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     await chatService.deleteChat(req.params.id, req.userId!);

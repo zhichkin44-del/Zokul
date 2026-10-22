@@ -7,7 +7,11 @@ import { useChats, useUnread, useMessages } from '../hooks/useChat';
 import { usePagination } from '../hooks/usePagination';
 import { useTyping } from '../hooks/useTyping';
 import { usePresence } from '../hooks/usePresence';
+import api from '../services/api';
 import AgentsModal, { BotIcon } from './agents/AgentsModal';
+import SearchPanel from './chat/SearchPanel';
+import ChatInfoModal from './chat/ChatInfoModal';
+import { formatLastSeen } from '../utils/format';
 import { usePushSubscription } from '../hooks/usePushSubscription';
 import { useDraft } from '../hooks/useDraft';
 import { ChatProvider } from '../contexts/ChatContext';
@@ -40,10 +44,12 @@ function HomePageInner() {
   const createMenuRef = useRef<HTMLDivElement>(null);
   const chatActionsRef = useRef<HTMLDivElement>(null);
   const { chats, loading: chatsLoading, error: chatsError, reload: reloadChats } = useChats();
-  const { messages, loading: msgsLoading, error: msgsError, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion } = useMessages(selectedChat?.id || null);
+  const { messages, loading: msgsLoading, error: msgsError, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion, sendFile } = useMessages(selectedChat?.id || null);
   const { loadMore, loadingMore, hasMore, reset: resetPagination } = usePagination(selectedChat?.id || null);
   const { handleTyping } = useTyping(selectedChat?.id || null);
-  const { isOnline } = usePresence(user?.id);
+  const { isOnline, lastSeenOf } = usePresence(user?.id);
+  const [showInfo, setShowInfo] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const { count: unreadCount, markRead } = useUnread(selectedChat?.id || null);
   const { socket } = useSocket();
   const { status: pushStatus, enable: enablePush } = usePushSubscription();
@@ -195,6 +201,24 @@ function HomePageInner() {
   const isGroupChat = selectedChat?.isGroup === true;
   const displayChatName = isGroupChat ? (selectedChat?.name || 'Group') : (otherUser?.name || 'Unknown');
   const otherOnline = isOnline(otherUser?.id || '');
+  const canDeleteChat = !isGroupChat || selectedChat?.creatorId === user?.id;
+
+  // Keep the open chat in sync with the reloaded list (rename, members, mute).
+  useEffect(() => {
+    if (!selectedChat) return;
+    const fresh = chats.find((c) => c.id === selectedChat.id);
+    if (fresh && fresh !== selectedChat) setSelectedChat(fresh);
+  }, [chats, selectedChat]);
+
+  // Search result picked: scroll to it if it is loaded and flash it.
+  const jumpToMessage = useCallback((messageId: string) => {
+    setShowSearch(false);
+    const el = document.getElementById(`msg-${messageId}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('bg-primary/10');
+    setTimeout(() => el.classList.remove('bg-primary/10'), 1600);
+  }, []);
 
   return (
     <AppLayout>
@@ -352,14 +376,25 @@ function HomePageInner() {
                   )}
                   {!isGroupChat && !otherUser?.isAgent && <OnlineDot online={otherOnline} />}
                 </div>
-                <div className="flex-1 min-w-0">
+                <button type="button" onClick={() => setShowInfo(true)} className="flex-1 min-w-0 text-left" aria-label={isGroupChat ? 'Group info' : 'Profile'}>
                   <div className="font-medium text-sm truncate">
                     {displayChatName}
+                    {selectedChat.muted && <span className="ml-1 text-gray-400" title="Notifications off">🔕</span>}
                   </div>
-                  <div className="text-xs text-gray-400">
-                    {isGroupChat ? `${selectedChat.participants.length} members` : otherUser?.isAgent ? 'AI agent' : (otherOnline ? 'Online' : 'Offline')}
+                  <div className="text-xs text-gray-400 truncate">
+                    {isGroupChat
+                      ? `${selectedChat.participants.length} members`
+                      : otherUser?.isAgent ? 'AI agent' : otherOnline ? 'Online' : formatLastSeen(lastSeenOf(otherUser?.id || '', otherUser?.lastSeenAt))}
                   </div>
-                </div>
+                </button>
+                <button
+                  onClick={() => setShowSearch((v) => !v)}
+                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-[#C9D6E4] dark:hover:bg-gray-700/50"
+                  title="Search in chat"
+                  aria-label="Search in chat"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+                </button>
                 <div className="relative" ref={chatActionsRef}>
                   <button
                     onClick={() => setShowChatActions((v) => !v)}
@@ -374,7 +409,22 @@ function HomePageInner() {
                     </svg>
                   </button>
                   {showChatActions && (
-                    <div className="absolute right-0 top-full mt-1 w-48 bg-[#F8FAFD] dark:bg-gray-800 border border-[#D5DEE9] dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-20">
+                    <div className="absolute right-0 top-full mt-1 w-52 bg-[#F8FAFD] dark:bg-gray-800 border border-[#D5DEE9] dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-20">
+                      <button onClick={() => { setShowChatActions(false); setShowInfo(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#DFEAF5] dark:hover:bg-gray-700 transition-colors text-left" role="menuitem">
+                        <span className="text-sm font-medium">{isGroupChat ? 'Group info' : 'Profile'}</span>
+                      </button>
+                      <button
+                        onClick={async () => {
+                          setShowChatActions(false);
+                          await api.patch(`/chats/${selectedChat.id}/mute`, { muted: !selectedChat.muted }).catch(() => undefined);
+                          reloadChats();
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#DFEAF5] dark:hover:bg-gray-700 transition-colors text-left"
+                        role="menuitem"
+                      >
+                        <span className="text-sm font-medium">{selectedChat.muted ? 'Turn notifications on' : 'Mute notifications'}</span>
+                      </button>
+                      {canDeleteChat && (
                       <button
                         onClick={() => { setShowChatActions(false); setDeleteConfirmChatId(selectedChat?.id || null); }}
                         className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#DFEAF5] dark:hover:bg-gray-700 transition-colors text-left"
@@ -385,10 +435,24 @@ function HomePageInner() {
                         </svg>
                         <span className="text-sm font-medium text-red-500">Delete chat</span>
                       </button>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
+              {showSearch && (
+                <SearchPanel chatId={selectedChat.id} participants={selectedChat.participants} onPick={jumpToMessage} onClose={() => setShowSearch(false)} />
+              )}
+              {showInfo && (
+                <ChatInfoModal
+                  chat={selectedChat}
+                  currentUserId={user?.id || ''}
+                  isOnline={isOnline}
+                  lastSeenOf={lastSeenOf}
+                  onClose={() => setShowInfo(false)}
+                  onChanged={reloadChats}
+                />
+              )}
               <ChatView
                 messages={messages}
                 currentUserId={user?.id || ''}
@@ -409,6 +473,7 @@ function HomePageInner() {
                 onEdit={handleEditSubmit}
                 onSendImage={sendImage}
                 onSendImages={sendImages}
+                onSendFile={sendFile}
                 onSendVoice={sendVoice}
                 onTyping={handleTyping}
                 draft={draft}

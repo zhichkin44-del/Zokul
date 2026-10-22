@@ -121,6 +121,28 @@ export async function migrate(): Promise<void> {
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_messages_handoffs ON messages(created_at) WHERE kind = 'handoff' AND deleted_at IS NULL;
     `);
+    // v1.0 messenger features
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ`);
+    await client.query(`ALTER TABLE chat_participants ADD COLUMN IF NOT EXISTS muted BOOLEAN NOT NULL DEFAULT false`);
+    await client.query(`ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_url VARCHAR(500)`);
+    await client.query(`ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_name VARCHAR(255)`);
+    await client.query(`ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_size INTEGER`);
+    await client.query(`ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_mime VARCHAR(120)`);
+    // Search: the 'simple' config works for Russian and English alike
+    // ('english' stemming left Cyrillic words unsearchable by prefix).
+    await client.query(`
+      CREATE OR REPLACE FUNCTION messages_text_search_trigger() RETURNS trigger AS $$
+      BEGIN
+        NEW.text_search_vector := to_tsvector('simple', COALESCE(NEW.text, '') || ' ' || COALESCE(NEW.file_name, ''));
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    `);
+    // Re-index rows written with the old config (no-op once they match).
+    await client.query(`
+      UPDATE messages SET text_search_vector = to_tsvector('simple', COALESCE(text, '') || ' ' || COALESCE(file_name, ''))
+      WHERE text_search_vector IS DISTINCT FROM to_tsvector('simple', COALESCE(text, '') || ' ' || COALESCE(file_name, ''))
+    `);
     console.log('Migration completed successfully');
   } finally {
     client.release();

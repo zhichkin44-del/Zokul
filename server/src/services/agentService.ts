@@ -95,33 +95,53 @@ export async function chatIdFor(agent: AgentRecord): Promise<string> {
   return (await ChatModel.createChat(agent.ownerId, agent.id)).id;
 }
 
-async function post(agent: AgentRecord, text: string, kind: Message['kind'], payload?: Record<string, unknown>): Promise<Message> {
-  const chatId = await chatIdFor(agent);
+// Where an agent posts: its chat with the owner by default, or a project
+// room it was added to. It can never post into a chat it is not part of.
+async function targetChat(agent: AgentRecord, chatId: unknown): Promise<string> {
+  if (chatId === undefined || chatId === null || chatId === '') return chatIdFor(agent);
+  if (typeof chatId !== 'string' || !/^[0-9a-f-]{36}$/i.test(chatId) || !(await MessageModel.isParticipant(chatId, agent.id))) {
+    throw new AgentInputError('This agent is not a member of that chat');
+  }
+  return chatId;
+}
+
+export async function listChats(agent: AgentRecord) {
+  const chats = await ChatModel.findChatsByUserId(agent.id);
+  return chats.map((c) => ({
+    id: c.id,
+    name: c.isGroup ? c.name || 'Group' : 'Direct chat with your owner',
+    isGroup: c.isGroup || false,
+    members: c.participants.map((p) => ({ name: p.name, isAgent: p.isAgent || false })),
+  }));
+}
+
+async function post(agent: AgentRecord, text: string, kind: Message['kind'], payload?: Record<string, unknown>, chatId?: unknown): Promise<Message> {
+  chatId = await targetChat(agent, chatId);
   // `text` is the plain-language summary used for the chat list, search and push.
-  const message = await messageService.createMessage(chatId, agent.id, text, undefined, undefined, undefined, undefined, undefined, kind, payload);
-  emitToChat(chatId, 'message:new', message);
+  const message = await messageService.createMessage(chatId as string, agent.id, text, undefined, undefined, undefined, undefined, undefined, kind, payload);
+  await emitToChat(chatId as string, 'message:new', message);
   return message;
 }
 
-export async function postMessage(agent: AgentRecord, raw: { text?: unknown }) {
-  return post(agent, clean(raw.text, LIMITS.text, 'text', true)!, 'text');
+export async function postMessage(agent: AgentRecord, raw: { text?: unknown; chatId?: unknown }) {
+  return post(agent, clean(raw.text, LIMITS.text, 'text', true)!, 'text', undefined, raw.chatId);
 }
 
-export async function postStatus(agent: AgentRecord, raw: { state?: unknown; text?: unknown }) {
+export async function postStatus(agent: AgentRecord, raw: { state?: unknown; text?: unknown; chatId?: unknown }) {
   const state = (raw.state ?? 'info') as StatusState;
   if (!STATUS_STATES.includes(state)) throw new AgentInputError(`state must be one of ${STATUS_STATES.join(', ')}`);
   const text = clean(raw.text, LIMITS.text, 'text', true)!;
-  return post(agent, text, 'status', { state });
+  return post(agent, text, 'status', { state }, raw.chatId);
 }
 
-export async function askQuestion(agent: AgentRecord, raw: { question?: unknown; options?: unknown }) {
+export async function askQuestion(agent: AgentRecord, raw: { question?: unknown; options?: unknown; chatId?: unknown }) {
   const question = clean(raw.question, LIMITS.question, 'question', true)!;
   const options = raw.options === undefined ? [] : raw.options;
   if (!Array.isArray(options) || options.length > LIMITS.options) {
     throw new AgentInputError(`options must be an array of up to ${LIMITS.options} strings`);
   }
   const cleanOptions = options.map((o, i) => clean(o, LIMITS.option, `options[${i}]`, true)!);
-  return post(agent, question, 'question', { question, options: cleanOptions, answer: null });
+  return post(agent, question, 'question', { question, options: cleanOptions, answer: null }, raw.chatId);
 }
 
 async function findOwnCard(agent: AgentRecord, messageId: string, kind: Message['kind']): Promise<Message | null> {
@@ -157,7 +177,7 @@ export async function cancelQuestion(agent: AgentRecord, messageId: string) {
     { keys: ['answer', 'cancelled'] }
   );
   if (!updated) return { error: 'closed' as const };
-  emitToChat(updated.chatId, 'message:updated', updated);
+  await emitToChat(updated.chatId, 'message:updated', updated);
   return { ok: true as const };
 }
 
@@ -172,7 +192,7 @@ export async function createHandoff(agent: AgentRecord, raw: Record<string, unkn
     notes: clean(raw.notes, LIMITS.notes, 'notes'),
     claimedBy: null,
   };
-  return post(agent, `Handoff: ${title}`, 'handoff', payload);
+  return post(agent, `Handoff: ${title}`, 'handoff', payload, raw.chatId);
 }
 
 export async function listHandoffs(agent: AgentRecord, onlyOpen: boolean, limit = 20) {
@@ -195,7 +215,7 @@ export async function claimHandoff(agent: AgentRecord, messageId: string) {
     const takenBy = (msg.payload as { claimedBy?: string } | undefined)?.claimedBy;
     return { error: 'already_claimed' as const, message: `Handoff already taken${takenBy ? ` by ${takenBy}` : ''}` };
   }
-  emitToChat(updated.chatId, 'message:updated', updated);
+  await emitToChat(updated.chatId, 'message:updated', updated);
   return { handoff: { id: updated.id, from: row.sender_name, ...updated.payload } };
 }
 

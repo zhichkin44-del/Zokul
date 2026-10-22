@@ -22,6 +22,7 @@ import agentRoutes from './routes/agentRoutes';
 import agentApiRoutes from './routes/agentApiRoutes';
 import { uploadMiddleware } from './middleware/uploadMiddleware';
 import { processImage, processAvatar } from './middleware/processImage';
+import { fileUpload, describeUpload } from './services/fileService';
 import { authMiddleware, AuthRequest } from './middleware/authMiddleware';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import { uploadLimiter } from './middleware/rateLimit';
@@ -52,7 +53,16 @@ app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
   }
   next(err);
 });
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'), {
+  // Shared documents are always downloaded, never rendered by the browser,
+  // so an uploaded HTML/JS-looking file cannot run in Zokul's origin.
+  setHeaders: (res, filePath) => {
+    if (filePath.includes(`${path.sep}files${path.sep}`)) {
+      res.setHeader('Content-Disposition', 'attachment');
+      res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+    }
+  },
+}));
 
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
@@ -83,12 +93,25 @@ app.post('/api/upload', uploadLimiter, authMiddleware, (req, res, next) => {
   });
 });
 
+app.post('/api/upload/file', uploadLimiter, authMiddleware, (req, res, next) => {
+  fileUpload(req, res, (err) => {
+    if (err) return next(err);
+    if (!req.file) return res.status(400).json({ error: 'No file provided' });
+    res.json(describeUpload(req.file));
+  });
+});
+
 app.post('/api/upload/avatar', authMiddleware, (req: AuthRequest, res, next) => {
   uploadMiddleware(req, res, async (err) => {
     if (err) return next(err);
     if (!req.file) return res.status(400).json({ error: 'No file provided' });
     await processAvatar(req, res, async (processErr) => {
       if (processErr) return next(processErr);
+      // processAvatar only converts images; anything else is not an avatar.
+      if (req.file!.mimetype !== 'image/webp') {
+        fs.unlink(req.file!.path, () => undefined);
+        return res.status(400).json({ error: 'Avatar must be an image' });
+      }
       const url = `/uploads/${req.file!.filename}`;
       await UserModel.updateProfile(req.userId!, { avatarUrl: url });
       res.json({ url });

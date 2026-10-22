@@ -16,7 +16,11 @@
 //   handoffs [--all] [--json]                  list handoffs from your agents
 //   claim <handoff-id>                         take a handoff and print it as a prompt
 //   connect <url> <token>                      verify and save the connection for this user
+//   chats                                      list chats and project rooms this agent is in
 //   whoami                                     check the token
+//
+// status / say / ask / handoff accept --chat <chat-id> to post into a project
+// room instead of the direct chat with your owner.
 //   mcp                                        run as an MCP server over stdio
 //
 // Exit codes: 0 ok, 1 error, 2 question not answered in time.
@@ -28,7 +32,7 @@ import { createInterface } from 'node:readline';
 
 const VERSION = '1.0.0';
 
-const VALUE_FLAGS = new Set(['options', 'wait', 'title', 'summary', 'done', 'next', 'files', 'notes', 'url', 'token']);
+const VALUE_FLAGS = new Set(['options', 'wait', 'title', 'summary', 'done', 'next', 'files', 'notes', 'url', 'token', 'chat']);
 const BOOLEAN_FLAGS = new Set(['all', 'help']);
 
 // Only known flags are flags: anything else that starts with "--" is text
@@ -161,6 +165,11 @@ function handoffAsPrompt(h) {
   ].join('').trim();
 }
 
+function chatLine(c) {
+  const members = c.members.map((m) => (m.isAgent ? `${m.name} (agent)` : m.name)).join(', ');
+  return `${c.id}  ${c.isGroup ? '[room] ' : ''}${c.name}  — ${members}`;
+}
+
 function handoffLine(h) {
   const state = h.claimedBy ? `taken by ${h.claimedBy}` : 'open';
   return `${h.id}  [${state}]  ${h.title}  — from ${h.from}, ${new Date(h.createdAt).toLocaleString()}`;
@@ -210,18 +219,23 @@ async function cli(argv) {
     }
     case 'status': {
       const [state, ...words] = rest;
-      await api(cfg, 'POST', '/status', { state, text: words.join(' ') });
+      await api(cfg, 'POST', '/status', { state, text: words.join(' '), chatId: flags.chat });
       return 0;
     }
     case 'say': {
-      await api(cfg, 'POST', '/messages', { text: rest.join(' ') });
+      await api(cfg, 'POST', '/messages', { text: rest.join(' '), chatId: flags.chat });
+      return 0;
+    }
+    case 'chats': {
+      const chats = await api(cfg, 'GET', '/chats');
+      console.log(chats.map(chatLine).join('\n'));
       return 0;
     }
     case 'ask': {
       // Validate before posting, so a typo does not leave a stray question.
       const wait = waitSeconds(flags.wait, 600);
       const options = splitList(flags.options, ',');
-      const q = await api(cfg, 'POST', '/questions', { question: rest.join(' '), options });
+      const q = await api(cfg, 'POST', '/questions', { question: rest.join(' '), options, chatId: flags.chat });
       if (!wait) { console.log(q.id); return 0; }
       const result = await waitForAnswer(cfg, q.id, wait);
       if (result.status !== 'answered') {
@@ -253,6 +267,7 @@ async function cli(argv) {
         files: splitList(flags.files, ','),
         notes: flags.notes,
       };
+      if (flags.chat) body.chatId = flags.chat;
       const created = await api(cfg, 'POST', '/handoffs', body);
       console.log(created.id);
       return 0;
@@ -277,6 +292,8 @@ async function cli(argv) {
 
 // ---------------------------------------------------------------- MCP (stdio)
 
+const CHAT_ID = { type: 'string', description: 'Optional project room id from zokul_list_chats. Default: your direct chat with your human.' };
+
 const TOOLS = [
   {
     name: 'zokul_post_status',
@@ -286,6 +303,7 @@ const TOOLS = [
       properties: {
         state: { type: 'string', enum: ['working', 'done', 'failed', 'info'] },
         text: { type: 'string', description: 'One or two sentences.' },
+        chat_id: CHAT_ID,
       },
       required: ['state', 'text'],
     },
@@ -299,6 +317,7 @@ const TOOLS = [
         question: { type: 'string' },
         options: { type: 'array', items: { type: 'string' }, description: 'Up to 6 short answer buttons, e.g. ["Yes","No"]. They can still type a free answer.' },
         wait_seconds: { type: 'number', description: 'How long to wait, default 120, max 900.' },
+        chat_id: CHAT_ID,
       },
       required: ['question'],
     },
@@ -336,6 +355,7 @@ const TOOLS = [
         next: { type: 'array', items: { type: 'string' } },
         files: { type: 'array', items: { type: 'string' } },
         notes: { type: 'string', description: 'Decisions, gotchas, things not to touch.' },
+        chat_id: CHAT_ID,
       },
       required: ['title'],
     },
@@ -360,7 +380,12 @@ const TOOLS = [
   {
     name: 'zokul_send_message',
     description: 'Send a free-form message to your human in Zokul.',
-    inputSchema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] },
+    inputSchema: { type: 'object', properties: { text: { type: 'string' }, chat_id: CHAT_ID }, required: ['text'] },
+  },
+  {
+    name: 'zokul_list_chats',
+    description: 'List the chats you can post to: the direct chat with your human and any project rooms (with people and other agents) you were added to.',
+    inputSchema: { type: 'object', properties: {} },
   },
 ];
 
@@ -379,13 +404,13 @@ function describeAnswer(result, id) {
 async function callTool(cfg, name, args = {}) {
   switch (name) {
     case 'zokul_post_status':
-      await api(cfg, 'POST', '/status', { state: args.state, text: args.text });
+      await api(cfg, 'POST', '/status', { state: args.state, text: args.text, chatId: args.chat_id });
       return 'Status posted.';
     case 'zokul_send_message':
-      await api(cfg, 'POST', '/messages', { text: args.text });
+      await api(cfg, 'POST', '/messages', { text: args.text, chatId: args.chat_id });
       return 'Message sent.';
     case 'zokul_ask_human': {
-      const q = await api(cfg, 'POST', '/questions', { question: args.question, options: args.options || [] });
+      const q = await api(cfg, 'POST', '/questions', { question: args.question, options: args.options || [], chatId: args.chat_id });
       const result = await waitForAnswer(cfg, q.id, clampWait(args.wait_seconds, 120));
       return describeAnswer(result, q.id);
     }
@@ -401,8 +426,13 @@ async function callTool(cfg, name, args = {}) {
     case 'zokul_create_handoff': {
       const h = await api(cfg, 'POST', '/handoffs', {
         title: args.title, summary: args.summary, done: args.done, next: args.next, files: args.files, notes: args.notes,
+        chatId: args.chat_id,
       });
       return `Handoff saved (id: ${h.id}). Your human and other agents can see it.`;
+    }
+    case 'zokul_list_chats': {
+      const chats = await api(cfg, 'GET', '/chats');
+      return chats.map(chatLine).join('\n');
     }
     case 'zokul_list_handoffs': {
       const list = await api(cfg, 'GET', `/handoffs${args.include_taken ? '?status=all' : ''}`);

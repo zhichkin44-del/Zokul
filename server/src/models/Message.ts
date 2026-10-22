@@ -1,5 +1,5 @@
 import { pool } from '../config/db';
-import { Message, MessageKind, ReadReceipt, ReplyPreview } from '../types';
+import { FileAttachment, Message, MessageKind, ReadReceipt, ReplyPreview } from '../types';
 
 interface MessageRow {
   id: string; chat_id: string; sender_id: string;
@@ -8,6 +8,7 @@ interface MessageRow {
   voice_duration: number | null; is_edited: boolean;
   created_at: string;
   kind?: string | null; payload?: Record<string, unknown> | null;
+  file_url?: string | null; file_name?: string | null; file_size?: number | null; file_mime?: string | null;
   reply_id?: string; reply_sender_id?: string;
   reply_sender_name?: string; reply_text?: string | null;
   reply_image_url?: string | null;
@@ -20,7 +21,7 @@ export async function findByChatId(
 ): Promise<Message[]> {
   const result = await pool.query(
     `SELECT m.id, m.chat_id, m.sender_id, m.text, m.image_url, m.image_urls, m.voice_url, m.voice_duration,
-            m.is_edited, m.created_at, m.kind, m.payload,
+            m.is_edited, m.created_at, m.kind, m.payload, m.file_url, m.file_name, m.file_size, m.file_mime,
             rm.id as reply_id, rm.sender_id as reply_sender_id,
             ru.name as reply_sender_name, rm.text as reply_text, rm.image_url as reply_image_url
      FROM messages m
@@ -44,13 +45,16 @@ export async function create(
   replyToId?: string,
   imageUrls?: string[],
   kind: MessageKind = 'text',
-  payload?: Record<string, unknown>
+  payload?: Record<string, unknown>,
+  file?: FileAttachment
 ): Promise<Message> {
   const result = await pool.query(
-    `INSERT INTO messages (chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, reply_to_id, kind, payload)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-     RETURNING id, chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, is_edited, created_at, kind, payload`,
-    [chatId, senderId, text || null, imageUrl || null, imageUrls || null, voiceUrl || null, voiceDuration || null, replyToId || null, kind, payload ? JSON.stringify(payload) : null]
+    `INSERT INTO messages (chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, reply_to_id, kind, payload,
+                           file_url, file_name, file_size, file_mime)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+     RETURNING id, chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, is_edited, created_at, kind, payload, file_url, file_name, file_size, file_mime`,
+    [chatId, senderId, text || null, imageUrl || null, imageUrls || null, voiceUrl || null, voiceDuration || null, replyToId || null, kind, payload ? JSON.stringify(payload) : null,
+     file?.url ?? null, file?.name ?? null, file?.size ?? null, file?.mime ?? null]
   );
   const msg = mapMessage(result.rows[0]);
   if (replyToId) {
@@ -66,7 +70,7 @@ export async function updateMessage(
   const result = await pool.query(
     `UPDATE messages SET text = $1, is_edited = true, edited_at = NOW()
      WHERE id = $2 AND deleted_at IS NULL
-     RETURNING id, chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, is_edited, created_at, kind, payload`,
+     RETURNING id, chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, is_edited, created_at, kind, payload, file_url, file_name, file_size, file_mime`,
     [text, messageId]
   );
   if (result.rows.length === 0) return null;
@@ -95,7 +99,7 @@ export async function updatePayload(
     `UPDATE messages SET payload = $1
      WHERE id = $2 AND deleted_at IS NULL
        AND ($3::text[] IS NULL OR NOT (jsonb_strip_nulls(payload) ?| $3::text[]))
-     RETURNING id, chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, is_edited, created_at, kind, payload`,
+     RETURNING id, chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, is_edited, created_at, kind, payload, file_url, file_name, file_size, file_mime`,
     [JSON.stringify(payload), messageId, guard?.keys ?? null]
   );
   if (result.rows.length === 0) return null;
@@ -104,7 +108,7 @@ export async function updatePayload(
 
 export async function findById(messageId: string): Promise<Message | null> {
   const result = await pool.query(
-    `SELECT id, chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, is_edited, created_at, kind, payload
+    `SELECT id, chat_id, sender_id, text, image_url, image_urls, voice_url, voice_duration, is_edited, created_at, kind, payload, file_url, file_name, file_size, file_mime
      FROM messages WHERE id = $1 AND deleted_at IS NULL`,
     [messageId]
   );
@@ -123,15 +127,15 @@ export async function search(
   const tsquery = escaped.split(/\s+/).map(w => w + ':*').join(' & ');
   const result = await pool.query(
     `SELECT m.id, m.chat_id, m.sender_id, m.text, m.image_url, m.image_urls, m.voice_url, m.voice_duration,
-            m.is_edited, m.created_at, m.kind, m.payload,
+            m.is_edited, m.created_at, m.kind, m.payload, m.file_url, m.file_name, m.file_size, m.file_mime,
             rm.id as reply_id, rm.sender_id as reply_sender_id,
             ru.name as reply_sender_name, rm.text as reply_text, rm.image_url as reply_image_url,
-            ts_rank(m.text_search_vector, to_tsquery('english', $2)) as rank
+            ts_rank(m.text_search_vector, to_tsquery('simple', $2)) as rank
      FROM messages m
      LEFT JOIN messages rm ON rm.id = m.reply_to_id AND rm.deleted_at IS NULL
      LEFT JOIN users ru ON ru.id = rm.sender_id
      WHERE m.chat_id = $1 AND m.deleted_at IS NULL
-       AND m.text_search_vector @@ to_tsquery('english', $2)
+       AND m.text_search_vector @@ to_tsquery('simple', $2)
      ORDER BY rank DESC, m.created_at DESC
      LIMIT $3 OFFSET $4`,
     [chatId, tsquery, limit, offset]
@@ -211,6 +215,9 @@ function mapMessage(row: MessageRow): Message {
     isEdited: row.is_edited || false,
     createdAt: row.created_at,
   };
+  if (row.file_url) {
+    msg.file = { url: row.file_url, name: row.file_name || 'file', size: row.file_size || 0, mime: row.file_mime || 'application/octet-stream' };
+  }
   if (row.kind && row.kind !== 'text') {
     msg.kind = row.kind as MessageKind;
     msg.payload = row.payload || undefined;

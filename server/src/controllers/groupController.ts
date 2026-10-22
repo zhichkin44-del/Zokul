@@ -23,7 +23,16 @@ export async function addMember(req: AuthRequest, res: Response, next: NextFunct
       res.status(400).json({ error: 'userId is required' });
       return;
     }
-    await groupService.addMember(req.params.id, userId);
+    await groupService.addMember(req.params.id, req.userId!, userId);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function renameGroup(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    await groupService.renameGroup(req.params.id, req.userId!, req.body?.name);
     res.json({ success: true });
   } catch (err) {
     next(err);
@@ -32,7 +41,7 @@ export async function addMember(req: AuthRequest, res: Response, next: NextFunct
 
 export async function removeMember(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    await groupService.removeMember(req.params.id, req.params.userId);
+    await groupService.removeMember(req.params.id, req.userId!, req.params.userId);
     res.json({ success: true });
   } catch (err) {
     next(err);

@@ -5,8 +5,7 @@ import * as messageService from '../services/messageService';
 export async function getMessages(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     const { chatId } = req.params;
-    const offset = parseInt(req.query.offset as string) || 0;
-    const limit = parseInt(req.query.limit as string) || 50;
+    const { offset, limit } = page(req);
     const messages = await messageService.getMessages(chatId, offset, limit);
     res.json(messages);
   } catch (err) {
@@ -36,12 +35,18 @@ export async function updateMessage(req: AuthRequest, res: Response, next: NextF
   }
 }
 
+// Clamped so a client cannot ask for the whole history in one request.
+function page(req: AuthRequest): { offset: number; limit: number } {
+  const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 50, 1), 100);
+  const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
+  return { offset, limit };
+}
+
 export async function searchMessages(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     const { chatId } = req.params;
-    const q = (req.query.q as string) || '';
-    const limit = parseInt(req.query.limit as string) || 50;
-    const offset = parseInt(req.query.offset as string) || 0;
+    const q = typeof req.query.q === 'string' ? req.query.q.slice(0, 200) : '';
+    const { offset, limit } = page(req);
     if (!q.trim()) {
       res.json([]);
       return;

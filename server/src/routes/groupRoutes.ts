@@ -8,6 +8,7 @@ const router = Router();
 router.use(authMiddleware);
 router.post('/group', groupController.createGroup);
 router.post('/:id/members', checkParticipant, groupController.addMember);
+router.patch('/:id', checkParticipant, groupController.renameGroup);
 router.delete('/:id/members/:userId', checkParticipant, groupController.removeMember);
 
 export default router;

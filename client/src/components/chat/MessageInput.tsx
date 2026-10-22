@@ -1,15 +1,20 @@
 import { useState, useRef, useEffect, FormEvent, useCallback } from 'react';
+import { FileAttachment } from '../../types';
 import api from '../../services/api';
 import { useChatContext } from '../../contexts/ChatContext';
 import ReplyQuote from './ReplyQuote';
 import VoiceRecorder from './VoiceRecorder';
 import { isTouchDevice, getSupportedMimeType, getExtension, MIN_DURATION_MS } from '../../utils/voice';
 
+// Must match the server's allowed document list (fileService.ts).
+const DOCUMENT_TYPES = '.pdf,.txt,.log,.md,.csv,.json,.zip,.docx,.xlsx,.pptx';
+
 interface MessageInputProps {
   onSend: (text: string) => void;
   onEdit?: (messageId: string, text: string) => void;
   onSendImage?: (imageUrl: string) => void;
   onSendImages?: (imageUrls: string[]) => void;
+  onSendFile?: (file: FileAttachment) => void;
   onSendVoice?: (voiceUrl: string, voiceDuration: number) => void;
   onTyping?: () => void;
   draft?: string;
@@ -18,7 +23,7 @@ interface MessageInputProps {
 
 const EMOJIS = ['😀','😁','😂','🤣','😊','😎','🥰','😍','🤩','😋','🤔','🙄','😴','🥳','😇','🙃','😤','😢','😭','🥺','🤗','😡','🤯','🫡','😏','🥴','🫠','😶','🫥','😬','🥸','🤨','😐','😑','😮‍💨','🤤','😪','😵','🤐','🥶','🥵','🤧','🤮','🥴','😈','👹','👺','💩','👻','☠️','👽','🤖','🎃','😺','💀','🔥','⭐','✨','🌟','💫','⚡','🌈','☀️','🌙','⭐','💥','🔥','❤️','💔','💖','💗','💙','💚','💛','💜','🖤','🤍','🤎','💝','💞','💓','❣️','💕','💌','💋','🫶','👀','👁️','👅','👄','🦷','👍','👎','👊','✊','🤛','🤜','🤚','👋','✋','🖐️','✌️','🤞','🫰','🤟','🤘','👌','🤌','🤏','🫵','🫱','🫲','🫳','🫴','👐','🤲','🙌','🙏','💪','🦾','🦶','👣','👂','🦻','👃','🧠','🫀','🫁','👁️‍🗨️','👤','👥','🗣️','👶','🧒','👦','👧','🧑','👱','👨','👩','🧔','👩‍🦰','👨‍🦰','👩‍🦱','👨‍🦱','👩‍🦳','👨‍🦳','👩‍🦲','👨‍🦲','👳','🧕','👮','🕵️','💂','👷','👸','🤴','👳‍♂️','👳‍♀️','🧑‍🎄','🎅','🤶','🦸','🦹','🧙','🧚','🧛','🧜','🧝','🧞','🧟','🧌','👯','🧑‍🤝‍🧑','👫','👬','👭','💑','👩‍❤️‍👨','👨‍❤️‍👨','👩‍❤️‍👩','💏','👩‍❤️‍💋‍👨','👨‍❤️‍💋‍👨','👩‍❤️‍💋‍👩','👪','👨‍👩‍👧','👨‍👩‍👧‍👦','👨‍👩‍👦‍👦','👨‍👩‍👧‍👧','👩‍👩‍👦','👩‍👩‍👧','👩‍👩‍👧‍👦','👩‍👩‍👦‍👦','👩‍👩‍👧‍👧','👨‍👨‍👦','👨‍👨‍👧','👨‍👨‍👧‍👦','👨‍👨‍👦‍👦','👨‍👨‍👧‍👧','👩‍👦','👩‍👧','👩‍👧‍👦','👩‍👦‍👦','👩‍👧‍👧','👨‍👦','👨‍👧','👨‍👧‍👦','👨‍👦‍👦','👨‍👧‍👧','🧑‍🧑‍🧒','🧑‍🧑‍🧒‍🧒','🧑‍🧒','🧑‍🧒‍🧒','👴','👵','🧓','🙇','💁','🙅','🙆','🙋','🙎','🙍','💇','💆','🧖','💅','🤳','💃','🕺','🕴️','👯‍♂️','👯‍♀️','🧑‍🦯','🧑‍🦼','🧑‍🦽','🦮','🐕‍🦺','🐕','🐩','🐈','🐈‍⬛','🐓','🦃','🦤','🦚','🦜','🦢','🦩','🕊️','🐇','🦝','🦊','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🪰','🪲','🪳','🪴','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🦧','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🦙','🦥','🦨','🦡','🦦','🦔','🐁','🐀','🐹','🐿️','🦫','🦔','🦇','🐻','🐻‍❄️','🐨','🐼','🦣','🐲','🐉','🐦','🐧','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐸','🐊','🐍','🐢','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐚','🪸','🐌','🐛','🦋','🐜','🐝','🪲','🐞','🦗','🪳','🪰','🦟','🪱','🦂','🕷️','🕸️','☘️','🍀','🍁','🍂','🍃','🍄','🌰','🪵','🌲','🌳','🌴','🌵','🌾','🌿','☘️','🍀','🍁','🍂','🍃','🍇','🍈','🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔','🥕','🌽','🌶️','🫑','🥒','🥬','🥦','🧄','🧅','🍄','🥜','🌰','🍞','🥐','🥖','🥨','🧀','🥚','🍳','🧈','🥞','🧇','🥓','🥩','🍗','🍖','🦴','🌭','🍔','🍟','🍕','🫓','🥪','🥙','🧆','🌮','🌯','🫔','🥗','🥘','🫕','🥫','🍝','🍜','🍲','🍛','🍣','🍱','🥟','🦪','🍤','🍙','🍚','🍘','🍥','🥠','🥮','🍢','🍡','🍧','🍨','🍦','🥧','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍿','🍩','🍪','🌰','🥜','🍯','🥛','🍼','🫖','☕','🍵','🧃','🥤','🧋','🍶','🍺','🍻','🥂','🍷','🫗','🥃','🧊','🍸','🍹','🍾','🥄','🍴','🍽️','🔪','🫙','🏺','🌍','🌎','🌏','🗺️','🧭','🏔️','⛰️','🌋','🗻','🏕️','🏖️','🏜️','🏝️','🏞️','🏟️','🏛️','🏗️','🧱','🪨','🪵','🛖','🏘️','🏚️','🏠','🏡','🏢','🏣','🏤','🏥','🏦','🏨','🏩','🏪','🏫','🏬','🏭','🏯','🏰','💒','🗼','🗽','⛪','🕌','🛕','🕍','⛩️','🕋','⛲','⛺','🌁','🌃','🏙️','🌄','🌅','🌆','🌇','🌉','🎠','🎡','🎢','💈','🎪','🎭','🖼️','🎨','🎬','🎤','🎧','🎼','🎹','🥁','🪘','🎷','🎺','🎸','🪕','🎻','🎲','♟️','🎯','🎳','🎮','🕹️','🎰','🚗','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🛺','🚲','🛴','🛹','🛼','🚏','🛣️','🛤️','⛽','🛞','🚨','🚥','🚦','🛑','🚧','⚓','🛟','⛵','🛶','🚤','🛳️','⛴️','🛥️','🚢','✈️','🛩️','🛫','🛬','🪂','💺','🚁','🚟','🚠','🚡','🛰️','🚀','🛸','🏠','🏡','🏢','🏣','🏤','🏥','🏦','🏨','🏩','🏪','🏫','🏬','🏭','🏯','🏰','💒','🗼','🗽','⛪','🕌','🛕','🕍','⛩️','🕋','⛲','⛺','🌁','🌃','🏙️','🌄','🌅','🌆','🌇','🌉','🎠','🎡','🎢','💈','🎪','🎭','🖼️','🎨','🎬','🎤','🎧','🎼','🎹','🥁','🪘','🎷','🎺','🎸','🪕','🎻','🎲','♟️','🎯','🎳','🎮','🕹️','🎰','🚗','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🛺','🚲','🛴','🛹','🛼','⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','🕹️','🗜️','💽','💾','💿','📀','📼','📷','📸','📹','🎥','📽️','🎞️','📞','☎️','📟','📠','📺','📻','🎙️','🎚️','🎛️','🧭','⏱️','⏲️','🕰️','⌛','⏳','📡','🔋','🔌','💡','🔦','🕯️','🪔','🧯','🗑️','🛢️','💸','💵','💴','💶','💷','🪙','💰','💳','💎','⚖️','🪜','🧰','🪛','🔧','🔨','⚒️','🛠️','⛏️','🪚','🔩','⚙️','🪤','🧱','⛓️','🧲','🔫','💣','🧨','🪓','🔪','🗡️','⚔️','🛡️','🚬','⚰️','🪦','⚱️','🏺','🔮','📿','💈','⚗️','🔭','🔬','🕳️','🩻','🩼','🩺','💊','💉','🩸','🧬','🦠','🧫','🧪','🌡️','🧹','🪠','🧺','🧻','🚽','🚰','🚿','🛁','🛀','🧼','🪥','🪒','🧽','🪣','🧴','🛎️','🔑','🗝️','🚪','🪑','🛋️','🛏️','🛌','🧸','🪆','🖼️','🪞','🪟','🛍️','🛒','🎁','🎀','🎊','🎉','🎎','🏮','🎐','🧧','✉️','📩','📨','📧','💌','📥','📤','📦','🏷️','📪','📫','📬','📭','📮','📯','📜','📃','📄','📑','🧾','🏷️','💰','💴','💵','💶','💷','✂️','📌','📍','📎','🖇️','📏','📐','🧮','📊','📈','📉','🗒️','🗓️','📆','📅','🗑️','📇','🗃️','🗳️','🗄️','📋','📁','📂','🗂️','🗞️','📰','📓','📔','📒','📕','📗','📘','📙','📚','📖','🔖','🧷','🔗','📎','🖇️','📐','📏','🧮','📌','📍','✂️','🖊️','🖋️','✒️','🖌️','🖍️','📝','✏️','🔍','🔎','🔏','🔐','🔒','🔓','💯','🔢','🔣','🔤','🅰️','🆎','🅱️','🆑','🅾️','🆘','🛑','⛔','📛','🚫','❌','⭕','💢','♨️','🚷','🚯','🚳','🚱','🔞','📵','🚭','❗','❕','❓','❔','‼️','⁉️','🔅','🔆','〽️','⚠️','🚸','🔱','⚜️','🔰','♻️','✅','🈯','💹','❇️','✳️','❎','🌐','💠','Ⓜ️','🌀','💤','🚼','🈂️','🈁','🈶','🈚','🈸','🈺','🈷️','✴️','🆚','🉑','💮','🉐','㊗️','㊙️','🈴','🈵','🔯','🔴','🟠','🟡','🟢','🔵','🟣','🟤','⚫','⚪','🟥','🟧','🟨','🟩','🟦','🟪','🟫','⬛','⬜','◼️','◻️','◾','◽','▪️','▫️','🔶','🔷','🔸','🔹','🔺','🔻','💠','🔘','🔳','🔲','🏁','🚩','🎌','🏴','🏳️','🏳️‍🌈','🏳️‍⚧️','🏴‍☠️'];
 
-export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages, onSendVoice, onTyping, draft, onDraftChange }: MessageInputProps) {
+export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages, onSendFile, onSendVoice, onTyping, draft, onDraftChange }: MessageInputProps) {
   const [text, setText] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
@@ -248,16 +253,42 @@ export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages
     onDraftChange?.(e.target.value);
   };
 
+  // Documents (pdf, logs, …) are uploaded and sent right away, one message each.
+  const sendDocuments = async (docs: File[]) => {
+    setUploading(true);
+    setUploadError('');
+    try {
+      for (const doc of docs) {
+        const formData = new FormData();
+        formData.append('file', doc);
+        const res = await api.post<FileAttachment>('/upload/file', formData);
+        onSendFile?.(res.data);
+      }
+    } catch (err: unknown) {
+      setUploadError((err as { response?: { data?: { error?: string } } }).response?.data?.error || 'Failed to upload file');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+    const all = Array.from(e.target.files ?? []);
+    // Some phones send HEIC photos without a MIME type: trust the extension too.
+    const isImage = (f: File) => f.type.startsWith('image/') || /\.(heic|heif|jpe?g|png|gif|webp)$/i.test(f.name);
+    const docs = all.filter((f) => !isImage(f));
+    if (docs.length > 0) sendDocuments(docs);
+    const files = all.filter(isImage);
+    if (files.length === 0) {
+      if (fileRef.current) fileRef.current.value = '';
+      return;
+    }
     const total = pendingImages.length + files.length;
     if (total > 4) {
       setUploadError('Maximum 4 images');
       if (fileRef.current) fileRef.current.value = '';
       return;
     }
-    const newImages = Array.from(files).map((file) => ({
+    const newImages = files.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
     }));
@@ -365,7 +396,7 @@ export default function MessageInput({ onSend, onEdit, onSendImage, onSendImages
             </svg>
           </button>
         )}
-        <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleFiles} className="hidden" />
+        <input ref={fileRef} type="file" accept={`image/*,${DOCUMENT_TYPES}`} multiple onChange={handleFiles} className="hidden" />
         <div ref={emojiRef} className="relative flex-1">
           {showEmoji && !showVoiceRecorder && !showTouchRecorderBar && (
             <div className="absolute bottom-full left-0 mb-2 p-2 bg-[#F8FAFD] dark:bg-gray-800 rounded-xl shadow-lg border border-[#D5DEE9] dark:border-gray-700 grid grid-cols-10 gap-1 max-h-72 overflow-y-auto z-10">
