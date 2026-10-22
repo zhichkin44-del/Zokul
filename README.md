@@ -75,12 +75,12 @@ Each agent is a chat participant with its own token (only a SHA-256 hash is stor
 
 ```bash
 curl -fsSL https://your-zokul/zokul-agent.mjs -o zokul-agent.mjs
+node zokul-agent.mjs connect https://your-zokul zk_...   # once: saves ~/.zokul/config.json, so no secrets in configs
 
 # As an MCP server (Claude Code shown; any MCP client works)
-claude mcp add zokul -e ZOKUL_URL=https://your-zokul -e ZOKUL_TOKEN=zk_... -- node /path/to/zokul-agent.mjs mcp
+claude mcp add zokul -- node /path/to/zokul-agent.mjs mcp
 
-# As a CLI from any agent, hook or script
-export ZOKUL_URL=https://your-zokul ZOKUL_TOKEN=zk_...
+# As a CLI from any agent, hook or script (ZOKUL_URL / ZOKUL_TOKEN env vars also work)
 node zokul-agent.mjs status working "Refactoring push notifications"
 node zokul-agent.mjs ask "Delete old migrations?" --options Yes,No   # prints the answer, exit 2 on timeout
 node zokul-agent.mjs handoff --title "Push on iPhone" --done "sw.pwa.ts;enable button" --next "test over HTTPS"

@@ -2,7 +2,8 @@
 // Zokul agent tool: lets any AI agent post status, ask you questions and hand
 // off work through your Zokul messenger. One file, no dependencies, Node 18+.
 //
-//   ZOKUL_URL=https://your-zokul ZOKUL_TOKEN=zk_... node zokul-agent.mjs <command>
+//   node zokul-agent.mjs connect https://your-zokul zk_...   (once; saves ~/.zokul/config.json)
+//   node zokul-agent.mjs <command>        (or pass ZOKUL_URL / ZOKUL_TOKEN env vars)
 //
 // Commands:
 //   status <working|done|failed|info> <text>   post a status line
@@ -13,12 +14,15 @@
 //   handoff --json <file|->                    same, from a JSON file or stdin
 //   handoffs [--all] [--json]                  list handoffs from your agents
 //   claim <handoff-id>                         take a handoff and print it as a prompt
+//   connect <url> <token>                      verify and save the connection for this user
 //   whoami                                     check the token
 //   mcp                                        run as an MCP server over stdio
 //
 // Exit codes: 0 ok, 1 error, 2 question not answered in time.
 
-import { readFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { createInterface } from 'node:readline';
 
 const VERSION = '1.0.0';
@@ -40,11 +44,19 @@ function parseArgs(argv) {
   return { positional, flags };
 }
 
+// Saved by `connect` so MCP configs and scripts need no secrets in them.
+const CONFIG_FILE = process.env.ZOKUL_CONFIG || join(homedir(), '.zokul', 'config.json');
+
+function savedConfig() {
+  try { return JSON.parse(readFileSync(CONFIG_FILE, 'utf8')); } catch { return {}; }
+}
+
 function config(flags = {}) {
-  const url = (flags.url || process.env.ZOKUL_URL || '').replace(/\/+$/, '');
-  const token = flags.token || process.env.ZOKUL_TOKEN || '';
+  const saved = savedConfig();
+  const url = (flags.url || process.env.ZOKUL_URL || saved.url || '').replace(/\/+$/, '');
+  const token = flags.token || process.env.ZOKUL_TOKEN || saved.token || '';
   if (!url || !token) {
-    throw new Error('Set ZOKUL_URL and ZOKUL_TOKEN (create a token in Zokul: AI agents -> Add).');
+    throw new Error('Not connected. Run: node zokul-agent.mjs connect <zokul-url> <token> (token: Zokul -> AI agents -> Add).');
   }
   return { url, token };
 }
@@ -107,13 +119,26 @@ async function cli(argv) {
   const [command, ...rest] = positional;
 
   if (!command || command === 'help' || flags.help) {
-    const header = readFileSync(new URL(import.meta.url), 'utf8').split('\n').slice(1, 20)
-      .filter((l) => l.startsWith('//')).map((l) => l.replace(/^\/\/ ?/, '')).join('\n');
+    const lines = readFileSync(new URL(import.meta.url), 'utf8').split(/\r?\n/).slice(1);
+    const end = lines.findIndex((l) => !l.startsWith('//'));
+    const header = lines.slice(0, end).map((l) => l.replace(/^\/\/ ?/, '')).join('\n');
     console.log(header);
     return 0;
   }
   if (command === 'mcp') {
     await mcpServer(flags);
+    return 0;
+  }
+
+  if (command === 'connect') {
+    const [url, token] = rest;
+    if (!url || !token) throw new Error('Usage: connect <zokul-url> <token>');
+    const cfg = { url: url.replace(/\/+$/, ''), token };
+    const me = await api(cfg, 'GET', '/me');
+    mkdirSync(join(CONFIG_FILE, '..'), { recursive: true });
+    writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2), { mode: 0o600 });
+    try { chmodSync(CONFIG_FILE, 0o600); } catch { /* not supported on Windows */ }
+    console.log(`Connected as ${me.name}. Saved to ${CONFIG_FILE}`);
     return 0;
   }
 

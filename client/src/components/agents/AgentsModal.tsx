@@ -146,10 +146,12 @@ export default function AgentsModal({ open, onClose, onOpenChat, onChanged }: Ag
 
 function TokenPanel({ issued, onDone }: { issued: Issued; onDone: () => void }) {
   const origin = window.location.origin;
-  const env = `ZOKUL_URL=${origin} ZOKUL_TOKEN=${issued.token}`;
   const download = `curl -fsSL ${origin}/zokul-agent.mjs -o zokul-agent.mjs`;
-  const claude = `claude mcp add zokul -e ZOKUL_URL=${origin} -e ZOKUL_TOKEN=${issued.token} -- node /full/path/to/zokul-agent.mjs mcp`;
-  const cli = `${env} node zokul-agent.mjs ask "Deploy to staging?" --options Yes,No`;
+  // `connect` stores the token in ~/.zokul/config.json, so the MCP config
+  // and scripts below contain no secret.
+  const connect = `node zokul-agent.mjs connect ${origin} ${issued.token}`;
+  const claude = `claude mcp add zokul -- node /full/path/to/zokul-agent.mjs mcp`;
+  const cli = `node zokul-agent.mjs ask "Deploy to staging?" --options Yes,No`;
 
   return (
     <div className="space-y-3">
@@ -158,8 +160,9 @@ function TokenPanel({ issued, onDone }: { issued: Issued; onDone: () => void }) 
       </div>
       <CopyBlock label="Token" value={issued.token} />
       <CopyBlock label="1. Download the agent tool (Node 18+, no dependencies)" value={download} />
-      <CopyBlock label="2a. Claude Code / any MCP client" value={claude} />
-      <CopyBlock label="2b. Any agent or script (CLI)" value={cli} />
+      <CopyBlock label="2. Connect it once on this computer" value={connect} />
+      <CopyBlock label="3a. Claude Code (terminal) / any MCP client" value={claude} />
+      <CopyBlock label="3b. Any agent or script (CLI)" value={cli} />
       <button onClick={onDone} className="w-full py-2 rounded-lg bg-primary text-white font-medium">Done</button>
     </div>
   );
