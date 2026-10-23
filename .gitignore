@@ -9,3 +9,4 @@ reports/
 client/vite.config.js
 client/vite.config.d.ts
 ssl/*.pem
+backups/

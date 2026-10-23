@@ -257,13 +257,14 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                     <Avatar name={sender?.name || msg.senderId} size={32} url={sender?.avatarUrl} />
                   )}
                 </div>
-                <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} ${msg.kind ? 'w-[min(85%,440px)]' : 'max-w-[min(75%,400px)]'}`}>
+                <div className={`flex min-w-0 flex-col ${isMine ? 'items-end' : 'items-start'} ${msg.kind ? 'w-[min(85%,440px)]' : 'max-w-[min(75%,400px)]'}`}>
                   {msg.kind ? (
                     <div className={`w-full ${isNew ? 'animate-message-appear' : ''}`}>
                       <AgentCard message={msg} onAnswer={(id, answer) => onAnswerQuestion ? onAnswerQuestion(id, answer) : Promise.resolve('Unavailable')} onClaim={(id) => onClaimHandoff ? onClaimHandoff(id) : Promise.resolve('Unavailable')} />
                     </div>
                   ) : (
-                  <div className="relative">
+                  // max-w-full: a one-line reply quote must not stretch the bubble past the screen.
+                  <div className="relative max-w-full">
                     <div
                       className={`px-3 py-2 text-sm leading-relaxed cursor-pointer ${isNew ? 'animate-message-appear' : ''} ${
                         isMine

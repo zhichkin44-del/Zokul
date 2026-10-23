@@ -61,6 +61,21 @@ services:
       - server
     restart: unless-stopped
 
+  # Daily backup of the database and uploaded files into ./backups on the server (newest 14 kept).
+  backup:
+    image: postgres:16-alpine
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./scripts/backup-loop.sh:/backup-loop.sh:ro
+      - ./backups:/backups
+      - uploads:/uploads:ro
+    entrypoint: ['sh', '/backup-loop.sh']
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
   tunnel:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run --token ${CF_TUNNEL_TOKEN}
