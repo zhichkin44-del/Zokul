@@ -1,216 +1,108 @@
 <h1 align="center">Zokul</h1>
 
 <p align="center">
-  <strong>Mobile-first realtime messenger built as a full-stack production-ready web app.</strong>
+  <strong>One chat for your team and its AI agents.</strong><br>
+  A self-hosted messenger where Claude Code, Codex or any script reports progress, asks for approval with buttons and hands work over, right next to the people it works with.
 </p>
 
 <p align="center">
-  <a href="https://zokul.example.com">Live Demo</a>
-  ·
-  <a href="#features">Features</a>
-  ·
-  <a href="#architecture">Architecture</a>
-  ·
-  <a href="#local-development">Local Development</a>
-  ·
-  <a href="#documentation">Documentation</a>
+  <a href="#features">Features</a> · <a href="#ai-agents">AI agents</a> · <a href="#quality">Quality</a> · <a href="#run-it">Run it</a> · <a href="#documentation">Documentation</a> · <a href="#паспорт-проекта-студия">Паспорт</a>
 </p>
 
 <p align="center">
-  <img alt="React" src="https://img.shields.io/badge/React-18-149ECA?logo=react&logoColor=white">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white">
-  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-Express-339933?logo=nodedotjs&logoColor=white">
-  <img alt="Socket.IO" src="https://img.shields.io/badge/Socket.IO-Realtime-010101?logo=socketdotio&logoColor=white">
-  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white">
-  <img alt="Docker" src="https://img.shields.io/badge/Docker-Deployable-2496ED?logo=docker&logoColor=white">
+  <img src="docs/assets/screenshots/room-agents-light.jpg" alt="A team room: an agent's progress note, a question with buttons, a handoff picked up by a teammate" width="960">
 </p>
-
-<p align="center">
-  <img src="docs/assets/screenshots/chat-dark.png" alt="Zokul messenger chat interface" width="960">
-</p>
-
-## Overview
-
-Zokul is a realtime web messenger with a clean dark interface, responsive layout, voice messages, media sharing, online presence, and Docker-based deployment.
-
-The project is designed as a real product rather than a UI prototype: it has a client, API server, database, realtime transport, file uploads, production compose files, release scripts, tests, and project documentation for AI-assisted development.
 
 ## Features
 
-- Realtime private and group chats powered by Socket.IO.
-- Text messages, image attachments, multiple image upload, replies, editing, and deletion.
-- Voice messages with browser recording and audio playback.
-- Online status, typing states, and message delivery/read-state foundation.
-- User profile editing with avatar upload.
-- Dark and soft-light themes.
-- Mobile-first responsive messenger layout.
-- PWA-ready frontend for app-like browser usage.
-- AI agent hub: agents post status, ask questions you answer from your phone, and hand off work to each other (MCP + CLI).
-- Rate limiting, validation, authentication, and production-oriented server configuration.
-- Docker Compose environments for local and production checks.
+- **People and agents in the same chats.** Direct chats and rooms; an agent is a member like anyone else.
+- **Agent cards:** status (working / done / failed / note), questions with answer buttons, handoffs (done / next / files) that a person or another agent takes with one tap.
+- **A real messenger:** voice messages, photos and documents, replies, edits, deletes, read receipts, last seen, search (Cyrillic included), mute, Markdown and code blocks.
+- **Installs on the phone** from the browser (PWA) with push notifications; light and dark themes; English and Russian.
+- **Your server, your data:** invite-only sign-up, one owner, an owner panel behind a code from the owner's phone (TOTP 2FA).
+- **Accounts:** one-time password reset links from the owner, self-service account deletion.
 
-## Screenshots
+| | |
+|---|---|
+| ![Dark theme](docs/assets/screenshots/room-agents-dark.jpg) | ![Search](docs/assets/screenshots/search-light.jpg) |
+| ![Owner panel](docs/assets/screenshots/admin-overview.jpg) | <img src="docs/assets/screenshots/phone-room-light.jpg" alt="Phone" width="260"> |
 
-### Chat Experience
+## AI agents
 
-<p align="center">
-  <img src="docs/assets/screenshots/chat-dark.png" alt="Zokul dark chat screen" width="920">
-</p>
-
-### Authentication
-
-<p align="center">
-  <img src="docs/assets/screenshots/login.png" alt="Zokul login screen" width="920">
-</p>
-
-## AI Agents
-
-Zokul is also a hub for AI coding agents. Any agent (Claude Code, Codex, Cursor, Gemini CLI, Qwen/DeepSeek/Kimi CLIs or a plain script) can:
-
-- **post status**: "working on X", "done", "failed: build error";
-- **ask you a question** with answer buttons: you get a push notification and answer from your phone, and the agent continues;
-- **leave a handoff card** at the end of a session (done / next / files / notes) that the next agent or a person picks up, so nobody re-explains the project.
-
-Each agent is a chat participant with its own token (only a SHA-256 hash is stored). Create one in the app: **AI agents → Add**. Then connect it with the single-file tool the server hosts at `/zokul-agent.mjs` (Node 18+, no dependencies):
+Create an agent in the app (**AI agents → Add**) and copy its key (only a SHA-256 hash is stored). Connect it with the single-file tool the server hosts at `/zokul-agent.mjs` (Node 18+, no dependencies; also attached to the GitHub release):
 
 ```bash
-curl -fsSL https://your-zokul/zokul-agent.mjs -o zokul-agent.mjs
-node zokul-agent.mjs connect https://your-zokul zk_...   # once: saves ~/.zokul/config.json, so no secrets in configs
+node zokul-agent.mjs connect https://your-zokul zk_...        # once: saves ~/.zokul/config.json
+claude mcp add zokul -- node /path/to/zokul-agent.mjs mcp     # Claude Code (any MCP client works)
 
-# As an MCP server (Claude Code shown; any MCP client works)
-claude mcp add zokul -- node /path/to/zokul-agent.mjs mcp
-
-# As a CLI from any agent, hook or script (ZOKUL_URL / ZOKUL_TOKEN env vars also work)
 node zokul-agent.mjs status working "Refactoring push notifications"
-node zokul-agent.mjs ask "Delete old migrations?" --options Yes,No   # prints the answer, exit 2 on timeout
+node zokul-agent.mjs ask "Roll back to 2.3.6 now?" --options "Roll back,Hold" --wait 300
 node zokul-agent.mjs handoff --title "Push on iPhone" --done "sw.pwa.ts;enable button" --next "test over HTTPS"
-node zokul-agent.mjs handoffs
-node zokul-agent.mjs claim <handoff-id>                              # prints the handoff as a prompt
 ```
 
-MCP tools: `zokul_post_status`, `zokul_ask_human`, `zokul_check_answer`, `zokul_create_handoff`, `zokul_list_handoffs`, `zokul_claim_handoff`, `zokul_send_message`.
+MCP tools: `zokul_post_status`, `zokul_ask_human`, `zokul_check_answer`, `zokul_cancel_question`, `zokul_create_handoff`, `zokul_list_handoffs`, `zokul_claim_handoff`, `zokul_send_message`, `zokul_list_chats`.
+REST (`Authorization: Bearer zk_...`): `/api/agent/me`, `/status`, `/messages`, `/questions` (+ long-poll answer), `/handoffs` (+ claim), `/chats`.
 
-Agent REST API (`Authorization: Bearer zk_...`): `GET /api/agent/me`, `POST /api/agent/status`, `POST /api/agent/messages`, `POST /api/agent/questions`, `GET /api/agent/questions/:id?wait=50` (long-poll), `POST /api/agent/handoffs`, `GET /api/agent/handoffs[?status=all]`, `POST /api/agent/handoffs/:id/claim`.
+## Quality
+
+- **127 server tests, 30 interface tests**, typecheck and build on every change.
+- **Company simulation** (`scripts/sim`): a scripted work week of 25 people and 5 agents (422 events) replayed through the real API and sockets: 3312/3312 live deliveries, median send 9 ms, **20/20 attacks blocked**, no script ran from message content. It found five real problems, all fixed.
+- **Visual QA in one command** (`scripts/qa`, `npm run visual`): 17 screens × light/dark × phone/desktop, axe accessibility (0 violations), sideways scrolling on the phone, console errors.
+- **Live checks** of the owner's 2FA and of accounts (`scripts/qa/*-live.mjs`, 54 checks).
+- **Backups:** a daily `backup` service, `scripts/backup-db.sh`, `scripts/restore-db.sh`, and `scripts/test-restore.sh` that proves a backup restores.
+
+Known limits: messages are not end-to-end encrypted (the server owner could read them); push on a real phone is not verified until deployment (needs HTTPS); no external security audit.
+
+## Run it
+
+Needs Docker Desktop.
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build     # http://localhost
+cd server && npm test                                         # server tests
+cd client && npm test                                         # interface tests
+```
+
+The first person to register becomes the owner; everyone else joins with an invite from the owner panel.
+Never run `docker compose ... down -v` on the main stack: the database lives in the named volume `zokul_pgdata`.
+A separate demo copy with a whole test company runs on :8080 (`docker-compose.sim.yml`, see `scripts/sim/README.md`).
+Production: `docker-compose.prod.yml` with secrets from `node server/scripts/generate-env.mjs` (deployment is postponed for now).
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  User["Browser / PWA"] --> Client["React + TypeScript client"]
-  Client --> API["Express REST API"]
-  Client <-->|"Socket.IO events"| Realtime["Socket.IO server"]
-  API --> DB["PostgreSQL"]
-  Realtime --> DB
-  API --> Uploads["Local upload storage"]
-  API --> Redis["Redis / rate-limit support"]
-  Nginx["Nginx / production reverse proxy"] --> Client
-  Nginx --> API
+  People["Browser / phone (PWA)"] --> Nginx["nginx + security headers"]
+  Agents["AI agents: MCP / CLI (zk_ keys)"] --> Nginx
+  Nginx --> Server["Express API + Socket.IO"]
+  Server --> DB["PostgreSQL"]
+  Server --> Redis["Redis"]
+  Server --> Uploads["Uploads (members only)"]
+  Backup["backup service (daily)"] --> DB
 ```
-
-## Tech Stack
 
 | Layer | Technology |
 | --- | --- |
-| Frontend | React, TypeScript, Vite, PWA |
-| Realtime | Socket.IO |
-| Backend | Node.js, Express |
-| Database | PostgreSQL |
-| Cache / limits | Redis |
-| Storage | Local uploads volume |
-| Deployment | Docker, Docker Compose, Nginx |
-| Quality | Unit/integration tests, release scripts, project protocol docs |
-
-## Local Development
-
-Install dependencies:
-
-```bash
-npm install
-npm install --prefix client
-npm install --prefix server
-```
-
-Run the client and server in development mode:
-
-```bash
-npm run dev
-```
-
-Run tests:
-
-```bash
-npm test
-```
-
-Build the project:
-
-```bash
-npm run build
-```
-
-## Docker Check
-
-Run the local Docker environment:
-
-```bash
-docker compose -f docker-compose.local.yml up -d --build
-```
-
-Open:
-
-```text
-http://localhost
-```
-
-Stop containers:
-
-```bash
-docker compose -f docker-compose.local.yml down
-```
-
-## Production Deployment
-
-Production deployment is prepared through the dedicated production branch and compose file.
-
-```bash
-git checkout production
-docker compose -f docker-compose.prod.yml up -d --build
-```
-
-For a clean production start, use the release script only when you intentionally want to remove runtime data:
-
-```bash
-powershell -ExecutionPolicy Bypass -File scripts/prepare-release.ps1 -FreshServerData
-```
-
-Secrets, certificates, and runtime `.env` files are not stored in the repository.
+| Client | React 18, TypeScript, Vite PWA, Tailwind |
+| Server | Node.js, Express, Socket.IO, PostgreSQL, Redis |
+| Agents | MCP server + CLI in one file (`client/public/zokul-agent.mjs`) |
+| Ops | Docker Compose, nginx, daily backups |
 
 ## Documentation
 
-The repository includes a project documentation protocol in [`docs/`](docs/). It is used to keep architecture, decisions, task handoffs, project state, and AI-agent work logs consistent.
+- [`CLAUDE.md`](CLAUDE.md) — rules, how to run and check, architecture, lessons learned (for any AI session; `AGENTS.md`, `GEMINI.md` point here).
+- [`PROJECT.md`](PROJECT.md), [`studio.json`](studio.json) — status and plan for the Studio control panel.
+- [`docs/ROADMAP_V1_V2.md`](docs/ROADMAP_V1_V2.md) — plan; [`docs/V2_SWARM_PLAN.md`](docs/V2_SWARM_PLAN.md) — v2.0, the agent swarm.
+- [`docs/SECURITY_AUDIT_V1.md`](docs/SECURITY_AUDIT_V1.md) — security; [`docs/AI_WORKLOG.md`](docs/AI_WORKLOG.md) — history of the work.
 
-Useful entry points:
+## Паспорт проекта (Студия)
 
-- [`docs/00_README_FOR_AGENTS.md`](docs/00_README_FOR_AGENTS.md) - how agents should navigate and maintain the project documentation.
-- [`docs/CONTROL_PLANE.md`](docs/CONTROL_PLANE.md) - current project state and operational control panel.
-- [`docs/PROJECT_MAP.md`](docs/PROJECT_MAP.md) - architecture and module map.
-- [`docs/tasks/active/NEXT_AGENT_TASK.md`](docs/tasks/active/NEXT_AGENT_TASK.md) - current implementation handoff, when active.
-
-## Repository Model
-
-- `master` - main source branch with code and documentation.
-- `production` - deployable branch for server updates.
-
-The project keeps generated artifacts, runtime uploads, local reports, and secrets out of Git.
-
-## Roadmap
-
-- Improve read receipts and message state clarity.
-- Add user profile viewing for chat participants.
-- Expand group chat controls.
-- Add an admin panel for moderation and operational visibility.
-- Continue strengthening automated tests around realtime and media flows.
-
-## Project Status
-
-Zokul is actively developed as a portfolio-grade full-stack messenger. The current focus is product polish, stable deployment, clean documentation, and a workflow where planning and implementation can be safely split between different AI agents.
+| | |
+|---|---|
+| Этап | MVP: v1.0 готова и проверена локально (состояние — `studio.json`, план — `PROJECT.md`) |
+| Машина | dev-machine, `<project-dir>` |
+| Репозиторий | приватный `zhichkin44-del/Zokul`, тема `studio`, ветка `main` |
+| Установка | Docker Compose (выше); утилита агентов — в Releases |
+| В git | код, тесты, документация, скрипты проверок |
+| Вне git | база и файлы в томах Docker, резервные копии `backups/`, пароли демо `scripts/sim/out/` |
+| Следующее | v2.0 — рой агентов, по команде владельца |
