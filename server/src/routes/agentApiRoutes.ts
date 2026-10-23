@@ -1,14 +1,21 @@
 import { Router, Response, NextFunction } from 'express';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
+import { createHash } from 'crypto';
 import { agentAuthMiddleware, AgentRequest } from '../middleware/agentAuthMiddleware';
 import * as agentService from '../services/agentService';
 
 // API used by AI agents (CLI / MCP server) with a bearer token.
 const router = Router();
 
+// Per agent key, not per address: many agents on one office network must
+// not share a single budget.
 router.use(rateLimit({
   windowMs: 60 * 1000,
   max: 120,
+  keyGenerator: (req) => {
+    const auth = req.headers.authorization ?? '';
+    return auth.startsWith('Bearer ') ? `key:${createHash('sha256').update(auth.slice(7)).digest('hex')}` : `ip:${ipKeyGenerator(req.ip ?? '')}`;
+  },
   message: { error: 'Too many agent requests, slow down' },
   standardHeaders: true,
   legacyHeaders: false,

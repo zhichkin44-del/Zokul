@@ -26,7 +26,7 @@ export default function Avatar({ name, url, size = 40, square = false }: AvatarP
     setImgError(false);
   }, [url]);
 
-  const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+  const initials = (name.split(/\s+/).filter((w) => /^[\p{L}\p{N}]/u.test(w)).map((w) => w[0]).join('') || '?').toUpperCase().slice(0, 2);
   if (url && !imgError) {
     return <img key={url} src={url} alt={name} className="rounded-full object-cover shrink-0" style={{ width: size, height: size }} onError={() => setImgError(true)} />;
   }

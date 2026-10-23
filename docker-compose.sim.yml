@@ -1,0 +1,72 @@
+# A second, separate Zokul for the company simulation and the LinkedIn demo:
+# its own database and files, on http://localhost:8080. Never shares data with
+# the main local copy (docker-compose.local.yml, http://localhost).
+#   docker compose -p zokul-sim -f docker-compose.sim.yml up -d --build
+#   node scripts/sim/run.mjs scripts/sim/company.json   (see scripts/sim/README.md)
+name: zokul-sim
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: zokul
+      POSTGRES_PASSWORD: zokul
+      POSTGRES_DB: zokul
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U zokul']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      PORT: '3001'
+      NODE_ENV: production
+      DATABASE_URL: postgresql://zokul:zokul@postgres:5432/zokul
+      JWT_SECRET: zokul-sim-only-2b8e41c97d3f4a06b5e19c7a8d2f6e30
+      CORS_ORIGIN: http://localhost:8080
+      REDIS_URL: redis://redis:6379
+      UPLOAD_DIR: /app/uploads
+      VAPID_PUBLIC_KEY: REDACTED
+      VAPID_PRIVATE_KEY: REDACTED
+    volumes:
+      - uploads:/app/uploads
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:3001/api/health']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - '8080:80'
+    volumes:
+      - ./client/nginx.local.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - server
+
+volumes:
+  pgdata:
+  uploads:

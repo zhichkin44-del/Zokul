@@ -16,7 +16,7 @@ jest.mock('../src/config/db', () => {
 
 jest.mock('../src/models/Chat');
 jest.mock('../src/models/User');
-jest.mock('../src/socket', () => ({ emitToChat: jest.fn(), emitToUsers: jest.fn(), joinUserToChat: jest.fn(), removeUserFromChat: jest.fn() }));
+jest.mock('../src/socket', () => ({ emitToChat: jest.fn(), emitToUsers: jest.fn(), joinUserToChat: jest.fn(), removeUserFromChat: jest.fn(), endSessions: jest.fn() }));
 
 describe('groupService', () => {
   beforeEach(() => {
@@ -126,6 +126,33 @@ describe('groupService', () => {
       await expect(groupService.renameGroup('g1', 'creator', '   ')).rejects.toThrow('1-100 characters');
       await expect(groupService.renameGroup('g1', 'creator', 'Team')).resolves.toBeUndefined();
       expect(chatModel.renameChat).toHaveBeenCalledWith('g1', 'Team');
+    });
+  });
+
+  describe('own agents in a group someone else created', () => {
+    const group = { id: 'g1', isGroup: true, creatorId: 'creator', participantIds: ['creator', 'member'], participants: [] };
+    beforeEach(() => {
+      (chatModel.findChatById as jest.Mock).mockResolvedValue(group);
+      (UserModel.findInvitees as jest.Mock).mockImplementation(async (ids: string[]) => ids.map((id) => ({
+        id, isAgent: id.startsWith('agent'), ownerId: id === 'agentOfMember' ? 'member' : id === 'agentOfOther' ? 'other' : null,
+      })));
+    });
+
+    it('lets a member bring in and remove their own agent', async () => {
+      await expect(groupService.addMember('g1', 'member', 'agentOfMember')).resolves.toBeUndefined();
+      (chatModel.findChatById as jest.Mock).mockResolvedValue({ ...group, participantIds: [...group.participantIds, 'agentOfMember'] });
+      await expect(groupService.removeMember('g1', 'member', 'agentOfMember')).resolves.toBeUndefined();
+    });
+
+    it('still keeps people and other agents creator-only', async () => {
+      await expect(groupService.addMember('g1', 'member', 'person3')).rejects.toMatchObject({ status: 403 });
+      await expect(groupService.addMember('g1', 'member', 'agentOfOther')).rejects.toMatchObject({ status: 403 });
+      await expect(groupService.removeMember('g1', 'member', 'creator')).rejects.toMatchObject({ status: 403 });
+    });
+
+    it('does not let an outsider add their agent', async () => {
+      (UserModel.findInvitees as jest.Mock).mockResolvedValue([{ id: 'agentX', isAgent: true, ownerId: 'outsider' }]);
+      await expect(groupService.addMember('g1', 'outsider', 'agentX')).rejects.toMatchObject({ status: 403 });
     });
   });
 });

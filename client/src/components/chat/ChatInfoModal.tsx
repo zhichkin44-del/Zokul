@@ -3,7 +3,7 @@ import api from '../../services/api';
 import { Agent, Chat, User } from '../../types';
 import Avatar from '../common/Avatar';
 import { formatLastSeen } from '../../utils/format';
-import { plural, t } from '../../i18n';
+import { personName, plural, t } from '../../i18n';
 
 interface ChatInfoModalProps {
   chat: Chat;
@@ -26,6 +26,11 @@ export default function ChatInfoModal({ chat, currentUserId, isOnline, lastSeenO
   const [muted, setMuted] = useState(chat.muted === true);
   const [name, setName] = useState(chat.name || '');
   const [error, setError] = useState('');
+  const [myAgents, setMyAgents] = useState<Agent[]>([]);
+
+  useEffect(() => {
+    if (isGroup) api.get<Agent[]>('/agents').then((res) => setMyAgents(res.data)).catch(() => setMyAgents([]));
+  }, [isGroup]);
 
   const statusOf = (u: User) => (u.isAgent ? t('AI agent') : isOnline(u.id) ? t('Online') : formatLastSeen(lastSeenOf(u.id, u.lastSeenAt)));
 
@@ -58,7 +63,7 @@ export default function ChatInfoModal({ chat, currentUserId, isOnline, lastSeenO
           {!isGroup && other && (
             <div className="flex flex-col items-center text-center gap-2">
               <Avatar name={other.name} size={72} url={other.avatarUrl} />
-              <div className="text-lg font-semibold">{other.name}</div>
+              <div className="text-lg font-semibold">{personName(other.name)}</div>
               <div className="text-sm text-gray-500">{statusOf(other)}</div>
             </div>
           )}
@@ -89,16 +94,16 @@ export default function ChatInfoModal({ chat, currentUserId, isOnline, lastSeenO
                   <Avatar name={p.name} size={32} url={p.avatarUrl} />
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">
-                      {p.name}{p.id === currentUserId ? ` (${t('you')})` : ''}{p.id === chat.creatorId ? ` · ${t('creator')}` : ''}
+                      {personName(p.name)}{p.id === currentUserId ? ` (${t('you')})` : ''}{p.id === chat.creatorId ? ` · ${t('creator')}` : ''}
                     </div>
                     <div className="text-xs text-gray-500">{statusOf(p)}</div>
                   </div>
-                  {isCreator && p.id !== currentUserId && (
+                  {((isCreator && p.id !== currentUserId) || myAgents.some((a) => a.id === p.id)) && (
                     <button onClick={() => run(() => api.delete(`/chats/${chat.id}/members/${p.id}`), 'Could not remove')} className="text-xs text-gray-600 dark:text-gray-300 px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">{t('Remove')}</button>
                   )}
                 </div>
               ))}
-              {isCreator && <AddMembers chat={chat} onAdd={(userId) => run(() => api.post(`/chats/${chat.id}/members`, { userId }), 'Could not add')} />}
+              <AddMembers chat={chat} agents={myAgents} withPeople={isCreator} onAdd={(userId) => run(() => api.post(`/chats/${chat.id}/members`, { userId }), 'Could not add')} />
             </div>
           )}
 
@@ -116,22 +121,18 @@ export default function ChatInfoModal({ chat, currentUserId, isOnline, lastSeenO
   );
 }
 
-function AddMembers({ chat, onAdd }: { chat: Chat; onAdd: (userId: string) => void }) {
+// The creator adds people and own agents; other members only their own agents.
+function AddMembers({ chat, agents, withPeople, onAdd }: { chat: Chat; agents: Agent[]; withPeople: boolean; onAdd: (userId: string) => void }) {
   const [query, setQuery] = useState('');
   const [people, setPeople] = useState<User[]>([]);
-  const [agents, setAgents] = useState<Agent[]>([]);
 
   useEffect(() => {
-    api.get<Agent[]>('/agents').then((res) => setAgents(res.data)).catch(() => setAgents([]));
-  }, []);
-
-  useEffect(() => {
-    if (!query.trim()) { setPeople([]); return; }
+    if (!withPeople || !query.trim()) { setPeople([]); return; }
     const t = setTimeout(() => {
       api.get<User[]>('/users/search', { params: { q: query } }).then((res) => setPeople(res.data)).catch(() => setPeople([]));
     }, 300);
     return () => clearTimeout(t);
-  }, [query]);
+  }, [query, withPeople]);
 
   const notMember = (id: string) => !chat.participantIds.includes(id);
   const candidates = [
@@ -139,9 +140,10 @@ function AddMembers({ chat, onAdd }: { chat: Chat; onAdd: (userId: string) => vo
     ...people.filter((p) => notMember(p.id)).map((p) => ({ id: p.id, name: p.name, note: '' })),
   ];
 
+  if (!withPeople && candidates.length === 0) return null;
   return (
     <div className="pt-2 space-y-2">
-      <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('Add people by name…')} className="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
+      {withPeople && <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('Add people by name…')} aria-label={t('Add people by name…')} className="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />}
       {candidates.map((c) => (
         <div key={c.id} className="flex items-center justify-between gap-2 text-sm">
           <span className="truncate">{c.name}{c.note && <span className="text-gray-400"> · {c.note}</span>}</span>

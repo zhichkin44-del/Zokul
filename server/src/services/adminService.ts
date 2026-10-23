@@ -4,7 +4,7 @@ import { pool } from '../config/db';
 import { config } from '../config/app';
 import * as presenceService from './presenceService';
 import { logEvent } from './auditService';
-import { emitToUsers } from '../socket';
+import { endSessions } from '../socket';
 
 export class AdminError extends Error {
   constructor(message: string, readonly status: 400 | 404 = 400) {
@@ -67,7 +67,7 @@ export async function setBlocked(adminId: string, userId: string, blocked: boole
     [userId, blocked]
   );
   if (result.rows.length === 0) throw new AdminError('User not found', 404);
-  if (blocked) emitToUsers([userId], 'session:revoked', {});
+  if (blocked) endSessions(userId);
   await logEvent(adminId, blocked ? 'user_blocked' : 'user_unblocked', { name: result.rows[0].name });
 }
 

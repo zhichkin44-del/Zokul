@@ -14,7 +14,7 @@ import SearchPanel from './chat/SearchPanel';
 import ChatInfoModal from './chat/ChatInfoModal';
 import { formatLastSeen } from '../utils/format';
 import { BellIcon, BellOffIcon } from './common/Icons';
-import { plural, t } from '../i18n';
+import { personName, plural, t } from '../i18n';
 import { usePushSubscription } from '../hooks/usePushSubscription';
 import { useDraft } from '../hooks/useDraft';
 import { ChatProvider } from '../contexts/ChatContext';
@@ -47,7 +47,7 @@ function HomePageInner() {
   const createMenuRef = useRef<HTMLDivElement>(null);
   const chatActionsRef = useRef<HTMLDivElement>(null);
   const { chats, loading: chatsLoading, error: chatsError, reload: reloadChats } = useChats();
-  const { messages, loading: msgsLoading, error: msgsError, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion, sendFile } = useMessages(selectedChat?.id || null);
+  const { messages, loading: msgsLoading, error: msgsError, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion, claimHandoff, sendFile } = useMessages(selectedChat?.id || null);
   const { loadMore, loadingMore, hasMore, reset: resetPagination } = usePagination(selectedChat?.id || null);
   const { handleTyping } = useTyping(selectedChat?.id || null);
   const { isOnline, lastSeenOf } = usePresence(user?.id);
@@ -205,7 +205,7 @@ function HomePageInner() {
 
   const otherUser = selectedChat?.participants.find((p) => p.id !== user?.id);
   const isGroupChat = selectedChat?.isGroup === true;
-  const displayChatName = isGroupChat ? (selectedChat?.name || t('Group')) : (otherUser?.name || t('Unknown'));
+  const displayChatName = isGroupChat ? (selectedChat?.name || t('Group')) : (personName(otherUser?.name) || t('Unknown'));
   const otherOnline = isOnline(otherUser?.id || '');
   const canDeleteChat = !isGroupChat || selectedChat?.creatorId === user?.id;
 
@@ -494,6 +494,7 @@ function HomePageInner() {
                 onMessageEdit={handleMessageEdit}
                 onMessageDelete={handleMessageDelete}
                 onAnswerQuestion={answerQuestion}
+                onClaimHandoff={claimHandoff}
               />
               <MessageInput
                 onSend={sendMessage}

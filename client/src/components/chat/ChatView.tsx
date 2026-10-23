@@ -12,7 +12,7 @@ import ReplyQuote from './ReplyQuote';
 import VoicePlayer from './VoicePlayer';
 import ImageViewer from './ImageViewer';
 import '../animations.css';
-import { t } from '../../i18n';
+import { personName, t } from '../../i18n';
 
 interface ChatViewProps {
   messages: Message[];
@@ -28,6 +28,7 @@ interface ChatViewProps {
   onMessageEdit?: (messageId: string, text: string, chatId: string) => void;
   onMessageDelete?: (messageId: string, chatId: string) => void;
   onAnswerQuestion?: (messageId: string, answer: string) => Promise<string | null>;
+  onClaimHandoff?: (messageId: string) => Promise<string | null>;
 }
 
 function formatTime(date: Date) {
@@ -49,7 +50,7 @@ function DaySeparator({ date }: { date: Date }) {
   );
 }
 
-export default function ChatView({ messages, currentUserId, currentUserName, participants, chatId, loading, error, hasMore, loadingMore, onLoadMore, onMessageEdit, onMessageDelete, onAnswerQuestion }: ChatViewProps) {
+export default function ChatView({ messages, currentUserId, currentUserName, participants, chatId, loading, error, hasMore, loadingMore, onLoadMore, onMessageEdit, onMessageDelete, onAnswerQuestion, onClaimHandoff }: ChatViewProps) {
   const [typingUsers, setTypingUsers] = useState<Map<string, { userId: string; userName: string }>>(new Map());
   const [actionsMsg, setActionsMsg] = useState<string | null>(null);
   const [viewerUrl, setViewerUrl] = useState<string | null>(null);
@@ -169,7 +170,7 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
     const preview: ReplyPreview = {
       messageId: msg.id,
       senderId: msg.senderId,
-      senderName: sender?.name || msg.senderId,
+      senderName: personName(sender?.name) || msg.senderId,
       text: msg.text,
       imageUrl: msg.imageUrl,
     };
@@ -259,7 +260,7 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                 <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} ${msg.kind ? 'w-[min(85%,440px)]' : 'max-w-[min(75%,400px)]'}`}>
                   {msg.kind ? (
                     <div className={`w-full ${isNew ? 'animate-message-appear' : ''}`}>
-                      <AgentCard message={msg} onAnswer={(id, answer) => onAnswerQuestion ? onAnswerQuestion(id, answer) : Promise.resolve('Unavailable')} />
+                      <AgentCard message={msg} onAnswer={(id, answer) => onAnswerQuestion ? onAnswerQuestion(id, answer) : Promise.resolve('Unavailable')} onClaim={(id) => onClaimHandoff ? onClaimHandoff(id) : Promise.resolve('Unavailable')} />
                     </div>
                   ) : (
                   <div className="relative">

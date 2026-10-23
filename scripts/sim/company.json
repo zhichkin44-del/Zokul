@@ -1,0 +1,3570 @@
+{
+  "company": {
+    "name": "Northwind Labs",
+    "product": "Slotly",
+    "about": "Northwind Labs is a small software company building Slotly, a B2B scheduling SaaS for clinics and service teams, with engineers and AI coding agents working side by side."
+  },
+  "people": [
+    {
+      "key": "maya",
+      "name": "Maya Lindqvist",
+      "email": "maya@northwind.test",
+      "title": "CEO & Co-founder",
+      "lang": "en"
+    },
+    {
+      "key": "anna",
+      "name": "Anna Keller",
+      "email": "anna@northwind.test",
+      "title": "CTO",
+      "lang": "en"
+    },
+    {
+      "key": "boris",
+      "name": "Boris Petrov",
+      "email": "boris@northwind.test",
+      "title": "Senior Backend Engineer",
+      "lang": "ru"
+    },
+    {
+      "key": "dmitri",
+      "name": "Dmitri Sokolov",
+      "email": "dmitri@northwind.test",
+      "title": "Backend Engineer",
+      "lang": "ru"
+    },
+    {
+      "key": "elena",
+      "name": "Elena Fischer",
+      "email": "elena@northwind.test",
+      "title": "Frontend Lead",
+      "lang": "en"
+    },
+    {
+      "key": "frank",
+      "name": "Frank Osei",
+      "email": "frank@northwind.test",
+      "title": "Frontend Engineer",
+      "lang": "en"
+    },
+    {
+      "key": "grace",
+      "name": "Grace Tanaka",
+      "email": "grace@northwind.test",
+      "title": "Mobile Lead",
+      "lang": "en"
+    },
+    {
+      "key": "hugo",
+      "name": "Hugo Alvarez",
+      "email": "hugo@northwind.test",
+      "title": "iOS Engineer",
+      "lang": "en"
+    },
+    {
+      "key": "irina",
+      "name": "Irina Volkova",
+      "email": "irina@northwind.test",
+      "title": "QA Lead",
+      "lang": "ru"
+    },
+    {
+      "key": "jake",
+      "name": "Jake Morrison",
+      "email": "jake@northwind.test",
+      "title": "DevOps / SRE",
+      "lang": "en"
+    },
+    {
+      "key": "kira",
+      "name": "Kira Novak",
+      "email": "kira@northwind.test",
+      "title": "Product Manager",
+      "lang": "en"
+    },
+    {
+      "key": "leo",
+      "name": "Leo Brandt",
+      "email": "leo@northwind.test",
+      "title": "Product Designer",
+      "lang": "en"
+    },
+    {
+      "key": "mia",
+      "name": "Mia Chen",
+      "email": "mia@northwind.test",
+      "title": "UX Researcher",
+      "lang": "en"
+    },
+    {
+      "key": "nikolai",
+      "name": "Nikolai Romanov",
+      "email": "nikolai@northwind.test",
+      "title": "Data Engineer",
+      "lang": "ru"
+    },
+    {
+      "key": "olga",
+      "name": "Olga Smirnova",
+      "email": "olga@northwind.test",
+      "title": "Engineering Manager",
+      "lang": "ru"
+    },
+    {
+      "key": "paul",
+      "name": "Paul Dubois",
+      "email": "paul@northwind.test",
+      "title": "Head of Sales",
+      "lang": "en"
+    },
+    {
+      "key": "quinn",
+      "name": "Quinn Adeyemi",
+      "email": "quinn@northwind.test",
+      "title": "Account Executive",
+      "lang": "en"
+    },
+    {
+      "key": "rosa",
+      "name": "Rosa Martinez",
+      "email": "rosa@northwind.test",
+      "title": "Sales Development Rep",
+      "lang": "en"
+    },
+    {
+      "key": "sam",
+      "name": "Sam Whitaker",
+      "email": "sam@northwind.test",
+      "title": "Office & Ops Manager",
+      "lang": "en"
+    },
+    {
+      "key": "tina",
+      "name": "Tina Berg",
+      "email": "tina@northwind.test",
+      "title": "People & Recruiting",
+      "lang": "en"
+    },
+    {
+      "key": "uma",
+      "name": "Uma Patel",
+      "email": "uma@northwind.test",
+      "title": "Customer Success Manager",
+      "lang": "en"
+    },
+    {
+      "key": "victor",
+      "name": "Victor Hale",
+      "email": "victor@northwind.test",
+      "title": "Backend Contractor",
+      "lang": "en"
+    },
+    {
+      "key": "wendy",
+      "name": "Wendy Cho",
+      "email": "wendy@northwind.test",
+      "title": "Frontend Engineer",
+      "lang": "en"
+    },
+    {
+      "key": "xavier",
+      "name": "Xavier Moreau",
+      "email": "xavier@northwind.test",
+      "title": "Android Engineer",
+      "lang": "en"
+    },
+    {
+      "key": "yara",
+      "name": "Yara Haddad",
+      "email": "yara@northwind.test",
+      "title": "Support Engineer",
+      "lang": "en"
+    }
+  ],
+  "agents": [
+    {
+      "key": "cc_api",
+      "name": "Claude Code · API",
+      "owner": "boris"
+    },
+    {
+      "key": "codex_web",
+      "name": "Codex · Web",
+      "owner": "elena"
+    },
+    {
+      "key": "qwen_data",
+      "name": "Qwen · Data",
+      "owner": "nikolai"
+    },
+    {
+      "key": "cc_mobile",
+      "name": "Claude Code · Mobile",
+      "owner": "grace"
+    },
+    {
+      "key": "codex_qa",
+      "name": "Codex · QA",
+      "owner": "irina"
+    }
+  ],
+  "rooms": [
+    {
+      "key": "general",
+      "name": "General",
+      "creator": "maya",
+      "members": [
+        "maya",
+        "anna",
+        "boris",
+        "dmitri",
+        "elena",
+        "frank",
+        "grace",
+        "hugo",
+        "irina",
+        "jake",
+        "kira",
+        "leo",
+        "mia",
+        "nikolai",
+        "olga",
+        "paul",
+        "quinn",
+        "rosa",
+        "sam",
+        "tina",
+        "uma",
+        "victor",
+        "wendy",
+        "xavier",
+        "yara"
+      ],
+      "agents": [
+        "cc_api",
+        "codex_qa"
+      ]
+    },
+    {
+      "key": "backend",
+      "name": "Backend",
+      "creator": "anna",
+      "members": [
+        "anna",
+        "boris",
+        "dmitri",
+        "victor",
+        "jake",
+        "nikolai",
+        "irina",
+        "olga",
+        "kira"
+      ],
+      "agents": [
+        "cc_api",
+        "qwen_data",
+        "codex_qa"
+      ]
+    },
+    {
+      "key": "web",
+      "name": "Web",
+      "creator": "elena",
+      "members": [
+        "elena",
+        "frank",
+        "wendy",
+        "anna",
+        "irina",
+        "leo",
+        "kira",
+        "jake"
+      ],
+      "agents": [
+        "codex_web",
+        "codex_qa"
+      ]
+    },
+    {
+      "key": "mobile",
+      "name": "Mobile",
+      "creator": "grace",
+      "members": [
+        "grace",
+        "hugo",
+        "xavier",
+        "anna",
+        "irina",
+        "kira",
+        "leo",
+        "jake"
+      ],
+      "agents": [
+        "cc_mobile",
+        "codex_qa"
+      ]
+    },
+    {
+      "key": "product",
+      "name": "Product & Design",
+      "creator": "kira",
+      "members": [
+        "kira",
+        "leo",
+        "mia",
+        "anna",
+        "elena",
+        "grace",
+        "maya",
+        "uma",
+        "paul",
+        "frank"
+      ],
+      "agents": [
+        "codex_web"
+      ]
+    },
+    {
+      "key": "sales",
+      "name": "Sales",
+      "creator": "paul",
+      "members": [
+        "paul",
+        "quinn",
+        "rosa",
+        "uma",
+        "maya",
+        "kira",
+        "sam",
+        "yara"
+      ],
+      "agents": []
+    },
+    {
+      "key": "ru",
+      "name": "Русская команда",
+      "creator": "olga",
+      "members": [
+        "olga",
+        "boris",
+        "dmitri",
+        "irina",
+        "nikolai"
+      ],
+      "agents": [
+        "qwen_data"
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "Monday",
+      "events": [
+        {
+          "id": "e1",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Good morning, Northwind! ☀️ Big week ahead: **Slotly 2.4** ships on Friday (recurring availability + Google Calendar sync v2). Planning starts at 10:00 → https://meet.northwind.test/planning"
+        },
+        {
+          "id": "e2",
+          "type": "message",
+          "from": "anna",
+          "to": "room:general",
+          "text": "Sprint board is live: https://slotly.example/board/sprint-24. Please add your estimates before 10:00 so we don't burn half the meeting on it."
+        },
+        {
+          "id": "e3",
+          "type": "message",
+          "from": "sam",
+          "to": "room:general",
+          "text": "Facilities: fire drill today at 14:00 (meet at the car park), and yes, we are out of oat milk. A delivery is coming around lunch 🥛"
+        },
+        {
+          "id": "e4",
+          "type": "mute",
+          "from": "quinn",
+          "to": "room:general"
+        },
+        {
+          "id": "e5",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:general",
+          "text": "Quick one: who keeps taking the tall monitor stand from the 3rd floor? 👀"
+        },
+        {
+          "id": "e6",
+          "type": "message",
+          "from": "hugo",
+          "to": "room:general",
+          "text": "Not me, I'm a laptop-on-a-stack-of-books person.",
+          "replyTo": "e5"
+        },
+        {
+          "id": "e7",
+          "type": "message",
+          "from": "xavier",
+          "to": "room:general",
+          "text": "Did anyone watch the city marathon yesterday? A man in a banana costume beat my personal best. Again."
+        },
+        {
+          "id": "e8",
+          "type": "message",
+          "from": "frank",
+          "to": "room:general",
+          "text": "Same banana as last year? Asking for the honour of the whole chat.",
+          "replyTo": "e7"
+        },
+        {
+          "id": "e9",
+          "type": "message",
+          "from": "tina",
+          "to": "room:general",
+          "text": "Heads up: two on-site interviews for the Senior Product Designer role this week (Tue 14:00 and Thu 11:00). Invites are in your calendars. Please be kind and punctual 🙏"
+        },
+        {
+          "id": "e10",
+          "type": "message",
+          "from": "yara",
+          "to": "room:general",
+          "text": "Support inbox is calm this morning. Touching wood and saying nothing else."
+        },
+        {
+          "id": "e11",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Please don't say anything else 😄",
+          "replyTo": "e10"
+        },
+        {
+          "id": "e12",
+          "type": "message",
+          "from": "anna",
+          "to": "room:backend",
+          "text": "Backend scope for 2.4:\n- **Recurring availability** API (Boris)\n- **Calendar sync v2** webhook handler (Dmitri)\n- **Rate limiting** on `/public/slots` (Victor)\nShout early if an estimate looks wrong."
+        },
+        {
+          "id": "e13",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Taking recurrence. I'll let Claude Code · API draft the migration and the model, and I'll review everything before it touches staging."
+        },
+        {
+          "id": "e14",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:backend",
+          "text": "For the sync webhook: Google can deliver the same notification twice. Do we dedupe by `X-Goog-Message-Number` or store our own idempotency key?"
+        },
+        {
+          "id": "e15",
+          "type": "message",
+          "from": "anna",
+          "to": "room:backend",
+          "text": "Our own key, stored for 24h. Google's header isn't guaranteed to be stable across channel renewals.",
+          "replyTo": "e14"
+        },
+        {
+          "id": "e16",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "For rate limiting: token bucket in Redis or in-process? In-process won't survive multiple pods behind the load balancer."
+        },
+        {
+          "id": "e17",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Redis, we already run it. I'll drop the staging URL in the vault. Keep keys namespaced like `rl:{tenant}:{route}`.",
+          "replyTo": "e16"
+        },
+        {
+          "id": "e18",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "working",
+          "text": "Reading the `availability_windows` model and its 14 call sites. Plan: add a nullable `recurrence_rule` (RFC 5545 RRULE subset) and a `RecurrenceExpander` service."
+        },
+        {
+          "id": "e19",
+          "type": "agent_question",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "question": "Migration `add_recurrence_rule` adds one nullable column, no backfill. Apply it on staging now?",
+          "options": [
+            "Approve",
+            "Hold"
+          ],
+          "answer": {
+            "by": "boris",
+            "text": "Approve"
+          }
+        },
+        {
+          "id": "e20",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "done",
+          "text": "Migration applied on staging in 340 ms. Model and expander are on branch `feat/recurrence`, 31 unit tests green."
+        },
+        {
+          "id": "e21",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Looks clean. One nit: the expander must cap at 366 occurrences per query, otherwise a weekly rule with no end date is a memory bomb."
+        },
+        {
+          "id": "e22",
+          "type": "agent_handoff",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "title": "Recurring availability: schema, model, expander",
+          "summary": "Added nullable `recurrence_rule` to availability_windows and a RecurrenceExpander that turns RRULE subsets (daily/weekly, until/count) into concrete windows. API layer and DST edge cases are still open.",
+          "done": [
+            "Migration applied on staging",
+            "RecurrenceExpander with 31 unit tests",
+            "Model validation for the RRULE subset"
+          ],
+          "next": [
+            "Public API endpoint POST /availability/recurring",
+            "DST fixtures for Europe/Berlin",
+            "Cap of 366 occurrences per query"
+          ],
+          "files": [
+            "src/availability/recurrence-expander.ts",
+            "src/availability/model.ts",
+            "migrations/0042_add_recurrence_rule.sql"
+          ],
+          "claimedBy": "boris"
+        },
+        {
+          "id": "e23",
+          "type": "message",
+          "from": "nikolai",
+          "to": "room:backend",
+          "text": "FYI the analytics export reads `availability_windows` directly. Tell me before the column shape changes so I can update the pipeline."
+        },
+        {
+          "id": "e24",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Only one nullable column was added, your export is untouched.",
+          "replyTo": "e23"
+        },
+        {
+          "id": "e25",
+          "type": "message",
+          "from": "irina",
+          "to": "room:backend",
+          "text": "QA plan for recurrence is on the board. I need staging data with DST edge cases (Europe/Berlin spring-forward week). Boris, can you seed it?"
+        },
+        {
+          "id": "e26",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Will do after lunch."
+        },
+        {
+          "id": "e27",
+          "type": "message",
+          "from": "kira",
+          "to": "room:backend",
+          "text": "Product question: is the 366 cap visible to customers? I'd want a clear message if somebody hits it."
+        },
+        {
+          "id": "e28",
+          "type": "message",
+          "from": "olga",
+          "to": "room:backend",
+          "text": "Planning notes: Backend committed to the three items above and nothing else. Please push back on scope creep, including from me."
+        },
+        {
+          "id": "e29",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Maintenance note: I'm upgrading the staging Postgres minor version at 18:00, expect about 5 minutes of downtime."
+        },
+        {
+          "id": "e30",
+          "type": "message",
+          "from": "elena",
+          "to": "room:web",
+          "text": "Web scope: recurring availability editor (Frank), booking page performance (Wendy), and the settings redesign from Leo's latest Figma. Codex is scaffolding the editor so Frank can focus on interaction details."
+        },
+        {
+          "id": "e31",
+          "type": "agent_status",
+          "agent": "codex_web",
+          "to": "room:web",
+          "state": "working",
+          "text": "Scaffolding `RecurrenceEditor`: weekday chips, time range rows, end date picker. Reusing the existing `FormField` and `TimeRange` primitives."
+        },
+        {
+          "id": "e32",
+          "type": "message",
+          "from": "frank",
+          "to": "room:web",
+          "text": "Great, I'll pair with it this afternoon. Wendy, do you have a Lighthouse baseline for the booking page?"
+        },
+        {
+          "id": "e33",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:web",
+          "text": "Yes: LCP 3.4s on throttled mobile, mostly the calendar widget bundle. Target is under 2.5s. https://slotly.example/perf/booking-baseline"
+        },
+        {
+          "id": "e34",
+          "type": "message",
+          "from": "irina",
+          "to": "room:web",
+          "text": "Accessibility reminder: the weekday chips need real buttons with `aria-pressed`, not clickable divs. I'll test with a screen reader on Wednesday."
+        },
+        {
+          "id": "e35",
+          "type": "message",
+          "from": "jake",
+          "to": "room:web",
+          "text": "CDN cache rules change tonight so hashed assets get immutable caching. If you see stale JS tomorrow, tell me."
+        },
+        {
+          "id": "e36",
+          "type": "message",
+          "from": "grace",
+          "to": "room:mobile",
+          "text": "Mobile scope: offline booking queue (Hugo on iOS, Xavier on Android) and push notifications for rescheduling. Release candidate Thursday noon, store review Friday."
+        },
+        {
+          "id": "e37",
+          "type": "agent_status",
+          "agent": "cc_mobile",
+          "to": "room:mobile",
+          "state": "working",
+          "text": "Auditing the sync layer for the offline queue. Two places assume the network is always there: `BookingRepository.create` and `ReminderScheduler`."
+        },
+        {
+          "id": "e38",
+          "type": "message",
+          "from": "hugo",
+          "to": "room:mobile",
+          "text": "iOS: I'll use a persistent queue in Core Data. My concern is conflict resolution when the slot got taken while the phone was offline."
+        },
+        {
+          "id": "e39",
+          "type": "message",
+          "from": "xavier",
+          "to": "room:mobile",
+          "text": "Same on Android with Room. Proposal: the server answers 409 plus the next free slots, and the app shows them as suggestions."
+        },
+        {
+          "id": "e40",
+          "type": "message",
+          "from": "kira",
+          "to": "room:mobile",
+          "text": "That matches the product intent. Max 3 suggestions, same day first.",
+          "replyTo": "e39"
+        },
+        {
+          "id": "e41",
+          "type": "message",
+          "from": "leo",
+          "to": "room:mobile",
+          "text": "Offline banner copy and state designs are in the mobile frame. Keep it calm, no red unless the booking actually failed."
+        },
+        {
+          "id": "e42",
+          "type": "file",
+          "from": "kira",
+          "to": "room:product",
+          "fileName": "q4-roadmap.pdf",
+          "text": "Q4 roadmap draft. Comments welcome until Wednesday."
+        },
+        {
+          "id": "e43",
+          "type": "message",
+          "from": "leo",
+          "to": "room:product",
+          "text": "Looks good. Where does SSO land? Enterprise prospects keep asking."
+        },
+        {
+          "id": "e44",
+          "type": "message",
+          "from": "kira",
+          "to": "room:product",
+          "text": "Second half of Q4, depends on what Thursday's demo reveals."
+        },
+        {
+          "id": "e45",
+          "type": "message",
+          "from": "mia",
+          "to": "room:product",
+          "text": "Research update: we ran 6 interviews last week. The top pain is not scheduling itself, it's rescheduling when someone cancels. Full summary tomorrow."
+        },
+        {
+          "id": "e46",
+          "type": "message",
+          "from": "maya",
+          "to": "room:product",
+          "text": "Very useful. Mia, can you add three direct customer quotes? They help a lot in investor updates."
+        },
+        {
+          "id": "e47",
+          "type": "message",
+          "from": "paul",
+          "to": "room:product",
+          "text": "Sales confirms: rescheduling is the number one objection we hear. Please keep it in the roadmap talking points."
+        },
+        {
+          "id": "e48",
+          "type": "message",
+          "from": "paul",
+          "to": "room:sales",
+          "text": "Week targets: 3 demos, 2 proposals sent, Brightfield decision by month end. Let's go 💪"
+        },
+        {
+          "id": "e49",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:sales",
+          "text": "Brightfield Clinics demo is Wednesday 15:00. I need a stable staging environment by then."
+        },
+        {
+          "id": "e50",
+          "type": "edit",
+          "from": "quinn",
+          "of": "e49",
+          "text": "Brightfield Clinics demo is **Thursday 15:00** (not Wednesday, sorry!). I need a stable staging environment by Wednesday evening."
+        },
+        {
+          "id": "e51",
+          "type": "message",
+          "from": "rosa",
+          "to": "room:sales",
+          "text": "Quinn, can you share the objection handling doc? I'm calling the clinic list at 11."
+        },
+        {
+          "id": "e52",
+          "type": "delete",
+          "from": "rosa",
+          "of": "e51"
+        },
+        {
+          "id": "e53",
+          "type": "file",
+          "from": "rosa",
+          "to": "room:sales",
+          "fileName": "outreach-stats.csv",
+          "text": "Last week's outbound numbers: 412 emails, 38 replies, 9 meetings."
+        },
+        {
+          "id": "e54",
+          "type": "message",
+          "from": "uma",
+          "to": "room:sales",
+          "text": "Customer Success note: 3 clinics asked whether recurring availability will support split shifts. I'm adding them to the feedback doc."
+        },
+        {
+          "id": "e55",
+          "type": "message",
+          "from": "yara",
+          "to": "room:sales",
+          "text": "Support tip: customers keep emailing the old booking page URL. I added a redirect FAQ: https://slotly.example/help/old-booking-links"
+        },
+        {
+          "id": "e56",
+          "type": "message",
+          "from": "sam",
+          "to": "room:sales",
+          "text": "Reminder: guests sign in at the front desk. The Brightfield team will need badges on Thursday."
+        },
+        {
+          "id": "e57",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:sales",
+          "text": "Booked two visitor badges, thanks Sam."
+        },
+        {
+          "id": "e58",
+          "type": "message",
+          "from": "olga",
+          "to": "room:ru",
+          "text": "Всем привет! Планёрка по-русски в 10:30, как обычно 😄 Кто не успел выпить кофе — у вас пять минут."
+        },
+        {
+          "id": "e59",
+          "type": "message",
+          "from": "boris",
+          "to": "room:ru",
+          "text": "Я закончил миграцию для повторяющихся слотов. Ревью после обеда."
+        },
+        {
+          "id": "e60",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:ru",
+          "text": "Хорошо. Я пока разбираюсь с вебхуками Google — дубли приходят чаще, чем я думал."
+        },
+        {
+          "id": "e61",
+          "type": "message",
+          "from": "irina",
+          "to": "room:ru",
+          "text": "Мне нужны тестовые данные с переходом на летнее время. Борис, это к тебе 🙂"
+        },
+        {
+          "id": "e62",
+          "type": "message",
+          "from": "nikolai",
+          "to": "room:ru",
+          "text": "Выгрузка аналитики не сломается, я проверил. Если что-то поменяется — скажу заранее."
+        },
+        {
+          "id": "e63",
+          "type": "agent_message",
+          "agent": "qwen_data",
+          "to": "room:ru",
+          "text": "Ночной отчёт по бронированиям готов: 1 842 брони за выходные, на 6% больше, чем неделей раньше. Аномалий не найдено."
+        },
+        {
+          "id": "e64",
+          "type": "message",
+          "from": "olga",
+          "to": "room:ru",
+          "text": "Отлично, спасибо! Всем хорошей недели."
+        },
+        {
+          "id": "e65",
+          "type": "message",
+          "from": "anna",
+          "to": "dm:boris",
+          "text": "How confident are you in recurrence for Friday? Honest answer please."
+        },
+        {
+          "id": "e66",
+          "type": "message",
+          "from": "boris",
+          "to": "dm:anna",
+          "text": "Honest: 80%. The expander is done, the API and edge cases are left. DST will be the pain."
+        },
+        {
+          "id": "e67",
+          "type": "message",
+          "from": "anna",
+          "to": "dm:boris",
+          "text": "Pair with Dmitri on DST. And no merges on Thursday evening 😉"
+        },
+        {
+          "id": "e68",
+          "type": "message",
+          "from": "boris",
+          "to": "dm:dmitri",
+          "text": "Дима, посмотришь мой PR с миграцией? Правок минимум, но хочу второй взгляд."
+        },
+        {
+          "id": "e69",
+          "type": "message",
+          "from": "dmitri",
+          "to": "dm:boris",
+          "text": "Конечно, после обеда. Кстати, что делаем с повторами по последнему дню месяца?"
+        },
+        {
+          "id": "e70",
+          "type": "message",
+          "from": "boris",
+          "to": "dm:dmitri",
+          "text": "Пока не поддерживаем, в первой версии только еженедельные правила."
+        },
+        {
+          "id": "e71",
+          "type": "message",
+          "from": "kira",
+          "to": "dm:leo",
+          "text": "Can you send settings v3 before 10 tomorrow? I want to read it before the design review."
+        },
+        {
+          "id": "e72",
+          "type": "message",
+          "from": "leo",
+          "to": "dm:kira",
+          "text": "Yes. I'm still fixing the empty states."
+        },
+        {
+          "id": "e73",
+          "type": "message",
+          "from": "paul",
+          "to": "dm:quinn",
+          "text": "Brightfield: be ready for questions on SSO and data residency. I'll join for the pricing part."
+        },
+        {
+          "id": "e74",
+          "type": "message",
+          "from": "quinn",
+          "to": "dm:paul",
+          "text": "On it. I'll rehearse with Rosa on Wednesday."
+        },
+        {
+          "id": "e75",
+          "type": "message",
+          "from": "tina",
+          "to": "dm:anna",
+          "text": "First candidate for the Senior Designer role is Sofia. Her portfolio is strong, lots of B2B work. Can you join the panel tomorrow?"
+        },
+        {
+          "id": "e76",
+          "type": "message",
+          "from": "anna",
+          "to": "dm:tina",
+          "text": "Yes, 14:00 works. Send me the portfolio link."
+        },
+        {
+          "id": "e77",
+          "type": "message",
+          "from": "tina",
+          "to": "dm:anna",
+          "text": "https://portfolio.example/sofia-r. 45 minutes, technical part with Leo."
+        },
+        {
+          "id": "e78",
+          "type": "message",
+          "from": "grace",
+          "to": "dm:hugo",
+          "text": "How is the Core Data queue going? I'd like a demo of a queued booking by tomorrow."
+        },
+        {
+          "id": "e79",
+          "type": "message",
+          "from": "hugo",
+          "to": "dm:grace",
+          "text": "It crashes on cold start, but I think I know why. Demo tomorrow noon."
+        },
+        {
+          "id": "e80",
+          "type": "message",
+          "from": "elena",
+          "to": "dm:frank",
+          "text": "Want to pair at 14:00 on the recurrence editor? Codex has the skeleton."
+        },
+        {
+          "id": "e81",
+          "type": "message",
+          "from": "frank",
+          "to": "dm:elena",
+          "text": "Yes please. I'll bring snacks 🍪"
+        },
+        {
+          "id": "e82",
+          "type": "message",
+          "from": "irina",
+          "to": "dm:olga",
+          "text": "Оля, мне нужно ещё полдня на регрессию, до пятницы не успеваю без Дмитрия."
+        },
+        {
+          "id": "e83",
+          "type": "message",
+          "from": "olga",
+          "to": "dm:irina",
+          "text": "Поняла, поговорю с Анной, чтобы Дмитрий помог в четверг."
+        },
+        {
+          "id": "e84",
+          "type": "message",
+          "from": "sam",
+          "to": "dm:maya",
+          "text": "Cake budget for Hugo's birthday tomorrow? I'm thinking 40 euros plus candles."
+        },
+        {
+          "id": "e85",
+          "type": "message",
+          "from": "maya",
+          "to": "dm:sam",
+          "text": "Yes, and make it vegan, Hugo went vegan last month."
+        },
+        {
+          "id": "e86",
+          "type": "agent_status",
+          "agent": "codex_qa",
+          "to": "dm:irina",
+          "state": "working",
+          "text": "Reading the recurrence spec and the 31 unit tests on `feat/recurrence`. Drafting e2e cases."
+        },
+        {
+          "id": "e87",
+          "type": "agent_question",
+          "agent": "codex_qa",
+          "to": "dm:irina",
+          "question": "Generate Playwright e2e tests for recurrence now? About 24 cases, runs in 6 minutes.",
+          "options": [
+            "Yes",
+            "No, later"
+          ],
+          "answer": {
+            "by": "irina",
+            "text": "Yes, start with weekly rules"
+          }
+        },
+        {
+          "id": "e88",
+          "type": "agent_status",
+          "agent": "codex_qa",
+          "to": "dm:irina",
+          "state": "done",
+          "text": "24 e2e tests added in `e2e/recurrence.spec.ts`. 22 pass, 2 flaky around DST and marked for review."
+        },
+        {
+          "id": "e89",
+          "type": "agent_message",
+          "agent": "cc_api",
+          "to": "dm:boris",
+          "text": "Heads-up: your local `feat/recurrence` is 3 commits behind main. Want me to rebase before the review?"
+        },
+        {
+          "id": "e90",
+          "type": "agent_status",
+          "agent": "qwen_data",
+          "to": "dm:nikolai",
+          "state": "info",
+          "text": "Weekend bookings summary exported to the shared drive. Median booking lead time dropped from 3.1 to 2.8 days."
+        }
+      ]
+    },
+    {
+      "day": "Tuesday",
+      "events": [
+        {
+          "id": "e91",
+          "type": "message",
+          "from": "sam",
+          "to": "room:general",
+          "text": "🎂 It's **Hugo's birthday** today! Cake at 15:30 in the kitchen (vegan, as ordered). Please sign the card on the fridge."
+        },
+        {
+          "id": "e92",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Happy birthday, Hugo! 🎉 Thank you for the offline queue work, you're a star.",
+          "replyTo": "e91"
+        },
+        {
+          "id": "e93",
+          "type": "message",
+          "from": "hugo",
+          "to": "room:general",
+          "text": "Thak you all!! I'll try not to crash the cake on cold start."
+        },
+        {
+          "id": "e94",
+          "type": "edit",
+          "from": "hugo",
+          "of": "e93",
+          "text": "Thank you all!! I'll try not to crash the cake on cold start 😄"
+        },
+        {
+          "id": "e95",
+          "type": "message",
+          "from": "frank",
+          "to": "room:general",
+          "text": "Happy birthday 🥳🎂"
+        },
+        {
+          "id": "e96",
+          "type": "message",
+          "from": "uma",
+          "to": "room:general",
+          "text": "Happy bday Hugo! 🎈"
+        },
+        {
+          "id": "e97",
+          "type": "message",
+          "from": "sam",
+          "to": "room:general",
+          "text": "Heads-up: Wendy can't sign in after switching phones and asked me to ping the owner. Maya, could you send her a new sign-in link?"
+        },
+        {
+          "id": "e98",
+          "type": "owner_action",
+          "action": "reset_link",
+          "person": "wendy",
+          "reason": "Wendy lost her session after switching phones; identity confirmed in person at her desk, so a new sign-in link is safe to issue."
+        },
+        {
+          "id": "e99",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:general",
+          "text": "I'm back in, thank you Maya! Lesson learned: back up the passkey before wiping the phone 🙈"
+        },
+        {
+          "id": "e100",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Glad to help. Keep that link private."
+        },
+        {
+          "id": "e101",
+          "type": "message",
+          "from": "sam",
+          "to": "room:general",
+          "text": "Lunch order for the Thai place closes at 11:45. Menu: https://thai.example/menu (not affiliated, just good). Vegan options marked 🌱"
+        },
+        {
+          "id": "e102",
+          "type": "message",
+          "from": "xavier",
+          "to": "room:general",
+          "text": "Pad see ew please. And if the order gets lost again I will become unbearable."
+        },
+        {
+          "id": "e103",
+          "type": "message",
+          "from": "yara",
+          "to": "room:general",
+          "text": "Same as Xavier but spicier 🌶️"
+        },
+        {
+          "id": "e104",
+          "type": "rename",
+          "from": "anna",
+          "room": "backend",
+          "name": "Backend & Infra"
+        },
+        {
+          "id": "e105",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "PR #471 is open: recurring availability API. Dmitri, I'd like your eyes on the DST handling: https://git.northwind.test/slotly/api/pull/471"
+        },
+        {
+          "id": "e106",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:backend",
+          "text": "Reviewing. First comment: `expand()` uses the server time zone, it should use the tenant zone."
+        },
+        {
+          "id": "e107",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Good catch, fixing."
+        },
+        {
+          "id": "e108",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "working",
+          "text": "Switching `RecurrenceExpander` to the tenant IANA zone with zoneinfo-safe arithmetic. Adding Europe/Berlin and America/Sao_Paulo DST fixtures."
+        },
+        {
+          "id": "e109",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "done",
+          "text": "PR #471 updated: tenant time zone handling plus 6 DST tests. CI is green."
+        },
+        {
+          "id": "e110",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "Rate limit middleware is on staging: https://staging.slotly.example/public/slots, 60 req/min per tenant. Please hammer it. I kept it simple and call `createClient()` inside the middleware for now, I'll move to a shared client next week."
+        },
+        {
+          "id": "e111",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "OK for staging. Please put a TODO in the code so it doesn't slip into the backlog.",
+          "replyTo": "e110"
+        },
+        {
+          "id": "e112",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "TODO added (`// TODO(victor): share one pooled Redis client`)."
+        },
+        {
+          "id": "e113",
+          "type": "agent_question",
+          "agent": "qwen_data",
+          "to": "room:backend",
+          "question": "Backfill `bookings.tenant_tz` for 2.1M rows in batches of 5,000 with 200 ms pauses (about 25 minutes)?",
+          "options": [
+            "Approve",
+            "Hold"
+          ],
+          "answer": {
+            "by": "nikolai",
+            "text": "Approve"
+          }
+        },
+        {
+          "id": "e114",
+          "type": "agent_status",
+          "agent": "qwen_data",
+          "to": "room:backend",
+          "state": "done",
+          "text": "Backfill finished: 2,104,332 rows updated, 0 errors, replica lag peaked at 1.2 s."
+        },
+        {
+          "id": "e115",
+          "type": "message",
+          "from": "nikolai",
+          "to": "room:backend",
+          "text": "Verified a random sample of 500 rows by hand, all correct."
+        },
+        {
+          "id": "e116",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:backend",
+          "text": "Webhook handler PR #474 is ready. Idempotency key lives in `sync_events` with a 24h TTL. The flag `calendar_sync_v2` is off by default."
+        },
+        {
+          "id": "e117",
+          "type": "message",
+          "from": "olga",
+          "to": "room:backend",
+          "text": "Reminder: anything for patch release 2.3.7 must be merged by 17:00 today."
+        },
+        {
+          "id": "e118",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "Rate limiter PR #476 is merged to main. Thanks for the quick reviews!"
+        },
+        {
+          "id": "e119",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "2.3.7 deploys tonight at 19:00 with the rate limiter. Rollback plan is the usual blue/green flip."
+        },
+        {
+          "id": "e120",
+          "type": "message",
+          "from": "irina",
+          "to": "room:backend",
+          "text": "Regression on staging passed, but only under light load. We haven't load tested the limiter yet."
+        },
+        {
+          "id": "e121",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "k6 smoke test is on my list for tomorrow morning."
+        },
+        {
+          "id": "e122",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:web",
+          "text": "Bug report from Support (pasted as-is): the booking notes value `<script>alert(1)</script>` is rendered raw in the email preview. Expected: plain text."
+        },
+        {
+          "id": "e123",
+          "type": "message",
+          "from": "elena",
+          "to": "room:web",
+          "text": "That's a real XSS risk, not just cosmetic. Wendy, please fix first thing, I'll review."
+        },
+        {
+          "id": "e124",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:web",
+          "text": "On it. Escaping in the template and adding a sanitiser test."
+        },
+        {
+          "id": "e125",
+          "type": "message",
+          "from": "irina",
+          "to": "room:web",
+          "text": "Another variant I tried in the notes field:\n```html\n<img src=x onerror=alert(1)>\n```\nThe list view is fine, the PDF export isn't. Adding both to the e2e suite."
+        },
+        {
+          "id": "e126",
+          "type": "message",
+          "from": "jake",
+          "to": "room:web",
+          "text": "I can also draft a CSP header without `unsafe-inline`. Careful with the analytics snippet."
+        },
+        {
+          "id": "e127",
+          "type": "agent_status",
+          "agent": "codex_web",
+          "to": "room:web",
+          "state": "done",
+          "text": "RecurrenceEditor skeleton merged to `feat/recurrence-ui`: weekday toggle group with `aria-pressed`, time range rows, end date picker, 14 component tests."
+        },
+        {
+          "id": "e128",
+          "type": "agent_handoff",
+          "agent": "codex_web",
+          "to": "room:web",
+          "title": "RecurrenceEditor skeleton ready for interaction polish",
+          "summary": "Component structure, state handling and basic tests are done. Keyboard navigation between chips and the validation messages are still rough.",
+          "done": [
+            "Weekday toggle group with aria-pressed",
+            "Time range rows with add/remove",
+            "End date picker",
+            "14 component tests"
+          ],
+          "next": [
+            "Arrow-key navigation between chips",
+            "Inline validation for overlapping ranges",
+            "Copy review with Kira"
+          ],
+          "files": [
+            "web/src/components/RecurrenceEditor.tsx",
+            "web/src/components/RecurrenceEditor.test.tsx"
+          ],
+          "claimedBy": "frank"
+        },
+        {
+          "id": "e129",
+          "type": "message",
+          "from": "frank",
+          "to": "room:web",
+          "text": "Picking it up. First task: keyboard navigation between the chips."
+        },
+        {
+          "id": "e130",
+          "type": "message",
+          "from": "leo",
+          "to": "room:web",
+          "text": "Chips: 8px gap, 40px min height for touch targets please."
+        },
+        {
+          "id": "e131",
+          "type": "agent_question",
+          "agent": "cc_mobile",
+          "to": "dm:grace",
+          "question": "Bump the shared networking library `slotly-net` from 3.1 to 3.2? The changelog adds retry with backoff, which the offline queue needs.",
+          "options": [
+            "Approve",
+            "Hold"
+          ],
+          "answer": {
+            "by": "grace",
+            "text": "Approve"
+          }
+        },
+        {
+          "id": "e132",
+          "type": "agent_status",
+          "agent": "cc_mobile",
+          "to": "room:mobile",
+          "state": "working",
+          "text": "Opened PR #212: shared offline queue contract (OpenAPI for 409 + suggested slots) used by both iOS and Android clients."
+        },
+        {
+          "id": "e133",
+          "type": "message",
+          "from": "hugo",
+          "to": "room:mobile",
+          "text": "Cold start crash fixed, it was a nil migration context. Queue demo at 12:00 in the Fjord room."
+        },
+        {
+          "id": "e134",
+          "type": "message",
+          "from": "xavier",
+          "to": "room:mobile",
+          "text": "Android needs more time. The Room migration test fails on API 26."
+        },
+        {
+          "id": "e135",
+          "type": "message",
+          "from": "grace",
+          "to": "room:mobile",
+          "text": "No stress, but please post a screen recording of the queue when it works."
+        },
+        {
+          "id": "e136",
+          "type": "file",
+          "from": "leo",
+          "to": "room:product",
+          "fileName": "settings-redesign-v3.pdf",
+          "text": "Design review: settings v3. Main change is one Integrations card instead of five separate toggles. Please comment before 15:00."
+        },
+        {
+          "id": "e137",
+          "type": "message",
+          "from": "kira",
+          "to": "room:product",
+          "text": "Love the grouping. Will users still find 'Calendar sync' now that it's inside the card?",
+          "replyTo": "e136"
+        },
+        {
+          "id": "e138",
+          "type": "message",
+          "from": "mia",
+          "to": "room:product",
+          "text": "In last week's tests people looked for 'Connected apps'. Maybe rename the card?"
+        },
+        {
+          "id": "e139",
+          "type": "message",
+          "from": "leo",
+          "to": "room:product",
+          "text": "Good point, renaming it to 'Connected apps' and adding a counter."
+        },
+        {
+          "id": "e140",
+          "type": "message",
+          "from": "elena",
+          "to": "room:product",
+          "text": "Technically easy, and the card can be reused for Zoom/Teams later."
+        },
+        {
+          "id": "e141",
+          "type": "message",
+          "from": "anna",
+          "to": "room:product",
+          "text": "Check the contrast of the disabled state, it looked too light on my laptop."
+        },
+        {
+          "id": "e142",
+          "type": "message",
+          "from": "leo",
+          "to": "room:product",
+          "text": "Will adjust to 4.5:1."
+        },
+        {
+          "id": "e143",
+          "type": "file",
+          "from": "mia",
+          "to": "room:product",
+          "fileName": "user-interviews-summary.docx",
+          "text": "Research summary from the 6 interviews. Page 2 has the rescheduling quotes."
+        },
+        {
+          "id": "e144",
+          "type": "message",
+          "from": "maya",
+          "to": "room:product",
+          "text": "Thanks Mia, 'rescheduling eats my Mondays' is perfect for the investor update."
+        },
+        {
+          "id": "e145",
+          "type": "add_member",
+          "from": "kira",
+          "room": "product",
+          "person": "tina"
+        },
+        {
+          "id": "e146",
+          "type": "message",
+          "from": "tina",
+          "to": "room:product",
+          "text": "Thanks for adding me. I'll share candidate scorecards here when the panel is done."
+        },
+        {
+          "id": "e147",
+          "type": "message",
+          "from": "paul",
+          "to": "room:product",
+          "text": "Sales can set up customer calls if you need more interviews. We have a waiting list."
+        },
+        {
+          "id": "e148",
+          "type": "message",
+          "from": "mia",
+          "to": "room:product",
+          "text": "Yes please, two more, ideally from larger clinics."
+        },
+        {
+          "id": "e149",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:sales",
+          "text": "Demo script v2 for Brightfield: login → availability → recurring rule → rescheduling → Google sync. 25 minutes plus Q&A."
+        },
+        {
+          "id": "e150",
+          "type": "message",
+          "from": "paul",
+          "to": "room:sales",
+          "text": "Add the offline mobile moment, clinics love it."
+        },
+        {
+          "id": "e151",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:sales",
+          "text": "The mobile build isn't demo-stable yet. I'll mention it as 'coming soon'."
+        },
+        {
+          "id": "e152",
+          "type": "message",
+          "from": "rosa",
+          "to": "room:sales",
+          "text": "Four meetings booked from the dentist list 🎉"
+        },
+        {
+          "id": "e153",
+          "type": "message",
+          "from": "yara",
+          "to": "room:sales",
+          "text": "Support question: can someone confirm the SLA we promised Brightfield? The contract says 4 hours, the FAQ says 8."
+        },
+        {
+          "id": "e154",
+          "type": "message",
+          "from": "paul",
+          "to": "room:sales",
+          "text": "The contract wins: 4 hours for urgent. I'll fix the FAQ today."
+        },
+        {
+          "id": "e155",
+          "type": "message",
+          "from": "maya",
+          "to": "room:sales",
+          "text": "Please keep it consistent, promises are our brand."
+        },
+        {
+          "id": "e156",
+          "type": "message",
+          "from": "olga",
+          "to": "room:ru",
+          "text": "Коллеги, после релиза 2.3.7 я хочу сделать короткую ретроспективу. Предложения по формату?"
+        },
+        {
+          "id": "e157",
+          "type": "message",
+          "from": "boris",
+          "to": "room:ru",
+          "text": "Без слайдов. Десять минут разговора и три вопроса: что получилось, что было больно, что меняем."
+        },
+        {
+          "id": "e158",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:ru",
+          "text": "Поддерживаю. И пусть Джейк придёт, он про деплой знает больше всех."
+        },
+        {
+          "id": "e159",
+          "type": "message",
+          "from": "nikolai",
+          "to": "room:ru",
+          "text": "Бэкфилл закончился без ошибок: 2,1 млн строк, репликация почти не отставала."
+        },
+        {
+          "id": "e160",
+          "type": "message",
+          "from": "olga",
+          "to": "room:ru",
+          "text": "Отлично, молодцы!"
+        },
+        {
+          "id": "e161",
+          "type": "message",
+          "from": "tina",
+          "to": "dm:anna",
+          "text": "Sofia's interview is in the Fjord room at 14:00. I'll bring the scorecard template."
+        },
+        {
+          "id": "e162",
+          "type": "message",
+          "from": "anna",
+          "to": "dm:tina",
+          "text": "I'll be there. Her written answer on accessibility was excellent."
+        },
+        {
+          "id": "e163",
+          "type": "message",
+          "from": "leo",
+          "to": "dm:mia",
+          "text": "Can you join me for the user test script today? I want 'Connected apps' tested before Thursday."
+        },
+        {
+          "id": "e164",
+          "type": "message",
+          "from": "mia",
+          "to": "dm:leo",
+          "text": "Yes, 11:00 works. I'll recruit two people from the waiting list."
+        },
+        {
+          "id": "e165",
+          "type": "message",
+          "from": "uma",
+          "to": "dm:kira",
+          "text": "Three clinics asked for split shifts. Could that make the Q4 list?"
+        },
+        {
+          "id": "e166",
+          "type": "message",
+          "from": "kira",
+          "to": "dm:uma",
+          "text": "Add them to the feedback doc with account names, I'll size it."
+        },
+        {
+          "id": "e167",
+          "type": "message",
+          "from": "yara",
+          "to": "dm:uma",
+          "text": "Customers keep asking whether 2.4 will break their embedded booking widget."
+        },
+        {
+          "id": "e168",
+          "type": "message",
+          "from": "uma",
+          "to": "dm:yara",
+          "text": "I'll double-check with Elena. As far as I know the embed is unchanged."
+        },
+        {
+          "id": "e169",
+          "type": "message",
+          "from": "boris",
+          "to": "dm:dmitri",
+          "text": "Спасибо за ревью! Зону поправил, глянь ещё раз."
+        },
+        {
+          "id": "e170",
+          "type": "message",
+          "from": "dmitri",
+          "to": "dm:boris",
+          "text": "Теперь нормально. Аппрув поставил."
+        },
+        {
+          "id": "e171",
+          "type": "message",
+          "from": "jake",
+          "to": "dm:boris",
+          "text": "Do you want the migration in tonight's window or Wednesday?"
+        },
+        {
+          "id": "e172",
+          "type": "message",
+          "from": "boris",
+          "to": "dm:jake",
+          "text": "Wednesday. I don't want two risky things in one night."
+        },
+        {
+          "id": "e173",
+          "type": "message",
+          "from": "victor",
+          "to": "dm:boris",
+          "text": "Can I borrow your eyes on the middleware? I'm not 100% sure about the connection handling."
+        },
+        {
+          "id": "e174",
+          "type": "message",
+          "from": "boris",
+          "to": "dm:victor",
+          "text": "Fine for staging. Keep the TODO about the shared client and fix it before the next release."
+        },
+        {
+          "id": "e175",
+          "type": "message",
+          "from": "grace",
+          "to": "dm:xavier",
+          "text": "Room migration failing on API 26, want to look at it together?"
+        },
+        {
+          "id": "e176",
+          "type": "message",
+          "from": "xavier",
+          "to": "dm:grace",
+          "text": "Yes, right after standup."
+        },
+        {
+          "id": "e177",
+          "type": "message",
+          "from": "nikolai",
+          "to": "dm:dmitri",
+          "text": "Дим, кинь формат вебхука Google, хочу добавить его в дашборд."
+        },
+        {
+          "id": "e178",
+          "type": "message",
+          "from": "dmitri",
+          "to": "dm:nikolai",
+          "text": "Держи: https://slotly.example/docs/sync-events"
+        },
+        {
+          "id": "e179",
+          "type": "message",
+          "from": "irina",
+          "to": "dm:elena",
+          "text": "Elena, can your team add a stable test id on the weekday chips? Makes my tests less fragile."
+        },
+        {
+          "id": "e180",
+          "type": "message",
+          "from": "elena",
+          "to": "dm:irina",
+          "text": "Done in the editor, `data-testid=weekday-chip-<n>`."
+        },
+        {
+          "id": "e181",
+          "type": "agent_message",
+          "agent": "cc_api",
+          "to": "dm:boris",
+          "text": "PR #471 now includes the tenant-zone fix and 6 DST tests. Review comments from Dmitri are resolved."
+        },
+        {
+          "id": "e182",
+          "type": "agent_status",
+          "agent": "codex_qa",
+          "to": "dm:irina",
+          "state": "info",
+          "text": "The 2 flaky DST tests are stable after pinning the clock in the test setup. Full suite: 187 passed, 0 failed."
+        }
+      ]
+    },
+    {
+      "day": "Wednesday",
+      "events": [
+        {
+          "id": "e183",
+          "type": "message",
+          "from": "sam",
+          "to": "room:general",
+          "text": "Good morning! The coffee machine has been descaled. Please respect the 'out of order' sign while it settles ☕"
+        },
+        {
+          "id": "e184",
+          "type": "message",
+          "from": "kira",
+          "to": "room:general",
+          "text": "Release 2.3.7 has been live since last night and the dashboard looks calm. Nice work, everyone."
+        },
+        {
+          "id": "e185",
+          "type": "message",
+          "from": "irina",
+          "to": "room:general",
+          "text": "Calm so far. I would call this a famous last sentence."
+        },
+        {
+          "id": "e186",
+          "type": "mute",
+          "from": "irina",
+          "to": "room:web"
+        },
+        {
+          "id": "e187",
+          "type": "message",
+          "from": "frank",
+          "to": "room:product",
+          "text": "The product channel is a lot for me alongside the editor work. I'll keep following design in Web."
+        },
+        {
+          "id": "e188",
+          "type": "leave",
+          "from": "frank",
+          "room": "product"
+        },
+        {
+          "id": "e189",
+          "type": "message",
+          "from": "hugo",
+          "to": "room:mobile",
+          "text": "Queue demo recording is attached to the sprint board. Airplane mode, 3 bookings queued, all synced after reconnect ✈️"
+        },
+        {
+          "id": "e190",
+          "type": "message",
+          "from": "grace",
+          "to": "room:mobile",
+          "text": "Beautiful, thank you Hugo!"
+        },
+        {
+          "id": "e191",
+          "type": "message",
+          "from": "xavier",
+          "to": "room:mobile",
+          "text": "Room migration fixed (needed an explicit schema export). Android queue demo this afternoon."
+        },
+        {
+          "id": "e192",
+          "type": "agent_status",
+          "agent": "cc_mobile",
+          "to": "room:mobile",
+          "state": "working",
+          "text": "Reviewing the iOS and Android queue implementations for retry limits. Android retries forever on a 400, which is not what we want."
+        },
+        {
+          "id": "e193",
+          "type": "agent_question",
+          "agent": "codex_web",
+          "to": "room:web",
+          "question": "Remove the `recurrence_ui` feature flag from the default config now that the editor is merged?",
+          "options": [
+            "Remove flag",
+            "Keep flag"
+          ],
+          "answer": {
+            "by": "elena",
+            "text": "Keep flag, it stays off in prod until Friday"
+          }
+        },
+        {
+          "id": "e194",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:sales",
+          "text": "Rehearsal went well with Rosa. Demo script is 24 minutes now."
+        },
+        {
+          "id": "e195",
+          "type": "message",
+          "from": "rosa",
+          "to": "room:sales",
+          "text": "I asked the nastiest questions I could think of. Quinn handled all but 'what about HIPAA'."
+        },
+        {
+          "id": "e196",
+          "type": "message",
+          "from": "paul",
+          "to": "room:sales",
+          "text": "HIPAA is a Q1 compliance track. Be honest, share the roadmap slide."
+        },
+        {
+          "id": "e197",
+          "type": "message",
+          "from": "leo",
+          "to": "dm:tina",
+          "text": "Feedback on Sofia: excellent systems thinking, her accessibility instincts are better than mine. I'm a strong yes."
+        },
+        {
+          "id": "e198",
+          "type": "message",
+          "from": "tina",
+          "to": "dm:leo",
+          "text": "Thanks! Anna was also positive. I'll prepare the offer for Thursday."
+        },
+        {
+          "id": "e199",
+          "type": "message",
+          "from": "olga",
+          "to": "room:ru",
+          "text": "Доброе утро! Кто идёт сегодня на ланч в тот новый вьетнамский ресторан?"
+        },
+        {
+          "id": "e200",
+          "type": "message",
+          "from": "irina",
+          "to": "room:ru",
+          "text": "Я иду, только после регрессии."
+        },
+        {
+          "id": "e201",
+          "type": "message",
+          "from": "boris",
+          "to": "room:ru",
+          "text": "И я. Только не слишком поздно, у нас окно деплоя в 19:00."
+        },
+        {
+          "id": "e202",
+          "type": "message",
+          "from": "uma",
+          "to": "room:general",
+          "text": "Several clinics report that the booking page spins and then shows 'Something went wrong'. Is it just them?"
+        },
+        {
+          "id": "e203",
+          "type": "message",
+          "from": "yara",
+          "to": "room:general",
+          "text": "Support inbox is lighting up: 11 tickets in 10 minutes, all about booking pages."
+        },
+        {
+          "id": "e204",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "ALERT: `/public/slots` p95 is 12.4s and the error rate is **83%** since 14:05. Looking now."
+        },
+        {
+          "id": "e205",
+          "type": "edit",
+          "from": "jake",
+          "of": "e204",
+          "text": "ALERT: `/public/slots` p95 is 12.4s and the error rate is **38%** since 14:05. Looking now."
+        },
+        {
+          "id": "e206",
+          "type": "message",
+          "from": "anna",
+          "to": "room:backend",
+          "text": "Incident declared, I'm incident commander. This room is the war room. Jake, Boris, Victor, Dmitri: please look at your parts of the stack. Everyone else, keep General clear, I will post updates every 15 minutes."
+        },
+        {
+          "id": "e207",
+          "type": "add_member",
+          "from": "anna",
+          "room": "backend",
+          "person": "uma"
+        },
+        {
+          "id": "e208",
+          "type": "message",
+          "from": "uma",
+          "to": "room:backend",
+          "text": "I'm here. I'll handle customer messaging. I need three facts: what is affected, since when, what's the workaround?"
+        },
+        {
+          "id": "e209",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Pasting the last lines from the api pod before the alert fired:\n```\n14:05:10.100 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1040 clients=9700/10000\n14:05:16.137 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1047 clients=9711/10000\n14:05:22.174 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1054 clients=9722/10000\n14:06:28.211 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1061 clients=9733/10000\n14:06:34.248 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1068 clients=9744/10000\n14:06:40.285 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1075 clients=9755/10000\n14:07:46.322 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1082 clients=9766/10000\n14:07:52.359 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1089 clients=9777/10000\n14:07:58.396 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1096 clients=9788/10000\n14:08:64.433 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1103 clients=9799/10000\n14:08:70.470 WARN  redis.pool acquire timeout after 5000ms route=GET /public/slots tenant=t_1110 clients=9810/10000\n14:07:52.004 ERROR rate_limit.middleware ReplyError: ERR max number of clients reached\n    at RedisClient.connect (node_modules/redis/dist/client.js:214:19)\n    at rateLimit (src/middleware/rate-limit.ts:31:22)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\n```"
+        },
+        {
+          "id": "e210",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "working",
+          "text": "Pulling Redis metrics and the last 40 minutes of app logs. `connected_clients` on redis-prod-1 is 9,812 of 10,000."
+        },
+        {
+          "id": "e211",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "That is almost the whole connection limit. Which service is opening them?"
+        },
+        {
+          "id": "e212",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:backend",
+          "text": "Not the webhook handler. That uses the shared client and the flag is off anyway."
+        },
+        {
+          "id": "e213",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "Oh no. It's the rate limiter. `createClient()` runs on every request and early returns never close it. My fault, sorry everyone."
+        },
+        {
+          "id": "e214",
+          "type": "edit",
+          "from": "victor",
+          "of": "e213",
+          "text": "Oh no. It's the rate limiter. `createClient()` runs on every request and early returns never close it. My fault, sorry everyone. Hotfix PR within the hour."
+        },
+        {
+          "id": "e215",
+          "type": "message",
+          "from": "anna",
+          "to": "room:backend",
+          "text": "Blameless. Fix first. Options: hotfix forward or roll back 2.3.7. Agent, please assess."
+        },
+        {
+          "id": "e216",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "working",
+          "text": "Assessment: rollback to 2.3.6 removes the limiter and the sync handler flag. No schema changes in 2.3.7, so rollback is safe. Estimated 6 minutes. A forward fix needs review and deploy: about 35 minutes."
+        },
+        {
+          "id": "e217",
+          "type": "agent_question",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "question": "Roll production back from 2.3.7 to 2.3.6 now? Estimated recovery in about 6 minutes, no migrations to undo.",
+          "options": [
+            "Approve rollback",
+            "Hold, hotfix forward"
+          ],
+          "answer": {
+            "by": "anna",
+            "text": "Approve rollback"
+          }
+        },
+        {
+          "id": "e218",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Starting the blue/green flip on my side too, standing by with the manual command if the agent stalls."
+        },
+        {
+          "id": "e219",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "working",
+          "text": "Rollback in progress. Traffic switching to 2.3.6 pods, healthy 4 of 6."
+        },
+        {
+          "id": "e220",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "done",
+          "text": "Rollback complete at 14:31. Redis connections dropped from 9,812 to 640. Error rate 0.4% and falling."
+        },
+        {
+          "id": "e221",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Confirmed in Grafana: https://grafana.northwind.test/d/slotly-api. p95 is back to 380 ms."
+        },
+        {
+          "id": "e222",
+          "type": "message",
+          "from": "anna",
+          "to": "room:backend",
+          "text": "Mitigated at 14:31. Thank you all. Uma, customer comms next."
+        },
+        {
+          "id": "e223",
+          "type": "message",
+          "from": "uma",
+          "to": "room:backend",
+          "text": "Draft for the status page: 'Between 14:05 and 14:31 UTC booking pages were unavailable for some customers. The issue is resolved. We are sorry.' Okay to publish?"
+        },
+        {
+          "id": "e224",
+          "type": "message",
+          "from": "anna",
+          "to": "room:backend",
+          "text": "Yes, but say that some bookings could not be completed. Be honest about the impact.",
+          "replyTo": "e223"
+        },
+        {
+          "id": "e225",
+          "type": "edit",
+          "from": "uma",
+          "of": "e223",
+          "text": "Draft for the status page: 'Between 14:05 and 14:31 UTC some customers could not load booking pages, and some bookings could not be completed. The issue is resolved and we are sorry. We will email affected customers directly.' Okay to publish?"
+        },
+        {
+          "id": "e226",
+          "type": "message",
+          "from": "uma",
+          "to": "room:backend",
+          "text": "Published: https://status.slotly.example/incidents/booking-pages. I'm emailing the biggest affected accounts too."
+        },
+        {
+          "id": "e227",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Short version for everyone: a regression in last night's release made booking pages slow or unavailable between 14:05 and 14:31. Fixed by rollback. A written postmortem follows on Friday."
+        },
+        {
+          "id": "e228",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:general",
+          "text": "At least the loading spinner looked great"
+        },
+        {
+          "id": "e229",
+          "type": "delete",
+          "from": "wendy",
+          "of": "e228"
+        },
+        {
+          "id": "e230",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:general",
+          "text": "Does this affect tomorrow's Brightfield demo?"
+        },
+        {
+          "id": "e231",
+          "type": "message",
+          "from": "anna",
+          "to": "room:general",
+          "text": "No. Staging is separate and the hotfix will be on staging tonight."
+        },
+        {
+          "id": "e232",
+          "type": "agent_status",
+          "agent": "qwen_data",
+          "to": "room:backend",
+          "state": "working",
+          "text": "Counting failed booking attempts between 14:05 and 14:31 and joining them to tenant data."
+        },
+        {
+          "id": "e233",
+          "type": "agent_status",
+          "agent": "qwen_data",
+          "to": "room:backend",
+          "state": "done",
+          "text": "214 failed booking attempts across 37 tenants. 152 were retried successfully within one hour. Top 5 tenants account for 41% of failures."
+        },
+        {
+          "id": "e234",
+          "type": "agent_handoff",
+          "agent": "qwen_data",
+          "to": "room:backend",
+          "title": "Incident impact: failed bookings by tenant",
+          "summary": "Analysis of the 14:05-14:31 incident window. List of affected tenants and a retry success rate.",
+          "done": [
+            "Failed attempts counted: 214",
+            "Matched to 37 tenants",
+            "Retry success within 1h: 71%"
+          ],
+          "next": [
+            "Personal outreach to top 5 tenants",
+            "Check for double-booked slots"
+          ],
+          "files": [
+            "reports/incident-2.3.7/failed-bookings.csv"
+          ],
+          "claimedBy": "uma"
+        },
+        {
+          "id": "e235",
+          "type": "file",
+          "from": "nikolai",
+          "to": "room:backend",
+          "fileName": "affected-bookings.csv",
+          "text": "Affected tenants and booking counts, for Uma's outreach."
+        },
+        {
+          "id": "e236",
+          "type": "message",
+          "from": "uma",
+          "to": "room:backend",
+          "text": "Perfect. I'll email the top five personally within the hour."
+        },
+        {
+          "id": "e237",
+          "type": "file",
+          "from": "jake",
+          "to": "room:backend",
+          "fileName": "incident-redis-timeline.md",
+          "text": "Draft timeline for the postmortem. Please add your own entries."
+        },
+        {
+          "id": "e238",
+          "type": "agent_question",
+          "agent": "codex_qa",
+          "to": "room:backend",
+          "question": "Run a 30-minute load test against staging with the limiter fix? It reserves the staging cluster until 17:00.",
+          "options": [
+            "Run now",
+            "Run overnight"
+          ],
+          "answer": null
+        },
+        {
+          "id": "e239",
+          "type": "agent_status",
+          "agent": "codex_qa",
+          "to": "room:backend",
+          "state": "working",
+          "text": "Wrote a regression test: 500 concurrent requests must not exceed 20 Redis connections. It fails against 2.3.7 and passes with Victor's patch."
+        },
+        {
+          "id": "e240",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "Hotfix PR #482 is up: one shared pooled client, `finally` blocks, plus a max of 20 connections. https://git.northwind.test/slotly/api/pull/482"
+        },
+        {
+          "id": "e241",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Reviewing. Could you also add a metric for pool saturation? We'd have seen this earlier."
+        },
+        {
+          "id": "e242",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "Added `redis_pool_in_use` and an alert at 80%."
+        },
+        {
+          "id": "e243",
+          "type": "agent_handoff",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "title": "Incident analysis: Redis connection leak in rate limiter",
+          "summary": "Root cause: `createClient()` called per request in the rate limit middleware; early returns skipped `quit()`. Connections reached the server limit within 14 minutes of the peak. Rollback to 2.3.6 recovered service.",
+          "done": [
+            "Identified leak in rate-limit middleware",
+            "Rollback to 2.3.6 executed with approval",
+            "Confirmed connection count back to baseline"
+          ],
+          "next": [
+            "Merge PR #482 after review",
+            "Add pool saturation alert",
+            "Load test the limiter on staging"
+          ],
+          "files": [
+            "src/middleware/rate-limit.ts",
+            "src/lib/redis.ts"
+          ],
+          "claimedBy": "victor"
+        },
+        {
+          "id": "e244",
+          "type": "message",
+          "from": "olga",
+          "to": "room:backend",
+          "text": "Thanks for the calm and fast response. Retro slot Friday at 15:00, blameless format."
+        },
+        {
+          "id": "e245",
+          "type": "message",
+          "from": "kira",
+          "to": "room:backend",
+          "text": "Product impact note: 37 tenants affected, no data loss. I'll mention it in the customer call prep for tomorrow."
+        },
+        {
+          "id": "e246",
+          "type": "message",
+          "from": "paul",
+          "to": "dm:maya",
+          "text": "Quinn is nervous about tomorrow's demo after today's outage. I told him Brightfield will value honest transparency, but can you say a word to the team?"
+        },
+        {
+          "id": "e247",
+          "type": "message",
+          "from": "maya",
+          "to": "dm:paul",
+          "text": "Yes, I'll mention it in General tonight. Also I'll join the demo for the first 5 minutes."
+        },
+        {
+          "id": "e248",
+          "type": "message",
+          "from": "anna",
+          "to": "dm:maya",
+          "text": "Incident write-up: root cause was a missing pooled client in the rate limiter. We will add a load test gate before every release."
+        },
+        {
+          "id": "e249",
+          "type": "message",
+          "from": "maya",
+          "to": "dm:anna",
+          "text": "Good. Please keep Victor on the postmortem, it's a great learning moment for everyone."
+        },
+        {
+          "id": "e250",
+          "type": "message",
+          "from": "boris",
+          "to": "dm:victor",
+          "text": "Don't beat yourself up. Everybody has shipped a leak once. Yours just had a good alert."
+        },
+        {
+          "id": "e251",
+          "type": "message",
+          "from": "victor",
+          "to": "dm:boris",
+          "text": "Thanks Boris. Honestly the rollback process was smooth, that helped a lot."
+        },
+        {
+          "id": "e252",
+          "type": "message",
+          "from": "irina",
+          "to": "dm:olga",
+          "text": "Оля, всё хорошо, но я хочу добавить нагрузочный тест в чек-лист релиза."
+        },
+        {
+          "id": "e253",
+          "type": "message",
+          "from": "olga",
+          "to": "dm:irina",
+          "text": "Согласна, внеси предложение на ретро."
+        },
+        {
+          "id": "e254",
+          "type": "message",
+          "from": "boris",
+          "to": "room:ru",
+          "text": "Утечка соединений — классика. Хорошо, что откат занял шесть минут."
+        },
+        {
+          "id": "e255",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:ru",
+          "text": "Согласен. Предлагаю добавить в код ревью чек-лист: «закрываются ли ресурсы на всех путях выхода?»"
+        },
+        {
+          "id": "e256",
+          "type": "message",
+          "from": "nikolai",
+          "to": "room:ru",
+          "text": "Могу добавить дашборд по пулу соединений в аналитику."
+        },
+        {
+          "id": "e257",
+          "type": "message",
+          "from": "sam",
+          "to": "room:general",
+          "text": "Pizza on me tonight for everyone who stayed to help. Order is in for 18:30 🍕"
+        },
+        {
+          "id": "e258",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Thank you all for today. A mistake made it to production, and the team caught it, rolled back and told our customers honestly within 30 minutes. That's the company I want to run."
+        },
+        {
+          "id": "e259",
+          "type": "message",
+          "from": "hugo",
+          "to": "room:general",
+          "text": "🙌"
+        },
+        {
+          "id": "e260",
+          "type": "message",
+          "from": "rosa",
+          "to": "room:sales",
+          "text": "Customers are replying nicely to Uma's email. Two said they appreciated the honesty."
+        },
+        {
+          "id": "e261",
+          "type": "message",
+          "from": "uma",
+          "to": "room:sales",
+          "text": "Yes, and one asked for a credit. I'll propose a 10% discount for that account."
+        },
+        {
+          "id": "e262",
+          "type": "message",
+          "from": "paul",
+          "to": "room:sales",
+          "text": "Approved."
+        },
+        {
+          "id": "e263",
+          "type": "message",
+          "from": "irina",
+          "to": "dm:elena",
+          "text": "Heads-up: screen reader pass on the chips found one issue. The group needs an accessible name."
+        },
+        {
+          "id": "e264",
+          "type": "message",
+          "from": "elena",
+          "to": "dm:irina",
+          "text": "Thanks, adding `aria-label='Repeat on'` tomorrow."
+        },
+        {
+          "id": "e265",
+          "type": "message",
+          "from": "grace",
+          "to": "dm:hugo",
+          "text": "How's the incident from your side? I saw the status page."
+        },
+        {
+          "id": "e266",
+          "type": "message",
+          "from": "hugo",
+          "to": "dm:grace",
+          "text": "Only a few test bookings failed. Our queue retried them nicely when it came back, actually a nice real-world test 😅"
+        },
+        {
+          "id": "e267",
+          "type": "agent_message",
+          "agent": "cc_mobile",
+          "to": "dm:grace",
+          "text": "During the incident window the offline queue retried 6 failed bookings with backoff and all succeeded after the rollback. No manual action needed."
+        },
+        {
+          "id": "e268",
+          "type": "agent_status",
+          "agent": "codex_web",
+          "to": "room:web",
+          "state": "info",
+          "text": "Idle. Last task: Recurrence editor skeleton merged. Ready for the next assignment."
+        }
+      ]
+    },
+    {
+      "day": "Thursday",
+      "events": [
+        {
+          "id": "e269",
+          "type": "message",
+          "from": "anna",
+          "to": "room:backend",
+          "text": "PR #482 got two approvals. Merging after the load test passes. Jake, is staging free?"
+        },
+        {
+          "id": "e270",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Staging is free. I'll run the 30-minute test at 09:30."
+        },
+        {
+          "id": "e271",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "Sorry, wrong clipboard: `REDIS_URL=redis://:placeholder@redis-stg.northwind.test:6379/0`. Deleting that, it's just the staging URL, but still."
+        },
+        {
+          "id": "e272",
+          "type": "delete",
+          "from": "victor",
+          "of": "e271"
+        },
+        {
+          "id": "e273",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Thanks for deleting it quickly. I'll rotate the staging password anyway, 5 minutes."
+        },
+        {
+          "id": "e274",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Load test result: 500 concurrent clients, 30 minutes, max 17 Redis connections, p95 410 ms, zero errors ✅"
+        },
+        {
+          "id": "e275",
+          "type": "agent_question",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "question": "Merge hotfix PR #482 into main now, or wait for the full CI matrix (about 20 more minutes)?",
+          "options": [
+            "Merge now",
+            "Wait for CI"
+          ],
+          "answer": {
+            "by": "anna",
+            "text": "Wait for the full CI matrix"
+          }
+        },
+        {
+          "id": "e276",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "done",
+          "text": "Full CI matrix green. PR #482 merged to main as 2.3.8-rc1."
+        },
+        {
+          "id": "e277",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Recurrence API merged too. Release branch `release/2.4` cut from main."
+        },
+        {
+          "id": "e278",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:backend",
+          "text": "Sync v2: turned the flag on for the internal tenant, 50 events with no duplicates 👍"
+        },
+        {
+          "id": "e279",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "This is my last day. Contract ends at 17:00. Thanks for being kind about the incident, I learned a lot here."
+        },
+        {
+          "id": "e280",
+          "type": "message",
+          "from": "anna",
+          "to": "room:backend",
+          "text": "Thank you for everything, Victor. The limiter you shipped yesterday and the fix you wrote are both better for it. Please hand over your open notes to Boris."
+        },
+        {
+          "id": "e281",
+          "type": "message",
+          "from": "victor",
+          "to": "room:backend",
+          "text": "Handed over in the doc: https://slotly.example/docs/rate-limit-notes. Take care, all!"
+        },
+        {
+          "id": "e282",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Thanks Victor. Goodbye and good luck!"
+        },
+        {
+          "id": "e283",
+          "type": "message",
+          "from": "nikolai",
+          "to": "room:backend",
+          "text": "Good luck Victor!"
+        },
+        {
+          "id": "e284",
+          "type": "message",
+          "from": "victor",
+          "to": "room:general",
+          "text": "It's my last day at Northwind. Thank you all for a great few months. Keep Slotly fast and the connections closed 😄"
+        },
+        {
+          "id": "e285",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Thanks Victor, you'll be missed. Come back any time."
+        },
+        {
+          "id": "e286",
+          "type": "message",
+          "from": "victor",
+          "to": "dm:boris",
+          "text": "If you ever need me, my number is in the contractor sheet. Thanks for the mentoring."
+        },
+        {
+          "id": "e287",
+          "type": "message",
+          "from": "dmitri",
+          "to": "dm:victor",
+          "text": "Thanks for the help with the limiter, it was great working with you. Good luck!"
+        },
+        {
+          "id": "e288",
+          "type": "remove_member",
+          "from": "anna",
+          "room": "backend",
+          "person": "victor"
+        },
+        {
+          "id": "e289",
+          "type": "owner_action",
+          "action": "block",
+          "person": "victor",
+          "reason": "Contractor contract ended today at 17:00. Access removed per offboarding checklist."
+        },
+        {
+          "id": "e290",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:web",
+          "text": "XSS fix PR #488: escape in the email template, sanitise on input, and a CSP report-only header from Jake. Both test strings from Irina are now in the e2e suite."
+        },
+        {
+          "id": "e291",
+          "type": "message",
+          "from": "elena",
+          "to": "room:web",
+          "text": "Reviewed and approved. Great job Wendy."
+        },
+        {
+          "id": "e292",
+          "type": "message",
+          "from": "frank",
+          "to": "room:web",
+          "text": "Keyboard navigation for chips is done: arrows move, space toggles, home/end jump. Demo gif: https://slotly.example/demo/chips.gif"
+        },
+        {
+          "id": "e293",
+          "type": "message",
+          "from": "irina",
+          "to": "room:web",
+          "text": "Tested with VoiceOver and NVDA. Works. One tiny issue: announcement says 'toggle button, mixed' on the group, I'll file it.",
+          "replyTo": "e292"
+        },
+        {
+          "id": "e294",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:web",
+          "text": "Booking page LCP is down to 2.3s on throttled mobile. The calendar widget is now lazy loaded below the fold."
+        },
+        {
+          "id": "e295",
+          "type": "message",
+          "from": "elena",
+          "to": "room:web",
+          "text": "Nice! Target hit. Let's go and break nothing else."
+        },
+        {
+          "id": "e296",
+          "type": "message",
+          "from": "leo",
+          "to": "room:web",
+          "text": "Settings page build looks good. The 'Connected apps' rename tested well: 5 of 6 testers found Calendar sync in under 10 seconds."
+        },
+        {
+          "id": "e297",
+          "type": "message",
+          "from": "frank",
+          "to": "room:web",
+          "text": "Release notes draft for the editor is ready for Kira's copy review."
+        },
+        {
+          "id": "e298",
+          "type": "edit",
+          "from": "frank",
+          "of": "e297",
+          "text": "Release notes draft for the recurrence editor is ready for Kira's copy review: https://slotly.example/docs/release-notes-2-4"
+        },
+        {
+          "id": "e299",
+          "type": "message",
+          "from": "kira",
+          "to": "room:web",
+          "text": "Reading it now. Two tweaks on wording, I'll comment inline."
+        },
+        {
+          "id": "e300",
+          "type": "message",
+          "from": "grace",
+          "to": "room:mobile",
+          "text": "Release candidate build 2.4.0 (118) is out for internal testing on both platforms."
+        },
+        {
+          "id": "e301",
+          "type": "message",
+          "from": "hugo",
+          "to": "room:mobile",
+          "text": "iOS RC installs clean. Queue works, push for rescheduling works."
+        },
+        {
+          "id": "e302",
+          "type": "message",
+          "from": "xavier",
+          "to": "room:mobile",
+          "text": "Android RC too. One crash on Android 8 when notifications are disabled. Fixing now."
+        },
+        {
+          "id": "e303",
+          "type": "agent_status",
+          "agent": "cc_mobile",
+          "to": "room:mobile",
+          "state": "working",
+          "text": "Preparing store listing text and release notes for 2.4.0 in en and ru. Checking screenshot sizes for both stores."
+        },
+        {
+          "id": "e304",
+          "type": "agent_question",
+          "agent": "cc_mobile",
+          "to": "room:mobile",
+          "question": "Submit build 2.4.0 (118) to the TestFlight external group now? About 40 external testers.",
+          "options": [
+            "Submit",
+            "Hold"
+          ],
+          "answer": null
+        },
+        {
+          "id": "e305",
+          "type": "agent_handoff",
+          "agent": "cc_mobile",
+          "to": "room:mobile",
+          "title": "Offline booking queue: iOS and Android parity check",
+          "summary": "Compared both platforms. Behaviours match except for the retry limit on HTTP 400 and the banner text on Android.",
+          "done": [
+            "Behaviour comparison table",
+            "Android retry cap proposed (5 attempts)",
+            "Banner copy aligned with Leo"
+          ],
+          "next": [
+            "Android: stop retrying on 4xx",
+            "iOS: match banner wording",
+            "Store listing review"
+          ],
+          "files": [
+            "mobile/shared/offline-queue.md",
+            "android/app/src/main/java/OfflineQueue.kt"
+          ],
+          "claimedBy": "xavier"
+        },
+        {
+          "id": "e306",
+          "type": "message",
+          "from": "grace",
+          "to": "room:mobile",
+          "text": "I'll handle the TestFlight submission by hand after the Android fix, thanks anyway."
+        },
+        {
+          "id": "e307",
+          "type": "message",
+          "from": "kira",
+          "to": "room:mobile",
+          "text": "Store copy: please keep it under 4000 chars and mention rescheduling first."
+        },
+        {
+          "id": "e308",
+          "type": "file",
+          "from": "leo",
+          "to": "room:product",
+          "fileName": "booking-flow-notes.md",
+          "text": "Booking flow findings from yesterday's user test. Three small copy issues, one real problem on the confirmation screen."
+        },
+        {
+          "id": "e309",
+          "type": "message",
+          "from": "kira",
+          "to": "room:product",
+          "text": "Great. Confirmation screen first, can we fix that before Friday?",
+          "replyTo": "e308"
+        },
+        {
+          "id": "e310",
+          "type": "message",
+          "from": "leo",
+          "to": "room:product",
+          "text": "Yes, it's a one-line change. Not in the release but first patch."
+        },
+        {
+          "id": "e311",
+          "type": "file",
+          "from": "tina",
+          "to": "dm:kira",
+          "fileName": "candidate-scorecards.xlsx",
+          "text": "Scorecards from both Senior Designer candidates for your final input."
+        },
+        {
+          "id": "e312",
+          "type": "message",
+          "from": "kira",
+          "to": "dm:tina",
+          "text": "Sofia is a clear yes. The other candidate was strong on visuals, weaker on systems."
+        },
+        {
+          "id": "e313",
+          "type": "message",
+          "from": "tina",
+          "to": "dm:maya",
+          "text": "Offer approval: Sofia R. as Senior Product Designer, salary within the band, start date in 5 weeks. May I send it?"
+        },
+        {
+          "id": "e314",
+          "type": "message",
+          "from": "maya",
+          "to": "dm:tina",
+          "text": "Approved. Send it today and call her yourself, she'll like that."
+        },
+        {
+          "id": "e315",
+          "type": "message",
+          "from": "tina",
+          "to": "room:product",
+          "text": "Update: offer approved, I'll call Sofia this afternoon 🤞"
+        },
+        {
+          "id": "e316",
+          "type": "message",
+          "from": "mia",
+          "to": "room:product",
+          "text": "Fingers crossed. She'd be a great teammate."
+        },
+        {
+          "id": "e317",
+          "type": "message",
+          "from": "maya",
+          "to": "room:product",
+          "text": "Please keep this confidential until she signs."
+        },
+        {
+          "id": "e318",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:sales",
+          "text": "Demo at 15:00 in the glass room. Final deck here, with the incident transparency slide as Paul suggested."
+        },
+        {
+          "id": "e319",
+          "type": "file",
+          "from": "quinn",
+          "to": "room:sales",
+          "fileName": "brightfield-proposal.docx",
+          "text": "Draft proposal for the Brightfield team: 40 seats, 12 months, SSO add-on in Q4."
+        },
+        {
+          "id": "e320",
+          "type": "file",
+          "from": "paul",
+          "to": "room:sales",
+          "fileName": "pricing-q4.xlsx",
+          "text": "Updated pricing sheet. Volume tier now starts at 30 seats."
+        },
+        {
+          "id": "e321",
+          "type": "message",
+          "from": "sam",
+          "to": "room:sales",
+          "text": "Glass room is booked, badges at the front desk, snacks arranged 🍪"
+        },
+        {
+          "id": "e322",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:sales",
+          "text": "Demo done! They loved recurring rules and the rescheduling flow. Asked about HIPAA and SSO, we answered with the roadmap. Follow-up call Monday."
+        },
+        {
+          "id": "e323",
+          "type": "message",
+          "from": "paul",
+          "to": "room:sales",
+          "text": "Fantastic. Quinn, write the recap before you go home."
+        },
+        {
+          "id": "e324",
+          "type": "message",
+          "from": "rosa",
+          "to": "room:sales",
+          "text": "🎉🎉"
+        },
+        {
+          "id": "e325",
+          "type": "message",
+          "from": "maya",
+          "to": "room:sales",
+          "text": "Congratulations team! Brightfield said anything to the transparency slide?"
+        },
+        {
+          "id": "e326",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:sales",
+          "text": "Their CTO said it was the reason she wanted a second demo, honestly."
+        },
+        {
+          "id": "e327",
+          "type": "message",
+          "from": "uma",
+          "to": "room:sales",
+          "text": "Great, I'll start the onboarding checklist in case it's a yes."
+        },
+        {
+          "id": "e328",
+          "type": "message",
+          "from": "yara",
+          "to": "room:sales",
+          "text": "Support is ready with FAQ updates for recurring availability."
+        },
+        {
+          "id": "e329",
+          "type": "message",
+          "from": "olga",
+          "to": "room:ru",
+          "text": "Ребята, ретро завтра в 15:00. Приносите по одному плюсу и одному минусу недели."
+        },
+        {
+          "id": "e330",
+          "type": "message",
+          "from": "irina",
+          "to": "room:ru",
+          "text": "Мой плюс: откат работал как часы. Минус: нагрузочное тестирование не было в чек-листе."
+        },
+        {
+          "id": "e331",
+          "type": "message",
+          "from": "boris",
+          "to": "room:ru",
+          "text": "Мой плюс: агент справился с миграцией. Минус: я заметил поздно, что лимитер без пула."
+        },
+        {
+          "id": "e332",
+          "type": "file",
+          "from": "olga",
+          "to": "room:ru",
+          "fileName": "итоги-недели.docx",
+          "text": "Черновик итогов недели для руководства. Допишите свои пункты."
+        },
+        {
+          "id": "e333",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:ru",
+          "text": "Добавил про вебхуки и дедупликацию."
+        },
+        {
+          "id": "e334",
+          "type": "message",
+          "from": "nikolai",
+          "to": "room:ru",
+          "text": "Добавил цифры по бэкфиллу и инциденту."
+        },
+        {
+          "id": "e335",
+          "type": "agent_message",
+          "agent": "qwen_data",
+          "to": "room:ru",
+          "text": "Справка: за четверг зафиксировано 2 106 бронирований, ошибок оплаты нет, медиана отклика API 212 мс."
+        },
+        {
+          "id": "e336",
+          "type": "message",
+          "from": "anna",
+          "to": "dm:olga",
+          "text": "Olga, thank you for running the incident retro structure. Can you also own the follow-up list?"
+        },
+        {
+          "id": "e337",
+          "type": "message",
+          "from": "olga",
+          "to": "dm:anna",
+          "text": "Yes, I'll file the tickets today and assign owners."
+        },
+        {
+          "id": "e338",
+          "type": "message",
+          "from": "grace",
+          "to": "dm:xavier",
+          "text": "How bad is the Android 8 crash?"
+        },
+        {
+          "id": "e339",
+          "type": "message",
+          "from": "xavier",
+          "to": "dm:grace",
+          "text": "Only when notifications are disabled. Fix is 3 lines, PR in 20 minutes."
+        },
+        {
+          "id": "e340",
+          "type": "message",
+          "from": "frank",
+          "to": "dm:leo",
+          "text": "Chip spacing now matches your spec. Want to see a build?"
+        },
+        {
+          "id": "e341",
+          "type": "message",
+          "from": "leo",
+          "to": "dm:frank",
+          "text": "Please! Send me the preview link."
+        },
+        {
+          "id": "e342",
+          "type": "message",
+          "from": "elena",
+          "to": "dm:frank",
+          "text": "Nice work this week, by the way. The keyboard navigation is the best part of the editor."
+        },
+        {
+          "id": "e343",
+          "type": "message",
+          "from": "frank",
+          "to": "dm:elena",
+          "text": "Thanks! Codex scaffolding helped a lot, I just fixed the sharp edges."
+        },
+        {
+          "id": "e344",
+          "type": "message",
+          "from": "mia",
+          "to": "dm:leo",
+          "text": "Test notes from yesterday are in the shared folder. Want to turn them into a Notion-style one-pager?"
+        },
+        {
+          "id": "e345",
+          "type": "message",
+          "from": "leo",
+          "to": "dm:mia",
+          "text": "Yes please, with quotes if you have them."
+        },
+        {
+          "id": "e346",
+          "type": "message",
+          "from": "rosa",
+          "to": "dm:quinn",
+          "text": "Can I shadow the follow-up call on Monday?"
+        },
+        {
+          "id": "e347",
+          "type": "message",
+          "from": "quinn",
+          "to": "dm:rosa",
+          "text": "Of course. Bring questions."
+        },
+        {
+          "id": "e348",
+          "type": "agent_status",
+          "agent": "qwen_data",
+          "to": "dm:nikolai",
+          "state": "info",
+          "text": "Weekly retention cohorts updated. Rescheduling users retain 11 points better after 30 days."
+        }
+      ]
+    },
+    {
+      "day": "Friday",
+      "events": [
+        {
+          "id": "e349",
+          "type": "owner_action",
+          "action": "unblock",
+          "person": "victor",
+          "reason": "Contract extended by two weeks after the incident follow-ups grew; the new paperwork was signed this morning."
+        },
+        {
+          "id": "e350",
+          "type": "message",
+          "from": "victor",
+          "to": "room:general",
+          "text": "Plot twist: I'm back for two more weeks to finish the postmortem follow-ups. You can't get rid of me 😄"
+        },
+        {
+          "id": "e351",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Welcome back, Victor. Please keep the connections closed 😉"
+        },
+        {
+          "id": "e352",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Release day! 🚀 Code freeze was last night. Deploy window is 11:00, Jake drives. Thank you all for a week with more drama than I scheduled."
+        },
+        {
+          "id": "e353",
+          "type": "message",
+          "from": "jake",
+          "to": "room:general",
+          "text": "Release checklist: https://slotly.example/runbooks/release-2-4. Everyone on call stays online until 13:00."
+        },
+        {
+          "id": "e354",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Release branch `release/2.4` is green and the final candidate is tagged."
+        },
+        {
+          "id": "e355",
+          "type": "agent_question",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "question": "Start the production deploy of 2.4.0 (build 2.4.0-rc3) with a canary at 10% traffic first?",
+          "options": [
+            "Approve",
+            "Hold"
+          ],
+          "answer": {
+            "by": "jake",
+            "text": "Approve"
+          }
+        },
+        {
+          "id": "e356",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "working",
+          "text": "Canary deploy at 10% traffic started. Watching p95, error rate and Redis connections for 15 minutes."
+        },
+        {
+          "id": "e357",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Canary healthy: p95 410 ms, errors 0.2%, Redis connections steady at 120."
+        },
+        {
+          "id": "e358",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:backend",
+          "state": "working",
+          "text": "Promoting 2.4.0 to 50% traffic, then 100% if metrics stay flat."
+        },
+        {
+          "id": "e359",
+          "type": "agent_status",
+          "agent": "cc_api",
+          "to": "room:general",
+          "state": "done",
+          "text": "Slotly 2.4.0 is live for 100% of traffic as of 11:42. Error rate 0.2%, p95 405 ms."
+        },
+        {
+          "id": "e360",
+          "type": "message",
+          "from": "jake",
+          "to": "room:general",
+          "text": "All green. Redis connections: 118. That is the number I like to see."
+        },
+        {
+          "id": "e361",
+          "type": "message",
+          "from": "anna",
+          "to": "room:general",
+          "text": "Slotly 2.4 is out 🎉 Recurring availability and Calendar Sync v2 are live. Big thanks to Backend, Web, Mobile and QA."
+        },
+        {
+          "id": "e362",
+          "type": "file",
+          "from": "kira",
+          "to": "room:general",
+          "fileName": "release-2.4-notes.pdf",
+          "text": "Customer-facing release notes. Please share with your accounts."
+        },
+        {
+          "id": "e363",
+          "type": "message",
+          "from": "paul",
+          "to": "room:general",
+          "text": "Perfect timing. I'll send this to Brightfield and the other open proposals this afternoon."
+        },
+        {
+          "id": "e364",
+          "type": "message",
+          "from": "elena",
+          "to": "room:general",
+          "text": "Web checks: recurring editor, settings, booking page. Everything works on staging and prod 🎯"
+        },
+        {
+          "id": "e365",
+          "type": "message",
+          "from": "hugo",
+          "to": "room:general",
+          "text": "Mobile builds are submitted to both stores. Apple review usually takes 24h, Google a few hours."
+        },
+        {
+          "id": "e366",
+          "type": "message",
+          "from": "xavier",
+          "to": "room:general",
+          "text": "Google Play: submitted, status 'in review'."
+        },
+        {
+          "id": "e367",
+          "type": "message",
+          "from": "grace",
+          "to": "room:general",
+          "text": "Proud of this team. A week ago we weren't sure about the offline queue 🙌"
+        },
+        {
+          "id": "e368",
+          "type": "agent_handoff",
+          "agent": "codex_qa",
+          "to": "room:backend",
+          "title": "Release 2.4 regression run summary",
+          "summary": "Full regression after the 2.4.0 canary: 612 tests, 609 passed. Three known flaky tests are tracked.",
+          "done": [
+            "Smoke suite on prod canary",
+            "Recurrence e2e suite: 24/24",
+            "Accessibility checks on the editor"
+          ],
+          "next": [
+            "Triage 3 flaky tests",
+            "Add load test gate to the release pipeline",
+            "Update the QA checklist"
+          ],
+          "files": [
+            "e2e/regression-summary.md",
+            "e2e/recurrence.spec.ts"
+          ],
+          "claimedBy": null
+        },
+        {
+          "id": "e369",
+          "type": "file",
+          "from": "anna",
+          "to": "room:backend",
+          "fileName": "postmortem-redis-pool.md",
+          "text": "Draft postmortem for the 2.3.7 incident. Timeline, root cause, five follow-ups with owners. Retro at 15:00."
+        },
+        {
+          "id": "e370",
+          "type": "message",
+          "from": "jake",
+          "to": "room:backend",
+          "text": "Added the gate: no release without the load test job. Merged.",
+          "replyTo": "e369"
+        },
+        {
+          "id": "e371",
+          "type": "message",
+          "from": "victor",
+          "to": "room:general",
+          "text": "Postmortem follow-up #3 (lint rule for shared Redis clients) is mine. I'll have it ready Monday."
+        },
+        {
+          "id": "e372",
+          "type": "message",
+          "from": "boris",
+          "to": "room:backend",
+          "text": "Release tag is 2.4.0-rc3, deploy checklist is in the runbook."
+        },
+        {
+          "id": "e373",
+          "type": "edit",
+          "from": "boris",
+          "of": "e372",
+          "text": "Release tag is 2.4.0 (final from rc3), deploy checklist is in the runbook."
+        },
+        {
+          "id": "e374",
+          "type": "message",
+          "from": "olga",
+          "to": "room:backend",
+          "text": "Retro at 15:00 in the big room. Pizza will be there, so attendance is mandatory 🍕"
+        },
+        {
+          "id": "e375",
+          "type": "message",
+          "from": "quinn",
+          "to": "room:sales",
+          "text": "Brightfield wants a second demo with their CTO next week and asked for SSO details. Proposal v2 coming Monday."
+        },
+        {
+          "id": "e376",
+          "type": "message",
+          "from": "paul",
+          "to": "room:sales",
+          "text": "That's a very good week. Rosa, get your follow-up list for the dentists done by 16:00."
+        },
+        {
+          "id": "e377",
+          "type": "message",
+          "from": "rosa",
+          "to": "room:sales",
+          "text": "Done, 12 follow-ups queued."
+        },
+        {
+          "id": "e378",
+          "type": "message",
+          "from": "uma",
+          "to": "room:sales",
+          "text": "A customer in Lisbon already created a recurring weekly rule and sent a thank-you note. Screenshot: https://slotly.example/screens/lisbon-recurring.png"
+        },
+        {
+          "id": "e379",
+          "type": "message",
+          "from": "tina",
+          "to": "room:general",
+          "text": "Good news: Sofia accepted the offer! 🎉 She starts in five weeks as Senior Product Designer. Please welcome her when she arrives."
+        },
+        {
+          "id": "e380",
+          "type": "message",
+          "from": "leo",
+          "to": "room:general",
+          "text": "Yes!! 🙌 Looking forward to it."
+        },
+        {
+          "id": "e381",
+          "type": "message",
+          "from": "yara",
+          "to": "room:general",
+          "text": "Today is my last day at Northwind. I'm moving to a role closer to my family. Thank you for the best support team I've had. Please keep answering tickets kindly 💙"
+        },
+        {
+          "id": "e382",
+          "type": "message",
+          "from": "uma",
+          "to": "room:general",
+          "text": "We'll miss you, Yara. Come visit on Thursdays for the snacks."
+        },
+        {
+          "id": "e383",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Thank you, Yara. Every customer who writes in gets a friendlier day because of you."
+        },
+        {
+          "id": "e384",
+          "type": "message",
+          "from": "yara",
+          "to": "dm:uma",
+          "text": "Handover document is in the CS folder. The tricky customers are marked with 🧩."
+        },
+        {
+          "id": "e385",
+          "type": "message",
+          "from": "uma",
+          "to": "dm:yara",
+          "text": "Thank you! I read it, it's very thorough. We'll keep your FAQ structure."
+        },
+        {
+          "id": "e386",
+          "type": "message",
+          "from": "yara",
+          "to": "dm:maya",
+          "text": "Thanks for the chance to work here. I'm deleting my account on my way out, as per the offboarding list."
+        },
+        {
+          "id": "e387",
+          "type": "message",
+          "from": "maya",
+          "to": "dm:yara",
+          "text": "Good luck, Yara!"
+        },
+        {
+          "id": "e388",
+          "type": "delete_account",
+          "from": "yara"
+        },
+        {
+          "id": "e389",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:web",
+          "text": "Prod check: booking page LCP on the real 2.4.0 build is 2.2s. Lighthouse report: https://slotly.example/perf/booking-2-4"
+        },
+        {
+          "id": "e390",
+          "type": "message",
+          "from": "elena",
+          "to": "room:web",
+          "text": "Lovely. Frank, Wendy, thank you. The retro point from Web: the Codex scaffolding worked best when Frank reviewed each commit."
+        },
+        {
+          "id": "e391",
+          "type": "message",
+          "from": "frank",
+          "to": "room:web",
+          "text": "Agreed. I'd still like it to write the tests first next time 😉"
+        },
+        {
+          "id": "e392",
+          "type": "agent_status",
+          "agent": "codex_web",
+          "to": "room:web",
+          "state": "info",
+          "text": "Retro note from Codex · Web: next time I will add the accessibility test before the component, not after."
+        },
+        {
+          "id": "e393",
+          "type": "agent_status",
+          "agent": "cc_mobile",
+          "to": "room:mobile",
+          "state": "done",
+          "text": "Store listings for 2.4.0 submitted in en and ru. Screenshots verified for 6.7 inch iPhone and Pixel 8."
+        },
+        {
+          "id": "e394",
+          "type": "message",
+          "from": "xavier",
+          "to": "room:mobile",
+          "text": "Google Play approved the 2.4.0 build. Staged rollout at 20% 🚀"
+        },
+        {
+          "id": "e395",
+          "type": "message",
+          "from": "grace",
+          "to": "room:mobile",
+          "text": "Apple is still in review. Hugo, ping me when it changes."
+        },
+        {
+          "id": "e396",
+          "type": "message",
+          "from": "paul",
+          "to": "room:sales",
+          "text": "Weekly recap: 4 demos, 3 proposals sent, Brightfield moving to a second demo, 14 new meetings. Great week, people."
+        },
+        {
+          "id": "e397",
+          "type": "message",
+          "from": "dmitri",
+          "to": "dm:victor",
+          "text": "Welcome back, Victor! The postmortem needs your lint rule more than my reviews 😄"
+        },
+        {
+          "id": "e398",
+          "type": "message",
+          "from": "victor",
+          "to": "dm:dmitri",
+          "text": "I'm already writing it. Keep an eye out for the PR."
+        },
+        {
+          "id": "e399",
+          "type": "message",
+          "from": "kira",
+          "to": "room:product",
+          "text": "Confirmation screen fix is in the next patch. Leo, can we review it Monday?"
+        },
+        {
+          "id": "e400",
+          "type": "message",
+          "from": "leo",
+          "to": "room:product",
+          "text": "Sure. Also Sofia sent a hello message, she is excited."
+        },
+        {
+          "id": "e401",
+          "type": "message",
+          "from": "maya",
+          "to": "room:product",
+          "text": "Great. Next week I'll propose an all-hands demo of recurring availability."
+        },
+        {
+          "id": "e402",
+          "type": "message",
+          "from": "olga",
+          "to": "room:ru",
+          "text": "Итоги недели отправила руководству. Спасибо всем, особенно тем, кто остался после инцидента."
+        },
+        {
+          "id": "e403",
+          "type": "message",
+          "from": "boris",
+          "to": "room:ru",
+          "text": "Рад, что откат прошёл спокойно. Пятничное пиво?"
+        },
+        {
+          "id": "e404",
+          "type": "message",
+          "from": "irina",
+          "to": "room:ru",
+          "text": "Только если без разговоров о деплое 😄"
+        },
+        {
+          "id": "e405",
+          "type": "message",
+          "from": "dmitri",
+          "to": "room:ru",
+          "text": "Согласен. Вторник — день без Redis."
+        },
+        {
+          "id": "e406",
+          "type": "message",
+          "from": "nikolai",
+          "to": "room:ru",
+          "text": "Сегодня тоже никаких Redis-тем. Хорошей пятницы!"
+        },
+        {
+          "id": "e407",
+          "type": "file",
+          "from": "maya",
+          "to": "room:general",
+          "fileName": "team-photo-friday.zip",
+          "text": "Friday photos from the release party: 14 pictures. Please send me favorites."
+        },
+        {
+          "id": "e408",
+          "type": "message",
+          "from": "sam",
+          "to": "room:general",
+          "text": "Party at 16:00 in the kitchen: snacks, drinks, and the Brightfield cake (it's mostly a normal cake). Oat milk delivery arrived 🥛"
+        },
+        {
+          "id": "e409",
+          "type": "message",
+          "from": "wendy",
+          "to": "room:general",
+          "text": "Whoever took the monitor stand on Monday, I know it was you, Hugo."
+        },
+        {
+          "id": "e410",
+          "type": "message",
+          "from": "hugo",
+          "to": "room:general",
+          "text": "I can neither confirm nor deny. It's very comfortable though 🖥️"
+        },
+        {
+          "id": "e411",
+          "type": "message",
+          "from": "maya",
+          "to": "room:general",
+          "text": "Have a lovely weekend, everyone. See you Monday for Slotly 2.5 planning!"
+        },
+        {
+          "id": "e412",
+          "type": "message",
+          "from": "anna",
+          "to": "dm:maya",
+          "text": "Strong week. I'd like to spend Monday morning on the postmortem follow-ups before we plan 2.5."
+        },
+        {
+          "id": "e413",
+          "type": "message",
+          "from": "maya",
+          "to": "dm:anna",
+          "text": "Agreed. And let's give the team a half day next Friday."
+        },
+        {
+          "id": "e414",
+          "type": "message",
+          "from": "tina",
+          "to": "dm:anna",
+          "text": "Sofia's start date is confirmed. I'll set up her laptop request next week."
+        },
+        {
+          "id": "e415",
+          "type": "message",
+          "from": "jake",
+          "to": "dm:boris",
+          "text": "Beers on Friday? I'm buying for the on-call heroes."
+        },
+        {
+          "id": "e416",
+          "type": "message",
+          "from": "boris",
+          "to": "dm:jake",
+          "text": "Yes. Bring Victor too."
+        },
+        {
+          "id": "e417",
+          "type": "message",
+          "from": "hugo",
+          "to": "dm:grace",
+          "text": "Apple review: already 'In review'. Fingers crossed!"
+        },
+        {
+          "id": "e418",
+          "type": "message",
+          "from": "grace",
+          "to": "dm:hugo",
+          "text": "Great, and happy belated birthday week. Cake was excellent."
+        },
+        {
+          "id": "e419",
+          "type": "agent_question",
+          "agent": "qwen_data",
+          "to": "dm:nikolai",
+          "question": "Archive this week's raw booking event files (about 4.2 GB) to cold storage?",
+          "options": [
+            "Archive all",
+            "Hold"
+          ],
+          "answer": {
+            "by": "nikolai",
+            "text": "Yes, but keep the last 4 weeks hot"
+          }
+        },
+        {
+          "id": "e420",
+          "type": "agent_status",
+          "agent": "qwen_data",
+          "to": "dm:nikolai",
+          "state": "done",
+          "text": "Archived weeks 1-3 to cold storage, kept the last 4 weeks hot. Freed 3.1 GB."
+        },
+        {
+          "id": "e421",
+          "type": "agent_message",
+          "agent": "cc_api",
+          "to": "room:general",
+          "text": "Weekly note from Claude Code · API: 4 PRs authored with Boris, 1 rollback executed on approval, 0 open critical bugs from this release."
+        },
+        {
+          "id": "e422",
+          "type": "agent_status",
+          "agent": "codex_qa",
+          "to": "room:general",
+          "state": "info",
+          "text": "Release 2.4.0 smoke tests pass on production. Monitoring continues over the weekend."
+        }
+      ]
+    }
+  ]
+}

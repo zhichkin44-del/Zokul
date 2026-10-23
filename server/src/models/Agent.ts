@@ -96,17 +96,20 @@ export interface HandoffRow {
 }
 
 // Handoff cards written by any agent of this owner, newest first.
-export async function listHandoffs(ownerId: string, onlyOpen: boolean, limit: number): Promise<HandoffRow[]> {
+// Handoffs an agent may pick up: from its owner's other agents (any chat), or
+// posted in a chat the agent itself is in (a shared team room). Never its own.
+export async function listHandoffs(ownerId: string, agentId: string, onlyOpen: boolean, limit: number): Promise<HandoffRow[]> {
   const result = await pool.query(
     `SELECT m.id, m.chat_id, m.sender_id, u.name AS sender_name, m.payload, m.created_at
      FROM messages m
      JOIN users u ON u.id = m.sender_id
      WHERE m.kind = 'handoff' AND m.deleted_at IS NULL
-       AND u.owner_id = $1
+       AND m.sender_id <> $4
+       AND (u.owner_id = $1 OR m.chat_id IN (SELECT chat_id FROM chat_participants WHERE user_id = $4))
        AND ($2::boolean = false OR m.payload->>'claimedBy' IS NULL)
      ORDER BY m.created_at DESC
      LIMIT $3`,
-    [ownerId, onlyOpen, limit]
+    [ownerId, onlyOpen, limit, agentId]
   );
   return result.rows;
 }

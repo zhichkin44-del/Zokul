@@ -5,7 +5,7 @@ import * as account from '../src/services/accountService';
 
 jest.mock('../src/config/db', () => ({ pool: { connect: jest.fn(), query: jest.fn() } }));
 jest.mock('../src/services/auditService', () => ({ logEvent: jest.fn() }));
-jest.mock('../src/socket', () => ({ emitToUsers: jest.fn() }));
+jest.mock('../src/socket', () => ({ endSessions: jest.fn() }));
 
 const query = pool.query as jest.Mock;
 const sha = (s: string) => crypto.createHash('sha256').update(s).digest('hex');

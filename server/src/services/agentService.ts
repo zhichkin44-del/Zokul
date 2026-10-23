@@ -2,6 +2,7 @@ import { createHash, randomBytes } from 'crypto';
 import * as AgentModel from '../models/Agent';
 import * as ChatModel from '../models/Chat';
 import * as MessageModel from '../models/Message';
+import * as UserModel from '../models/User';
 import * as messageService from './messageService';
 import { emitToChat, joinUserToChat } from '../socket';
 import { Message } from '../types';
@@ -200,14 +201,14 @@ export async function createHandoff(agent: AgentRecord, raw: Record<string, unkn
 }
 
 export async function listHandoffs(agent: AgentRecord, onlyOpen: boolean, limit = 20) {
-  const rows = await AgentModel.listHandoffs(agent.ownerId, onlyOpen, Math.min(Math.max(limit, 1), 50));
+  const rows = await AgentModel.listHandoffs(agent.ownerId, agent.id, onlyOpen, Math.min(Math.max(limit, 1), 50));
   return rows.map((r) => ({ id: r.id, from: r.sender_name, createdAt: r.created_at, ...r.payload }));
 }
 
 export async function claimHandoff(agent: AgentRecord, messageId: string) {
   const msg = await MessageModel.findById(messageId);
   if (!msg || msg.kind !== 'handoff') return { error: 'not_found' as const };
-  const handoffs = await AgentModel.listHandoffs(agent.ownerId, false, 200);
+  const handoffs = await AgentModel.listHandoffs(agent.ownerId, agent.id, false, 200);
   const row = handoffs.find((h) => h.id === messageId);
   if (!row) return { error: 'not_found' as const };
   const updated = await MessageModel.updatePayload(
@@ -221,6 +222,24 @@ export async function claimHandoff(agent: AgentRecord, messageId: string) {
   }
   await emitToChat(updated.chatId, 'message:updated', updated);
   return { handoff: { id: updated.id, from: row.sender_name, ...updated.payload } };
+}
+
+// A person in the chat takes the handoff ("I'll do it"). Same one-winner
+// guard as for agents: whoever sets claimedBy first keeps it.
+export async function claimHandoffByPerson(userId: string, messageId: unknown): Promise<Message> {
+  if (typeof messageId !== 'string') throw new AgentInputError('Handoff not found');
+  const msg = await MessageModel.findById(messageId);
+  if (!msg || msg.kind !== 'handoff') throw new AgentInputError('Handoff not found');
+  if (!(await MessageModel.isParticipant(msg.chatId, userId))) throw new AgentInputError('Forbidden');
+  const person = await UserModel.findById(userId);
+  if (!person || person.isAgent) throw new AgentInputError('Forbidden');
+  const updated = await MessageModel.updatePayload(
+    messageId,
+    { ...msg.payload, claimedBy: person.name, claimedById: userId, claimedAt: new Date().toISOString() },
+    { keys: ['claimedBy'] }
+  );
+  if (!updated) throw new AgentInputError('Someone already took this handoff');
+  return updated;
 }
 
 // --- Human answers a question card (socket) ------------------------------------

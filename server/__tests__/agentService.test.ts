@@ -4,10 +4,12 @@ import * as ChatModel from '../src/models/Chat';
 import * as MessageModel from '../src/models/Message';
 import * as messageService from '../src/services/messageService';
 import { emitToChat } from '../src/socket';
+import * as UserModel from '../src/models/User';
 
 jest.mock('../src/models/Agent');
 jest.mock('../src/models/Chat');
 jest.mock('../src/models/Message');
+jest.mock('../src/models/User');
 jest.mock('../src/services/messageService');
 jest.mock('../src/socket', () => ({ emitToChat: jest.fn(), joinUserToChat: jest.fn() }));
 
@@ -65,6 +67,35 @@ describe('agentService', () => {
     await expect(agentService.askQuestion(agent, { question: '   ' })).rejects.toThrow('question is required');
     await expect(agentService.askQuestion(agent, { question: 'q', options: Array(7).fill('o') })).rejects.toThrow(agentService.AgentInputError);
     await expect(agentService.createHandoff(agent, { title: 'T', next: 'not a list' })).rejects.toThrow('next must be an array');
+  });
+
+  describe('claimHandoffByPerson', () => {
+    const handoff = { id: 'h1', chatId: 'chat1', senderId: 'agent1', kind: 'handoff', payload: { title: 't', claimedBy: null } };
+
+    it('lets a person in the chat take it, first one wins', async () => {
+      (MessageModel.findById as jest.Mock).mockResolvedValue(handoff);
+      (MessageModel.isParticipant as jest.Mock).mockResolvedValue(true);
+      (UserModel.findById as jest.Mock).mockResolvedValue({ id: 'u1', name: 'Boris' });
+      (MessageModel.updatePayload as jest.Mock).mockResolvedValueOnce({ ...handoff, payload: { claimedBy: 'Boris' } }).mockResolvedValueOnce(null);
+      await agentService.claimHandoffByPerson('u1', 'h1');
+      const [, payload, guard] = (MessageModel.updatePayload as jest.Mock).mock.calls[0];
+      expect(payload).toMatchObject({ claimedBy: 'Boris', claimedById: 'u1' });
+      expect(guard).toEqual({ keys: ['claimedBy'] });
+      await expect(agentService.claimHandoffByPerson('u2', 'h1')).rejects.toThrow('already took');
+    });
+
+    it('refuses outsiders, agents and non-handoffs', async () => {
+      (MessageModel.findById as jest.Mock).mockResolvedValue(handoff);
+      (MessageModel.isParticipant as jest.Mock).mockResolvedValue(false);
+      await expect(agentService.claimHandoffByPerson('stranger', 'h1')).rejects.toThrow('Forbidden');
+      (MessageModel.isParticipant as jest.Mock).mockResolvedValue(true);
+      (UserModel.findById as jest.Mock).mockResolvedValue({ id: 'a2', name: 'Bot', isAgent: true });
+      await expect(agentService.claimHandoffByPerson('a2', 'h1')).rejects.toThrow('Forbidden');
+      (MessageModel.findById as jest.Mock).mockResolvedValue({ ...handoff, kind: 'text' });
+      await expect(agentService.claimHandoffByPerson('u1', 'h1')).rejects.toThrow('not found');
+      await expect(agentService.claimHandoffByPerson('u1', { id: 1 })).rejects.toThrow('not found');
+      expect(MessageModel.updatePayload).not.toHaveBeenCalled();
+    });
   });
 
   describe('answerQuestion', () => {

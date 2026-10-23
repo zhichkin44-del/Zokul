@@ -39,6 +39,16 @@ export function emitToUsers(userIds: Iterable<string>, event: string, data: unkn
   }
 }
 
+// Blocked, deleted or password reset: tell the open apps, then cut their
+// sockets so a client that ignores the notice keeps nothing open.
+export function endSessions(userId: string): void {
+  emitToUsers([userId], 'session:revoked', {});
+  const ids = [...(userSockets.get(userId) ?? [])];
+  setTimeout(() => {
+    for (const socketId of ids) ioInstance?.sockets.sockets.get(socketId)?.disconnect(true);
+  }, 150);
+}
+
 // A chat created over REST (e.g. a new agent): put the user's open sockets
 // into its room so they receive its messages without reconnecting.
 export function joinUserToChat(userId: string, chatId: string): void {
@@ -270,6 +280,21 @@ export function setupSocket(httpServer: HTTPServer): Server {
           return;
         }
         const updated = await agentService.answerQuestion(userId, data?.messageId, data?.answer);
+        await emitToChat(updated.chatId, 'message:updated', updated);
+        reply({ ok: true });
+      } catch (err: unknown) {
+        reply({ ok: false, error: err instanceof Error ? err.message : String(err) });
+      }
+    });
+
+    socket.on('handoff:claim', async (data: { messageId: string }, ack?: (r: { ok: boolean; error?: string }) => void) => {
+      const reply = typeof ack === 'function' ? ack : () => undefined;
+      try {
+        if (!checkRateLimit(userId)) {
+          reply({ ok: false, error: 'Too many messages' });
+          return;
+        }
+        const updated = await agentService.claimHandoffByPerson(userId, data?.messageId);
         await emitToChat(updated.chatId, 'message:updated', updated);
         reply({ ok: true });
       } catch (err: unknown) {

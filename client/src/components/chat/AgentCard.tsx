@@ -7,13 +7,14 @@ interface AgentCardProps {
   message: Message;
   // Resolves with an error message, or null when the answer was accepted.
   onAnswer: (messageId: string, answer: string) => Promise<string | null>;
+  onClaim?: (messageId: string) => Promise<string | null>;
 }
 
 // Rich rendering for messages posted by AI agents (status / question / handoff).
-export default function AgentCard({ message, onAnswer }: AgentCardProps) {
+export default function AgentCard({ message, onAnswer, onClaim }: AgentCardProps) {
   if (message.kind === 'status') return <StatusCard text={message.text} payload={message.payload as StatusPayload} />;
   if (message.kind === 'question') return <QuestionCard message={message} onAnswer={onAnswer} />;
-  if (message.kind === 'handoff') return <HandoffCard payload={message.payload as HandoffPayload} />;
+  if (message.kind === 'handoff') return <HandoffCard payload={message.payload as HandoffPayload} onTake={onClaim ? () => onClaim(message.id) : undefined} />;
   return null;
 }
 
@@ -122,8 +123,18 @@ export function handoffToPrompt(h: HandoffPayload): string {
   ].join('').trim();
 }
 
-function HandoffCard({ payload }: { payload: HandoffPayload }) {
+function HandoffCard({ payload, onTake }: { payload: HandoffPayload; onTake?: () => Promise<string | null> }) {
   const [copied, setCopied] = useState(false);
+  const [taking, setTaking] = useState(false);
+  const [error, setError] = useState('');
+  const take = async () => {
+    if (!onTake) return;
+    setTaking(true);
+    setError('');
+    const failure = await onTake();
+    if (failure) setError(t(failure));
+    setTaking(false);
+  };
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(handoffToPrompt(payload));
@@ -166,13 +177,17 @@ function HandoffCard({ payload }: { payload: HandoffPayload }) {
           </details>
         )}
       </div>
-      <button
-        type="button"
-        onClick={copy}
-        className="w-full px-3 py-2 border-t border-gray-100 dark:border-gray-700 text-primary font-medium text-sm hover:bg-primary/5"
-      >
-        {copied ? t('Copied ✓') : t('Copy as prompt')}
-      </button>
+      {error && <p role="alert" className="px-3 pb-2 text-xs text-red-600 dark:text-red-400">{error}</p>}
+      <div className="flex border-t border-gray-100 dark:border-gray-700">
+        {!payload.claimedBy && onTake && (
+          <button type="button" onClick={take} disabled={taking} className="flex-1 px-3 py-2 text-primary font-semibold text-sm hover:bg-primary/5 disabled:opacity-50 border-r border-gray-100 dark:border-gray-700">
+            {t("I'll take it")}
+          </button>
+        )}
+        <button type="button" onClick={copy} className="flex-1 px-3 py-2 text-primary font-medium text-sm hover:bg-primary/5">
+          {copied ? t('Copied ✓') : t('Copy as prompt')}
+        </button>
+      </div>
     </div>
   );
 }

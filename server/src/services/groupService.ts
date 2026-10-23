@@ -23,6 +23,11 @@ export async function assertCanInvite(requesterId: string, userIds: string[]): P
   }
 }
 
+async function isOwnAgent(requesterId: string, userId: string): Promise<boolean> {
+  const [user] = await UserModel.findInvitees([userId]);
+  return !!user?.isAgent && user.ownerId === requesterId;
+}
+
 async function loadGroup(chatId: string): Promise<ChatWithUsers> {
   const chat = await chatModel.findChatById(chatId);
   if (!chat) throw new GroupError('Chat not found', 404);
@@ -77,9 +82,13 @@ export async function createGroup(
   }
 }
 
+// The creator adds people (and their own agents); any member may bring in
+// their own agent.
 export async function addMember(chatId: string, requesterId: string, userId: string): Promise<void> {
   const chat = await loadGroup(chatId);
-  requireCreator(chat, requesterId);
+  if (chat.creatorId !== requesterId) {
+    if (!chat.participantIds.includes(requesterId) || !(await isOwnAgent(requesterId, userId))) requireCreator(chat, requesterId);
+  }
   if (chat.participantIds.includes(userId)) return;
   if (chat.participantIds.length >= MAX_GROUP_SIZE) throw new GroupError(`Group size cannot exceed ${MAX_GROUP_SIZE} participants`);
   await assertCanInvite(requesterId, [userId]);
@@ -92,13 +101,13 @@ export async function addMember(chatId: string, requesterId: string, userId: str
   await emitToChat(chatId, 'chat:updated', { chatId });
 }
 
-// The creator removes others; anyone can remove themselves (leave). The
-// creator cannot leave their own group: they delete it instead.
+// The creator removes others; anyone can remove themselves (leave) or their
+// own agent. The creator cannot leave their own group: they delete it instead.
 export async function removeMember(chatId: string, requesterId: string, userId: string): Promise<void> {
   const chat = await loadGroup(chatId);
   if (userId === requesterId) {
     if (chat.creatorId === requesterId) throw new GroupError('The creator cannot leave; delete the group instead', 403);
-  } else {
+  } else if (!(chat.participantIds.includes(requesterId) && (await isOwnAgent(requesterId, userId)))) {
     requireCreator(chat, requesterId);
   }
   await pool.query(

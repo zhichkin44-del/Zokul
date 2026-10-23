@@ -1,0 +1,49 @@
+{
+  "company": { "name": "Smoke Test Co", "product": "Smoke", "about": "Tiny script that touches every event type once." },
+  "people": [
+    { "key": "olga", "name": "Olga Owner", "email": "olga@smoke.test", "title": "CEO", "lang": "en" },
+    { "key": "ben", "name": "Ben Builder", "email": "ben@smoke.test", "title": "Engineer", "lang": "en" },
+    { "key": "kira", "name": "Кира Тестова", "email": "kira@smoke.test", "title": "QA", "lang": "ru" },
+    { "key": "max", "name": "Max Contractor", "email": "max@smoke.test", "title": "Contractor", "lang": "en" }
+  ],
+  "agents": [
+    { "key": "cc", "name": "Claude Code · Smoke", "owner": "ben" },
+    { "key": "cx", "name": "Codex · Smoke", "owner": "olga" }
+  ],
+  "rooms": [
+    { "key": "general", "name": "General", "creator": "olga", "members": ["olga", "ben", "kira", "max"], "agents": ["cc", "cx"] },
+    { "key": "eng", "name": "Engineering", "creator": "ben", "members": ["ben", "kira"], "agents": ["cc"] }
+  ],
+  "days": [
+    { "day": "Monday", "events": [
+      { "id": "e1", "type": "message", "from": "olga", "to": "room:general", "text": "Morning all! **Plan** for today:\n- ship `v1.2`\n- demo at 3pm" },
+      { "id": "e2", "type": "message", "from": "ben", "to": "room:general", "text": "On it 👍", "replyTo": "e1" },
+      { "id": "e3", "type": "message", "from": "kira", "to": "dm:ben", "text": "Бен, проверишь мой тест-план?" },
+      { "id": "e4", "type": "file", "from": "kira", "to": "dm:ben", "fileName": "test-plan.md", "text": "вот он" },
+      { "id": "e5", "type": "edit", "from": "kira", "of": "e3", "text": "Бен, проверишь мой тест-план сегодня?" },
+      { "id": "e6", "type": "message", "from": "max", "to": "room:general", "text": "Bug report: <script>alert(1)</script> shows up in the title" },
+      { "id": "e7", "type": "delete", "from": "max", "of": "e6" },
+      { "id": "e8", "type": "agent_status", "agent": "cc", "to": "room:eng", "state": "working", "text": "Running the migration tests" },
+      { "id": "e9", "type": "agent_question", "agent": "cc", "to": "room:eng", "question": "Roll back the migration?", "options": ["Roll back", "Keep"], "answer": { "by": "kira", "text": "Roll back" } },
+      { "id": "e10", "type": "agent_handoff", "agent": "cc", "to": "room:general", "title": "Migration rollback done", "summary": "Rolled back 042.", "done": ["rollback"], "next": ["fix index"], "files": ["db/042.sql"], "claimedBy": "olga" },
+      { "id": "e11", "type": "agent_message", "agent": "cx", "to": "dm:olga", "text": "Codex here, ready." },
+      { "id": "e12", "type": "agent_question", "agent": "cx", "to": "room:general", "question": "Publish release notes?", "options": ["Yes", "Later"], "answer": null }
+    ]},
+    { "day": "Tuesday", "events": [
+      { "id": "e13", "type": "rename", "from": "ben", "room": "eng", "name": "Engineering 🔧" },
+      { "id": "e14", "type": "add_member", "from": "ben", "room": "eng", "person": "max" },
+      { "id": "e15", "type": "message", "from": "max", "to": "room:eng", "text": "Thanks for adding me" },
+      { "id": "e16", "type": "remove_member", "from": "ben", "room": "eng", "person": "max" },
+      { "id": "e17", "type": "mute", "from": "kira", "to": "room:general" },
+      { "id": "e18", "type": "owner_action", "action": "reset_link", "person": "kira", "reason": "forgot password" },
+      { "id": "e19", "type": "message", "from": "kira", "to": "room:general", "text": "Снова в строю, спасибо!" },
+      { "id": "e20", "type": "owner_action", "action": "block", "person": "max", "reason": "contract ended" },
+      { "id": "e21", "type": "message", "from": "max", "to": "room:general", "text": "should be skipped" },
+      { "id": "e22", "type": "owner_action", "action": "unblock", "person": "max", "reason": "extended" },
+      { "id": "e23", "type": "message", "from": "max", "to": "room:general", "text": "Back, contract extended" },
+      { "id": "e24", "type": "leave", "from": "kira", "room": "eng" },
+      { "id": "e25", "type": "message", "from": "max", "to": "room:general", "text": "Bye everyone, last day!" },
+      { "id": "e26", "type": "delete_account", "from": "max" }
+    ]}
+  ]
+}

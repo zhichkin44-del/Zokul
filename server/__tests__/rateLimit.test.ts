@@ -30,7 +30,7 @@ describe('limiter isolation', () => {
     await loginLimiter(r1, res1, n1);
     expect(res1.status).toHaveBeenCalledWith(429);
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 10; i++) {
       const { req, res, next } = mockReqRes(ip);
       await registerLimiter(req, res, next);
       expect(next).toHaveBeenCalled();
@@ -62,8 +62,8 @@ describe('loginLimiter', () => {
 describe('registerLimiter', () => {
   const ip = '127.0.0.12';
 
-  it('allows 3 attempts then blocks the 4th', async () => {
-    for (let i = 0; i < 3; i++) {
+  it('allows 10 failed attempts then blocks the 11th', async () => {
+    for (let i = 0; i < 10; i++) {
       const { req, res, next } = mockReqRes(ip);
       await registerLimiter(req, res, next);
       expect(next).toHaveBeenCalled();

@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { pool } from '../config/db';
-import { emitToUsers } from '../socket';
+import { endSessions } from '../socket';
 import { logEvent } from './auditService';
 import { validatePassword, SALT_ROUNDS } from './authService';
 
@@ -68,7 +68,7 @@ export async function useResetLink(token: unknown, password: unknown) {
     const userId = used.rows[0].user_id as string;
     await client.query('UPDATE users SET password_hash = $2, token_version = token_version + 1 WHERE id = $1', [userId, passwordHash]);
     await client.query('COMMIT');
-    emitToUsers([userId], 'session:revoked', {});
+    endSessions(userId);
     await logEvent(userId, 'password_reset_used', {});
   } catch (err) {
     await client.query('ROLLBACK');
@@ -113,6 +113,6 @@ export async function deleteAccount(userId: string, password: unknown) {
   } finally {
     client.release();
   }
-  emitToUsers([userId], 'session:revoked', {});
+  endSessions(userId);
   await logEvent(userId, 'account_deleted', { name: row.name });
 }

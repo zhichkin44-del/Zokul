@@ -191,6 +191,14 @@ export function useMessages(chatId: string | null) {
     });
   }), [socket]);
 
+  const claimHandoff = useCallback((messageId: string) => new Promise<string | null>((resolve) => {
+    if (!socket?.connected) { resolve('Not connected, try again'); return; }
+    socket.timeout(10000).emit('handoff:claim', { messageId }, (err: Error | null, res?: { ok: boolean; error?: string }) => {
+      if (err) resolve('No response from server, try again');
+      else resolve(res?.ok ? null : res?.error || 'Could not take the handoff');
+    });
+  }), [socket]);
+
   const sendMessage = useCallback((text: string) => {
     if (!socket || !chatId) return;
     socket.emit('message:send', { chatId, text });
@@ -230,7 +238,7 @@ export function useMessages(chatId: string | null) {
     setMessages((prev) => [...older, ...prev]);
   }, []);
 
-  return { messages, loading, error, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion, sendFile };
+  return { messages, loading, error, sendMessage, sendImage, sendImages, sendVoice, editMessage, deleteMessage, prependMessages, answerQuestion, claimHandoff, sendFile };
 }
 
 export function useSearchUsers() {

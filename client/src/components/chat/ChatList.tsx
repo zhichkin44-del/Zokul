@@ -3,7 +3,7 @@ import { Chat } from '../../types';
 import Avatar from '../common/Avatar';
 import OnlineDot from './OnlineDot';
 import { BellOffIcon, PaperclipIcon } from '../common/Icons';
-import { t } from '../../i18n';
+import { personName, t } from '../../i18n';
 
 interface ChatListProps {
   chats: Chat[];
@@ -107,7 +107,7 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
         const preview = lastMsg?.text || (lastMsg?.imageUrl ? t('Photo') : '');
         const fileName = lastMsg?.file?.name;
         const count = unreadCount?.(chat.id) || 0;
-        const displayName = isGroup ? (chat.name || t('Group')) : (other?.name || t('Unknown'));
+        const displayName = isGroup ? (chat.name || t('Group')) : (personName(other?.name) || t('Unknown'));
         const isSelected = selectedId === chat.id;
         return (
           <div key={chat.id} className="relative group">

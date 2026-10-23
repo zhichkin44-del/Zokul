@@ -46,6 +46,11 @@ export function t(text: string, vars?: Record<string, string | number>): string 
 }
 
 // Russian plural: 1 участник, 2 участника, 5 участников.
+// Names stored by the server for removed people are shown in the UI language.
+export function personName(name: string | undefined): string | undefined {
+  return name === 'Deleted account' ? t(name) : name;
+}
+
 export function plural(n: number, one: string, few: string, many: string): string {
   if (current !== 'ru') return n === 1 ? one : few;
   const m10 = n % 10, m100 = n % 100;
@@ -298,6 +303,10 @@ const RU: Record<string, string> = {
   'became the owner (changed on the server)': 'стал(а) владельцем (изменено на сервере)',
   'had two-factor sign-in reset on the server': 'сбросил(а) двухфакторный вход через сервер',
   'Lock': 'Закрыть админку',
+  "I'll take it": 'Беру',
+  'Someone already took this handoff': 'Эту задачу уже кто-то взял',
+  'Handoff not found': 'Передача не найдена',
+  'Could not take the handoff': 'Не удалось взять задачу',
   'Change password': 'Сменить пароль',
   'Delete account': 'Удалить аккаунт',
   'Change photo': 'Сменить фото',

@@ -9,12 +9,15 @@ export const loginLimiter = rateLimit({
   skipSuccessfulRequests: true,
 });
 
+// Registration needs a valid invite anyway, so only failed attempts count:
+// a whole office behind one address can join in one go.
 export const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 3,
+  max: 10,
   message: { error: 'Too many registration attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  skipSuccessfulRequests: true,
 });
 
 export const changePasswordLimiter = rateLimit({
