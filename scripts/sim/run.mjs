@@ -27,7 +27,7 @@ const script = JSON.parse(readFileSync(scriptFile, 'utf8'));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---------- report ----------
-const report = { startedAt: new Date().toISOString(), base: BASE, counts: {}, problems: [], latencies: [], notes: [] };
+const report = { startedAt: new Date().toISOString(), base: BASE, counts: {}, problems: [], latencies: [], notes: [], attacks: [], perDay: [] };
 const count = (k) => { report.counts[k] = (report.counts[k] ?? 0) + 1; };
 const problem = (where, what, extra) => { report.problems.push({ where, what, ...(extra ? { extra } : {}) }); console.log(`  ✗ ${where}: ${what}${extra ? ' ' + JSON.stringify(extra).slice(0, 200) : ''}`); };
 
@@ -388,7 +388,7 @@ async function attacks() {
   const list = [...people.values()].filter((p) => !p.blocked && !p.deleted && p.key !== ownerKey);
   const outsiderRoom = [...rooms.values()].find((r) => list.some((p) => !r.members.has(p.key)));
   const outsider = list.find((p) => !outsiderRoom.members.has(p.key));
-  const check = (name, pass, extra) => { count(pass ? 'attack blocked' : 'attack succeeded'); if (!pass) problem(`attack: ${name}`, 'NOT blocked', extra); else console.log(`  ✓ ${name}`); };
+  const check = (name, pass, extra) => { count(pass ? 'attack blocked' : 'attack succeeded'); report.attacks.push({ name, blocked: !!pass }); if (!pass) problem(`attack: ${name}`, 'NOT blocked', extra); else console.log(`  ✓ ${name}`); };
 
   const err = await emitAndWaitError(outsider, 'message:send', { chatId: outsiderRoom.chatId, text: 'sneaking in' });
   check('outsider posts into a room', err === 'Forbidden', err);
@@ -523,6 +523,9 @@ await setup();
 let n = 0;
 for (const day of script.days) {
   console.log(`${day.day}: ${day.events.length} events`);
+  const byType = {};
+  for (const e of day.events) byType[e.type] = (byType[e.type] ?? 0) + 1;
+  report.perDay.push({ day: day.day, events: day.events.length, byType });
   for (const e of day.events) {
     try { await handle(e); } catch (err) { problem(e.id, `crashed: ${err.message}`); }
     n++;
@@ -535,6 +538,8 @@ await attacks();
 const lat = report.latencies.sort((a, b) => a - b);
 const pct = (q) => Math.round(lat[Math.min(lat.length - 1, Math.floor(q * lat.length))] ?? 0);
 report.latency = { count: lat.length, p50: pct(0.5), p95: pct(0.95), max: Math.round(lat[lat.length - 1] ?? 0) };
+const edges = [5, 10, 15, 20, 30, 50, 100, Infinity];
+report.latencyHistogram = edges.map((hi, i) => ({ from: i ? edges[i - 1] : 0, to: hi === Infinity ? null : hi, count: lat.filter((v) => v >= (i ? edges[i - 1] : 0) && v < hi).length }));
 delete report.latencies;
 report.events = n;
 report.durationSec = Math.round((Date.now() - t0) / 1000);
