@@ -1,4 +1,5 @@
 import { ReplyPreview } from '../../types';
+import { t } from '../../i18n';
 
 interface ReplyQuoteProps {
   reply: ReplyPreview;
@@ -11,7 +12,7 @@ export default function ReplyQuote({ reply, onCancel }: ReplyQuoteProps) {
       <div className="flex-1 min-w-0">
         <span className="text-xs font-semibold text-primary">{reply.senderName}</span>
         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-          {reply.text || (reply.imageUrl ? 'Photo' : '')}
+          {reply.text || (reply.imageUrl ? t('Photo') : '')}
         </p>
       </div>
       {onCancel && (

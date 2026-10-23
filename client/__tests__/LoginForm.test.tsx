@@ -19,7 +19,7 @@ function renderLoginForm() {
 
 async function waitForReady() {
   await waitFor(() => {
-    expect(screen.queryByText('Signing in...')).not.toBeInTheDocument();
+    expect(screen.queryByText('Signing in…')).not.toBeInTheDocument();
   });
 }
 
@@ -33,8 +33,8 @@ describe('LoginForm', () => {
     renderLoginForm();
     await waitForReady();
 
-    expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
@@ -46,8 +46,8 @@ describe('LoginForm', () => {
     renderLoginForm();
     await waitForReady();
 
-    fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'bad@test.com' } });
-    fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'wrong' } });
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'bad@test.com' } });
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'wrong' } });
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {

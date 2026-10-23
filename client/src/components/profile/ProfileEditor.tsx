@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { User } from '../../types';
 import Avatar from '../common/Avatar';
 import Modal from '../common/Modal';
+import { t } from '../../i18n';
 
 interface ProfileEditorProps {
   open: boolean;
@@ -31,7 +32,7 @@ export default function ProfileEditor({ open, onClose }: ProfileEditorProps) {
       updateUser(updated.data);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { error?: string } } };
-      setError(axiosErr.response?.data?.error || 'Failed to upload avatar');
+      setError(axiosErr.response?.data?.error || t('Failed to upload avatar'));
     } finally {
       setUploading(false);
     }
@@ -50,21 +51,21 @@ export default function ProfileEditor({ open, onClose }: ProfileEditorProps) {
       onClose();
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { error?: string } } };
-      setError(axiosErr.response?.data?.error || 'Failed to update profile');
+      setError(axiosErr.response?.data?.error || t('Failed to update profile'));
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Edit Profile">
+    <Modal open={open} onClose={onClose} title={t('Edit profile')}>
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
           <Avatar name={user?.name || '?'} size={72} url={user?.avatarUrl} />
           <button
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="absolute bottom-0 right-0 bg-primary text-on-primary rounded-full w-6 h-6 text-xs flex items-center justify-center shadow-md disabled:opacity-50"
+            className="absolute bottom-0 right-0 bg-primary text-on-primary rounded-full w-6 h-6 text-xs flex items-center justify-center shadow-md disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:bg-gray-700 dark:disabled:text-gray-400"
           >
             +
           </button>
@@ -76,9 +77,9 @@ export default function ProfileEditor({ open, onClose }: ProfileEditorProps) {
             onChange={handleAvatarUpload}
           />
         </div>
-        {uploading && <p className="text-xs text-gray-500">Uploading...</p>}
+        {uploading && <p className="text-xs text-gray-500">{t('Uploading…')}</p>}
         <div className="w-full">
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Name</label>
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('Name')}</label>
           <input
             type="text"
             value={name}
@@ -91,9 +92,9 @@ export default function ProfileEditor({ open, onClose }: ProfileEditorProps) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-2 bg-primary text-on-primary rounded-xl text-sm font-medium disabled:opacity-50"
+          className="w-full py-2 bg-primary text-on-primary rounded-xl text-sm font-medium disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:bg-gray-700 dark:disabled:text-gray-400"
         >
-          {saving ? 'Saving...' : 'Save'}
+          {saving ? t('Saving…') : t('Save')}
         </button>
       </div>
     </Modal>

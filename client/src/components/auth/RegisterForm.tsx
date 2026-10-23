@@ -1,6 +1,8 @@
 import { useState, FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { t } from '../../i18n';
+import { Field, errorText, primaryButton } from './Field';
 
 export default function RegisterForm() {
   const [name, setName] = useState('');
@@ -16,65 +18,30 @@ export default function RegisterForm() {
     e.preventDefault();
     setError('');
     if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError(t('Password must be at least 8 characters'));
       return;
     }
     try {
       await register(email, password, name, invite.trim() || undefined);
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { error?: string } } };
-      setError(axiosErr.response?.data?.error || 'Registration failed');
+      setError(t(errorText(err, 'Registration failed')));
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-2xl font-bold text-center">Create Account</h2>
-      {error && <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm">{error}</div>}
-      <input
-        type="text"
-        placeholder="Invite code"
-        aria-label="Invite code"
-        value={invite}
-        onChange={(e) => setInvite(e.target.value)}
-        autoComplete="off"
-        className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
-      />
-      <p className="text-xs text-gray-500 -mt-2">Zokul is invite-only. Use the link you were sent, or paste its code.</p>
-      <input
-        type="text"
-        placeholder="Your Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password (min 6 chars)"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-        minLength={8}
-      />
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-3 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary-dark disabled:opacity-50 transition-colors"
-      >
-        {loading ? 'Creating account...' : 'Create Account'}
+      <p className="text-center text-sm text-gray-600 dark:text-gray-400 -mt-2 mb-2">{t('Zokul is invite-only. Use the link you were sent, or paste its code.')}</p>
+      {error && <div role="alert" className="bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 p-3 rounded-xl text-sm">{error}</div>}
+      <Field id="reg-invite" label={t('Invite code')} type="text" autoComplete="off" value={invite} onChange={(e) => setInvite(e.target.value)} className="font-mono text-sm" />
+      <Field id="reg-name" label={t('Your name')} type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} />
+      <Field id="reg-email" label={t('Email')} type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <Field id="reg-password" label={t('Password')} type="password" autoComplete="new-password" placeholder={t('At least 8 characters')} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+      <button type="submit" disabled={loading} className={primaryButton}>
+        {loading ? t('Creating account…') : t('Create account')}
       </button>
-      <p className="text-center text-sm text-gray-500">
-        Already have an account? <Link to="/login" className="text-primary">Sign In</Link>
+      <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+        {t('Already have an account?')}{' '}
+        <Link to="/login" className="font-medium text-primary-dark dark:text-primary underline underline-offset-2">{t('Sign in')}</Link>
       </p>
     </form>
   );

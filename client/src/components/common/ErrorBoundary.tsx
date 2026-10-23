@@ -1,4 +1,5 @@
 import { Component, ReactNode } from 'react';
+import { t } from '../../i18n';
 
 interface Props {
   children: ReactNode;
@@ -31,14 +32,12 @@ export default class ErrorBoundary extends Component<Props, State> {
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             </div>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Something went wrong</h1>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('Something went wrong')}</h1>
             <p className="text-sm text-gray-500 mb-4 max-w-md">{this.state.error?.message || 'An unexpected error occurred'}</p>
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              Reload page
-            </button>
+            >{t('Reload page')}</button>
           </div>
         </div>
       );

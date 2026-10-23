@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from '../../services/api';
 import { Agent } from '../../types';
+import { t } from '../../i18n';
 
 interface AgentsModalProps {
   open: boolean;
@@ -15,12 +16,12 @@ interface Issued {
 }
 
 function timeAgo(iso?: string): string {
-  if (!iso) return 'never connected';
+  if (!iso) return t('never connected');
   const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (minutes < 1) return 'active just now';
-  if (minutes < 60) return `active ${minutes} min ago`;
-  if (minutes < 1440) return `active ${Math.round(minutes / 60)} h ago`;
-  return `active ${new Date(iso).toLocaleDateString()}`;
+  if (minutes < 1) return t('active just now');
+  if (minutes < 60) return t('active {n} min ago', { n: minutes });
+  if (minutes < 1440) return t('active {n} h ago', { n: Math.round(minutes / 60) });
+  return t('active {date}', { date: new Date(iso).toLocaleDateString() });
 }
 
 // Manage AI agents: create, show the one-time token with setup commands,
@@ -84,13 +85,13 @@ export default function AgentsModal({ open, onClose, onOpenChat, onChanged }: Ag
 
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/40 dark:bg-black/60 overflow-y-auto py-6" onKeyDown={(e) => e.key === 'Escape' && onClose()}>
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden" role="dialog" aria-modal="true" aria-label="AI agents">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden" role="dialog" aria-modal="true" aria-label={t('AI agents')}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <h2 className="text-lg font-semibold">AI agents</h2>
-            <p className="text-xs text-gray-500">Agents post status, ask you questions and leave handoffs here.</p>
+            <h2 className="font-display text-xl font-semibold">{t('AI agents')}</h2>
+            <p className="text-xs text-gray-500">{t('Agents post status, ask you questions and leave handoffs here.')}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label={t('Close')}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -105,36 +106,37 @@ export default function AgentsModal({ open, onClose, onOpenChat, onChanged }: Ag
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Agent name, e.g. Claude Code"
+                placeholder={t('Agent name, e.g. Claude Code')}
                 autoFocus
                 maxLength={60}
-                className="flex-1 min-w-0 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 min-w-0 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
-              <button type="submit" disabled={!name.trim() || busy} className="px-4 py-2 rounded-lg bg-primary text-on-primary font-medium disabled:opacity-50">
-                Add
-              </button>
+              <button type="submit" disabled={!name.trim() || busy} className="px-4 py-2 rounded-lg bg-primary text-on-primary font-medium disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:bg-gray-700 dark:disabled:text-gray-400">{t('Add')}</button>
             </form>
           )}
           {error && <p className="text-sm text-red-500">{error}</p>}
 
           <div className="space-y-2">
             {agents.length === 0 && !issued && (
-              <p className="text-sm text-gray-500">No agents yet. Add one, then connect Claude Code, Codex, Cursor or any CLI agent with its token.</p>
+              <p className="text-sm text-gray-500">{t('No agents yet. Add one, then connect Claude Code, Codex, Cursor or any CLI agent with its token.')}</p>
             )}
             {agents.map((agent) => (
-              <div key={agent.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0" aria-hidden>
+              <div key={agent.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800">
+                <div className="w-9 h-9 rounded-[30%] avatar-tint-0 flex items-center justify-center shrink-0" aria-hidden>
                   <BotIcon />
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-[8rem]">
                   <div className="text-sm font-semibold truncate">{agent.name}</div>
                   <div className="text-xs text-gray-500">{timeAgo(agent.lastUsedAt)}</div>
                 </div>
-                {agent.chatId && (
-                  <button onClick={() => { onOpenChat(agent.chatId!); onClose(); }} className="text-xs font-medium text-primary px-2 py-1 rounded hover:bg-primary/10">Chat</button>
-                )}
-                <button onClick={() => rotate(agent)} className="text-xs text-gray-500 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">New token</button>
-                <button onClick={() => remove(agent)} className="text-xs text-red-500 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20">Delete</button>
+                {/* Actions wrap under the name on narrow screens. */}
+                <div className="flex items-center gap-1 ml-auto">
+                  {agent.chatId && (
+                    <button onClick={() => { onOpenChat(agent.chatId!); onClose(); }} className="text-xs font-medium text-primary-dark dark:text-primary px-2.5 py-1.5 rounded-lg hover:bg-primary/10">{t('Chat')}</button>
+                  )}
+                  <button onClick={() => rotate(agent)} className="text-xs text-gray-600 dark:text-gray-300 px-2.5 py-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">{t('New token')}</button>
+                  <button onClick={() => remove(agent)} className="text-xs text-gray-600 dark:text-gray-300 px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">{t('Delete')}</button>
+                </div>
               </div>
             ))}
           </div>
@@ -163,7 +165,7 @@ function TokenPanel({ issued, onDone }: { issued: Issued; onDone: () => void }) 
       <CopyBlock label="2. Connect it once on this computer" value={connect} />
       <CopyBlock label="3a. Claude Code (terminal) / any MCP client" value={claude} />
       <CopyBlock label="3b. Any agent or script (CLI)" value={cli} />
-      <button onClick={onDone} className="w-full py-2 rounded-lg bg-primary text-on-primary font-medium">Done</button>
+      <button onClick={onDone} className="w-full py-2 rounded-lg bg-primary text-on-primary font-medium">{t('Done')}</button>
     </div>
   );
 }
@@ -183,7 +185,7 @@ function CopyBlock({ label, value }: { label: string; value: string }) {
     <div>
       <div className="flex items-center justify-between mb-1">
         <span className="text-xs font-medium text-gray-500">{label}</span>
-        <button onClick={copy} className="text-xs font-medium text-primary">{copied ? 'Copied ✓' : 'Copy'}</button>
+        <button onClick={copy} className="text-xs font-medium text-primary">{copied ? t('Copied ✓') : t('Copy')}</button>
       </div>
       <pre className="px-3 py-2 rounded-lg bg-gray-900 text-gray-100 text-[12px] whitespace-pre-wrap break-all select-all">{value}</pre>
     </div>

@@ -1,6 +1,8 @@
 import { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { t } from '../../i18n';
+import { Field, errorText, primaryButton } from './Field';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -14,40 +16,22 @@ export default function LoginForm() {
     try {
       await login(email, password);
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { error?: string } } };
-      setError(axiosErr.response?.data?.error || 'Login failed');
+      setError(t(errorText(err, 'Login failed')));
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-2xl font-bold text-center">Sign In</h2>
-      {error && <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm">{error}</div>}
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-      />
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-3 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary-dark disabled:opacity-50 transition-colors"
-      >
-        {loading ? 'Signing in...' : 'Sign In'}
+      <p className="text-center text-sm text-gray-600 dark:text-gray-400 -mt-2 mb-2">{t('Sign in to your workspace')}</p>
+      {error && <div role="alert" className="bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 p-3 rounded-xl text-sm">{error}</div>}
+      <Field id="login-email" label={t('Email')} type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <Field id="login-password" label={t('Password')} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      <button type="submit" disabled={loading} className={primaryButton}>
+        {loading ? t('Signing in…') : t('Sign in')}
       </button>
-      <p className="text-center text-sm text-gray-500">
-        No account? <Link to="/register" className="text-primary">Register</Link>
+      <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+        {t('No account?')}{' '}
+        <Link to="/register" className="font-medium text-primary-dark dark:text-primary underline underline-offset-2">{t('Join with an invite')}</Link>
       </p>
     </form>
   );

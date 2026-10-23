@@ -2,7 +2,8 @@ import { usePresence } from '../../hooks/usePresence';
 import { Chat } from '../../types';
 import Avatar from '../common/Avatar';
 import OnlineDot from './OnlineDot';
-import { BellOffIcon } from '../common/Icons';
+import { BellOffIcon, PaperclipIcon } from '../common/Icons';
+import { t } from '../../i18n';
 
 interface ChatListProps {
   chats: Chat[];
@@ -31,7 +32,7 @@ function formatTime(dateStr: string): string {
     date.getMonth() === yesterday.getMonth() &&
     date.getFullYear() === yesterday.getFullYear()
   ) {
-    return 'Yesterday';
+    return t('Yesterday');
   }
 
   return date.toLocaleDateString([], { day: 'numeric', month: 'short' });
@@ -64,7 +65,7 @@ function EmptyState() {
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         </div>
-        <p className="text-gray-500 font-medium text-sm">No chats yet</p>
+        <p className="text-gray-500 font-medium text-sm">{t('No chats yet')}</p>
         <p className="text-xs text-gray-400 mt-1">Tap + to start a conversation</p>
       </div>
     </div>
@@ -103,9 +104,10 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
         const online = isOnline(other?.id || '');
         const lastMsg = chat.lastMessage;
         const sender = lastMsg && chat.participants.find((p) => p.id === lastMsg.senderId);
-        const preview = lastMsg?.text || (lastMsg?.imageUrl ? 'Photo' : '');
+        const preview = lastMsg?.text || (lastMsg?.imageUrl ? t('Photo') : '');
+        const fileName = lastMsg?.file?.name;
         const count = unreadCount?.(chat.id) || 0;
-        const displayName = isGroup ? (chat.name || 'Group') : (other?.name || 'Unknown');
+        const displayName = isGroup ? (chat.name || t('Group')) : (other?.name || t('Unknown'));
         const isSelected = selectedId === chat.id;
         return (
           <div key={chat.id} className="relative group">
@@ -135,7 +137,7 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
                 </div>
                 <div className={`flex items-center justify-between ${lastMsg ? 'mt-0.5' : ''}`}>
                   <span className={`text-xs truncate ${count > 0 ? 'text-gray-600 dark:text-gray-400 font-medium' : 'text-gray-500 dark:text-gray-500'}`}>
-                    {isGroup && sender ? `${sender.name}: ` : ''}{preview || (other?.isAgent ? 'AI agent' : other?.email ? other.email.split('@')[0] : '')}
+                    {isGroup && sender ? `${sender.name}: ` : ''}{fileName ? <span className="inline-flex items-center gap-1"><PaperclipIcon />{fileName}</span> : (preview || (other?.isAgent ? t('AI agent') : ''))}
                   </span>
                   {count > 0 && (
                     <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center leading-none">
@@ -151,9 +153,9 @@ export default function ChatList({ chats, selectedId, currentUserId, onSelect, l
 
   return (
     <div className="flex-1 overflow-y-auto pb-2">
-      {agentChats.length > 0 && <SectionLabel>Agents</SectionLabel>}
+      {agentChats.length > 0 && <SectionLabel>{t('Agents')}</SectionLabel>}
       {agentChats.map(renderChat)}
-      {agentChats.length > 0 && otherChats.length > 0 && <SectionLabel>Rooms and people</SectionLabel>}
+      {agentChats.length > 0 && otherChats.length > 0 && <SectionLabel>{t('Rooms and people')}</SectionLabel>}
       {otherChats.map(renderChat)}
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import api from '../../services/api';
 import { Message, User } from '../../types';
+import { t } from '../../i18n';
 
 interface SearchPanelProps {
   chatId: string;
@@ -48,15 +49,15 @@ export default function SearchPanel({ chatId, participants, onPick, onClose }: S
           value={query}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => e.key === 'Escape' && onClose()}
-          placeholder="Search in this chat…"
-          className="flex-1 min-w-0 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder={t('Search in this chat…')}
+          className="flex-1 min-w-0 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
-        <button onClick={onClose} className="text-sm text-gray-500 px-2" aria-label="Close search">Close</button>
+        <button onClick={onClose} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800" aria-label={t('Close search')}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4"><path d="M18 6 6 18M6 6l12 12" /></svg></button>
       </div>
       {query.trim() && (
         <div className="max-h-64 overflow-y-auto pb-2">
-          {pending && <p className="px-4 py-2 text-xs text-gray-400">Searching…</p>}
-          {!pending && results.length === 0 && <p className="px-4 py-2 text-xs text-gray-400">Nothing found</p>}
+          {pending && <p className="px-4 py-2 text-xs text-gray-400">{t('Searching…')}</p>}
+          {!pending && results.length === 0 && <p className="px-4 py-2 text-xs text-gray-400">{t('Nothing found')}</p>}
           {!pending && results.map((m) => (
             <button
               key={m.id}

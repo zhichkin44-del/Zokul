@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import RichText from './RichText';
 import { HandoffPayload, Message, QuestionPayload, StatusPayload } from '../../types';
+import { t } from '../../i18n';
 
 interface AgentCardProps {
   message: Message;
@@ -28,9 +30,9 @@ function StatusCard({ text, payload }: { text?: string; payload: StatusPayload }
     <div className="px-3.5 py-2.5 rounded-2xl bg-surface/70 border border-gray-200 dark:border-gray-700 text-sm">
       <div className="flex items-center gap-2">
         <span className={`w-2 h-2 rounded-full shrink-0 ${style.dot}`} />
-        <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{style.label}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-600 dark:text-gray-400">{t(style.label)}</span>
       </div>
-      {text && <p className="mt-1 whitespace-pre-wrap break-words">{text}</p>}
+      {text && <div className="mt-1"><RichText text={text} /></div>}
     </div>
   );
 }
@@ -59,13 +61,13 @@ function QuestionCard({ message, onAnswer }: AgentCardProps) {
     <div className={`rounded-2xl border bg-surface overflow-hidden text-sm shadow-sm ${answered || withdrawn ? 'border-gray-200 dark:border-gray-700' : 'border-primary/40 '} dark:shadow-none`}>
       <div className="px-3 pt-2.5 pb-2">
         <div className={`text-[11px] font-semibold uppercase tracking-[0.05em] mb-1 ${withdrawn ? 'text-gray-400' : 'text-primary'}`}>
-          {withdrawn ? 'Withdrawn by agent' : answered ? 'Answered' : 'Needs your answer'}
+          {withdrawn ? t('Withdrawn by agent') : answered ? t('Answered') : t('Needs your answer')}
         </div>
         <p className="whitespace-pre-wrap break-words font-medium">{payload.question}</p>
       </div>
       {withdrawn ? null : answered ? (
         <div className="px-3 py-2 border-t border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300">
-          <span className="text-gray-400">Answer: </span>
+          <span className="text-gray-500">{t('Answer')}: </span>
           <span className="font-medium">{answered}</span>
         </div>
       ) : (
@@ -92,16 +94,14 @@ function QuestionCard({ message, onAnswer }: AgentCardProps) {
             <input
               value={custom}
               onChange={(e) => setCustom(e.target.value)}
-              placeholder={payload.options.length ? 'Or type an answer…' : 'Type an answer…'}
-              className="flex-1 min-w-0 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder={payload.options.length ? t('Or type an answer…') : t('Type an answer…')}
+              className="flex-1 min-w-0 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
             <button
               type="submit"
               disabled={!custom.trim()}
               className="px-3 py-1.5 rounded-full text-primary font-medium disabled:opacity-40"
-            >
-              Send
-            </button>
+            >{t('Send')}</button>
           </form>
         </div>
       )}
@@ -138,20 +138,20 @@ function HandoffCard({ payload }: { payload: HandoffPayload }) {
     <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-surface overflow-hidden text-sm shadow-sm dark:shadow-none">
       <div className="px-3 pt-2.5 pb-2 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">Handoff</span>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-500">{t('Handoff')}</span>
           <span className={`text-[11px] font-medium ${payload.claimedBy ? 'text-green-600' : 'text-amber-600'}`}>
-            {payload.claimedBy ? `Picked up by ${payload.claimedBy}` : 'Open'}
+            {payload.claimedBy ? t('Picked up by {name}', { name: payload.claimedBy }) : t('Open')}
           </span>
         </div>
         <p className="font-semibold mt-0.5 break-words">{payload.title}</p>
         {payload.summary && <p className="text-gray-600 dark:text-gray-300 mt-1 whitespace-pre-wrap break-words">{payload.summary}</p>}
       </div>
       <div className="px-3 py-2 space-y-2">
-        <HandoffList title="Done" items={payload.done} marker="✓" />
-        <HandoffList title="Next" items={payload.next} marker="→" />
+        <HandoffList title={t('Done')} items={payload.done} marker="✓" />
+        <HandoffList title={t('Next')} items={payload.next} marker="→" />
         {payload.files.length > 0 && (
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-400">Files</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-400">{t('Files')}</div>
             <div className="flex flex-wrap gap-1 mt-1">
               {payload.files.map((f) => (
                 <code key={f} className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-900 text-[12px] break-all">{f}</code>
@@ -161,7 +161,7 @@ function HandoffCard({ payload }: { payload: HandoffPayload }) {
         )}
         {payload.notes && (
           <details className="text-gray-600 dark:text-gray-300">
-            <summary className="cursor-pointer text-[12px] text-gray-400">Notes</summary>
+            <summary className="cursor-pointer text-[12px] text-gray-400">{t('Notes')}</summary>
             <p className="mt-1 whitespace-pre-wrap break-words">{payload.notes}</p>
           </details>
         )}
@@ -171,7 +171,7 @@ function HandoffCard({ payload }: { payload: HandoffPayload }) {
         onClick={copy}
         className="w-full px-3 py-2 border-t border-gray-100 dark:border-gray-700 text-primary font-medium text-sm hover:bg-primary/5"
       >
-        {copied ? 'Copied ✓' : 'Copy as prompt'}
+        {copied ? t('Copied ✓') : t('Copy as prompt')}
       </button>
     </div>
   );

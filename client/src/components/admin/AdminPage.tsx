@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatFileSize, formatLastSeen } from '../../utils/format';
+import { t } from '../../i18n';
 
 // Server administration in its own "glass lavender" look (fixed, not themed):
 // muted violet glass over a warm, lamp-lit background.
@@ -49,27 +50,27 @@ export default function AdminPage() {
       <div aria-hidden="true" className="pointer-events-none absolute -left-32 -top-40 h-[620px] w-[620px] rounded-full bg-[radial-gradient(closest-side,rgba(150,128,200,0.30),transparent)]" />
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-52 -right-20 h-[640px] w-[640px] rounded-full bg-[radial-gradient(closest-side,rgba(232,185,122,0.16),transparent)]" />
       <div className="relative mx-auto flex max-w-6xl flex-wrap gap-4 p-4">
-        <nav aria-label="Admin sections" className={`${glass} flex w-full flex-col gap-1 p-3 md:w-56`}>
+        <nav aria-label={t('Admin sections')} className={`${glass} flex w-full flex-col gap-1 p-3 md:w-56`}>
           <div className="flex items-center gap-2.5 px-2 pb-4 pt-1">
             <div className="flex h-8 w-8 items-center justify-center rounded-[11px] border border-[#CFC3F0]/25 bg-[#A99BD6]/20 font-semibold text-[#E6DEFF]" style={serif}>Z</div>
             <div>
               <div className="text-[17px] font-semibold" style={serif}>Zokul</div>
-              <div className="text-[11px] text-[#A69DB6]">admin</div>
+              <div className="text-[11px] text-[#A69DB6]">{t('admin')}</div>
             </div>
           </div>
-          <div className="flex flex-row flex-wrap gap-1 md:flex-col">
+          <div className="grid grid-cols-2 gap-1 md:flex md:flex-col">
             {SECTIONS.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setSection(s.id)}
                 aria-current={section === s.id ? 'page' : undefined}
-                className={`rounded-xl px-3 py-2.5 text-left text-sm ${section === s.id ? 'bg-[#CFC3F0]/[0.12] font-medium text-[#ECE7F2]' : 'text-[#C9C1D6] hover:bg-white/[0.04]'}`}
+                className={`rounded-xl px-3 py-2.5 text-center text-sm md:text-left ${section === s.id ? 'bg-[#CFC3F0]/[0.12] font-medium text-[#ECE7F2]' : 'text-[#C9C1D6] hover:bg-white/[0.04]'}`}
               >
-                {s.label}
+                {t(s.label)}
               </button>
             ))}
           </div>
-          <Link to="/" className="mt-auto rounded-xl px-3 py-2.5 text-sm text-[#A69DB6] hover:bg-white/[0.04]">← Back to chats</Link>
+          <Link to="/" className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-sm font-medium text-[#ECE7F2] hover:bg-white/[0.08] md:mt-auto">← {t('Back to chats')}</Link>
         </nav>
         <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-4">
           {section === 'overview' && <OverviewSection name={user.name} onGo={setSection} />}
@@ -121,25 +122,25 @@ function OverviewSection({ name, onGo }: { name: string; onGo: (s: Section) => v
   const { data: events } = useLoad<AuditEvent[]>('/admin/audit?limit=6');
   const calm = health ? health.database && health.redis : true;
   const hour = new Date().getHours();
-  const greeting = hour < 6 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const greeting = t(hour < 6 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening');
 
   return (
     <>
-      <Header eyebrow={`${greeting}, ${name}`} title={calm ? 'All quiet' : 'Needs attention'} action={
-        <button onClick={() => onGo('invites')} className="h-10 rounded-[13px] border border-[#CFC3F0]/30 bg-[#A99BD6]/20 px-4 text-sm font-medium text-[#F1ECFA] hover:bg-[#A99BD6]/30">Invite someone</button>
+      <Header eyebrow={`${greeting}, ${name}`} title={calm ? t('All quiet') : t('Needs attention')} action={
+        <button onClick={() => onGo('invites')} className="h-10 rounded-[13px] border border-[#CFC3F0]/30 bg-[#A99BD6]/20 px-4 text-sm font-medium text-[#F1ECFA] hover:bg-[#A99BD6]/30">{t('Invite someone')}</button>
       } />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="People" value={data?.people ?? '–'} note={data ? `online now: ${data.peopleOnline}` : undefined} />
-        <Stat label="Agents" value={data?.agents ?? '–'} note={data ? `waiting for an answer: ${data.openQuestions}` : undefined} warm={(data?.openQuestions ?? 0) > 0} />
-        <Stat label="Messages today" value={data?.messagesToday ?? '–'} note={data ? `from agents: ${data.agentMessagesToday}` : undefined} />
-        <Stat label="Files" value={data ? formatFileSize(data.uploadsBytes) : '–'} note={data ? `active invites: ${data.activeInvites}` : undefined} />
+        <Stat label={t('People')} value={data?.people ?? '–'} note={data ? t('{n} online', { n: data.peopleOnline }) : undefined} />
+        <Stat label={t('Agents')} value={data?.agents ?? '–'} note={data ? t('{n} waiting', { n: data.openQuestions }) : undefined} warm={(data?.openQuestions ?? 0) > 0} />
+        <Stat label={t('Messages today')} value={data?.messagesToday ?? '–'} note={data ? t('{n} from agents', { n: data.agentMessagesToday }) : undefined} />
+        <Stat label={t('Files')} value={data ? formatFileSize(data.uploadsBytes) : '–'} note={data ? t('{n} active invites', { n: data.activeInvites }) : undefined} />
       </div>
       <section className={`${glass} flex flex-col gap-1 px-5 py-4`}>
-        <h2 className="mb-2 text-[19px] font-semibold" style={serif}>Recent activity</h2>
+        <h2 className="mb-2 text-[19px] font-semibold" style={serif}>{t('Recent activity')}</h2>
         <EventList events={events ?? []} />
         {health && (
           <div className="mt-3 flex flex-wrap gap-2">
-            <Chip ok={health.database}>Database</Chip>
+            <Chip ok={health.database}>{t('Database')}</Chip>
             <Chip ok={health.redis}>Redis</Chip>
             <Chip ok={health.push}>Push</Chip>
           </div>
@@ -157,20 +158,36 @@ function Chip({ ok, children }: { ok: boolean; children: ReactNode }) {
   );
 }
 
+// Consecutive identical events (same person, same action) collapse into one
+// row with a count, so routine sign-ins do not drown the important lines.
+function collapse(events: AuditEvent[]): (AuditEvent & { count: number })[] {
+  const rows: (AuditEvent & { count: number })[] = [];
+  for (const e of events) {
+    const prev = rows[rows.length - 1];
+    if (prev && prev.action === e.action && prev.actorName === e.actorName && JSON.stringify(prev.details ?? {}) === JSON.stringify(e.details ?? {})) prev.count++;
+    else rows.push({ ...e, count: 1 });
+  }
+  return rows;
+}
+
 function EventList({ events }: { events: AuditEvent[] }) {
-  if (events.length === 0) return <p className="text-sm text-[#A69DB6]">Nothing yet.</p>;
+  if (events.length === 0) return <p className="text-sm text-[#A69DB6]">{t('Nothing yet.')}</p>;
   return (
     <ul className="m-0 list-none p-0">
-      {events.map((e) => (
-        <li key={e.id} className="flex gap-3 border-b border-white/[0.06] py-2 last:border-0">
-          <span className="w-24 shrink-0 text-xs text-[#7F778F]">{new Date(e.at).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-          <span className={`text-[13px] ${WARN.has(e.action) ? 'text-[#EBC892]' : 'text-[#D8D1E3]'}`}>
-            {e.actorName ?? 'Someone'} {ACTION_TEXT[e.action] ?? e.action}
-            {typeof e.details?.name === 'string' && <span className="text-[#A69DB6]"> · {e.details.name as string}</span>}
-            {typeof e.details?.label === 'string' && <span className="text-[#A69DB6]"> · {e.details.label as string}</span>}
-          </span>
-        </li>
-      ))}
+      {collapse(events).map((e) => {
+        const subject = (e.details?.label ?? e.details?.name) as string | undefined;
+        const showSubject = typeof subject === 'string' && subject !== e.actorName;
+        return (
+          <li key={e.id} className="flex gap-3 border-b border-white/[0.06] py-2 last:border-0">
+            <span className="w-24 shrink-0 text-xs text-[#9C93AE]">{new Date(e.at).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+            <span className={`text-[13px] ${WARN.has(e.action) ? 'text-[#EBC892]' : 'text-[#D8D1E3]'}`}>
+              {e.actorName ?? t('Someone')} {t(ACTION_TEXT[e.action] ?? e.action)}
+              {showSubject && <span className="text-[#A69DB6]"> · {subject}</span>}
+              {e.count > 1 && <span className="ml-1.5 rounded-full bg-white/[0.07] px-1.5 text-[11px] text-[#A69DB6]">×{e.count}</span>}
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -193,7 +210,7 @@ function InvitesSection() {
       setLabel('');
       reload();
     } catch (err) {
-      setError((err as ApiError).response?.data?.error || 'Could not create the invite');
+      setError(t((err as ApiError).response?.data?.error || 'Could not create the invite'));
     }
   };
 
@@ -206,40 +223,40 @@ function InvitesSection() {
 
   return (
     <>
-      <Header title="Invites" eyebrow="Only people with an invite can join this server" />
+      <Header title={t('Invites')} eyebrow={t('Only people with an invite can join this server')} />
       <form onSubmit={create} className={`${glass} flex flex-wrap items-end gap-3 px-5 py-4`}>
-        <label className="flex min-w-[200px] flex-1 flex-col gap-1 text-xs text-[#A69DB6]">For whom
-          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Bob, or the Site team" maxLength={100} className={field} />
+        <label className="flex min-w-[200px] flex-1 flex-col gap-1 text-xs text-[#A69DB6]">{t('For whom')}
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder={t('Bob, or the Site team')} maxLength={100} className={field} />
         </label>
-        <label className="flex w-24 flex-col gap-1 text-xs text-[#A69DB6]">Uses
+        <label className="flex w-24 flex-col gap-1 text-xs text-[#A69DB6]">{t('Uses')}
           <input type="number" min={1} max={50} value={uses} onChange={(e) => setUses(Number(e.target.value))} className={field} />
         </label>
-        <label className="flex w-24 flex-col gap-1 text-xs text-[#A69DB6]">Days
+        <label className="flex w-24 flex-col gap-1 text-xs text-[#A69DB6]">{t('Days')}
           <input type="number" min={1} max={30} value={days} onChange={(e) => setDays(Number(e.target.value))} className={field} />
         </label>
-        <button type="submit" className="h-10 rounded-[13px] border border-[#CFC3F0]/30 bg-[#A99BD6]/20 px-4 text-sm font-medium text-[#F1ECFA] hover:bg-[#A99BD6]/30">Create invite</button>
+        <button type="submit" className="h-10 rounded-[13px] border border-[#CFC3F0]/30 bg-[#A99BD6]/20 px-4 text-sm font-medium text-[#F1ECFA] hover:bg-[#A99BD6]/30">{t('Create invite')}</button>
         {error && <p className="w-full text-sm text-[#EBC892]">{error}</p>}
         {link && (
           <div className="w-full rounded-xl border border-[#E8B97A]/25 bg-[#E8B97A]/[0.08] p-3 text-sm">
-            <div className="mb-2 text-xs text-[#EBC892]">Send this link to the person. It is shown only once.</div>
+            <div className="mb-2 text-xs text-[#EBC892]">{t('Send this link to the person. It is shown only once.')}</div>
             <div className="flex flex-wrap items-center gap-2">
               <code className="min-w-0 flex-1 select-all break-all text-[12px] text-[#ECE7F2]">{link}</code>
-              <button type="button" onClick={copy} className="rounded-lg px-3 py-1.5 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">{copied ? 'Copied ✓' : 'Copy'}</button>
+              <button type="button" onClick={copy} className="rounded-lg px-3 py-1.5 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">{copied ? t('Copied ✓') : t('Copy')}</button>
             </div>
           </div>
         )}
       </form>
       <section className={`${glass} flex flex-col gap-2 px-5 py-4`}>
-        {(data ?? []).length === 0 && <p className="text-sm text-[#A69DB6]">No invites yet.</p>}
+        {(data ?? []).length === 0 && <p className="text-sm text-[#A69DB6]">{t('No invites yet.')}</p>}
         {(data ?? []).map((inv) => (
           <div key={inv.id} className="flex flex-wrap items-center gap-3 rounded-[14px] bg-white/[0.04] px-4 py-3">
             <div className="min-w-0 flex-1">
               <div className={`font-medium ${inv.state === 'active' ? '' : 'text-[#A69DB6]'}`}>{inv.label}</div>
-              <div className="text-xs text-[#A69DB6]">{inv.uses} of {inv.maxUses} used · until {new Date(inv.expiresAt).toLocaleDateString()}</div>
+              <div className="text-xs text-[#A69DB6]">{t('{used} of {max} used', { used: inv.uses, max: inv.maxUses })} · {t('until {date}', { date: new Date(inv.expiresAt).toLocaleDateString() })}</div>
             </div>
-            <span className={`rounded-full px-2.5 py-0.5 text-xs ${STATE[inv.state]}`}>{inv.state}</span>
+            <span className={`rounded-full px-2.5 py-0.5 text-xs ${STATE[inv.state]}`}>{t(inv.state)}</span>
             {inv.state === 'active' && (
-              <button onClick={() => api.delete(`/admin/invites/${inv.id}`).then(reload)} className="rounded-lg px-2 py-1 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">Revoke</button>
+              <button onClick={() => api.delete(`/admin/invites/${inv.id}`).then(reload)} className="rounded-lg px-2 py-1 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">{t('Revoke')}</button>
             )}
           </div>
         ))}
@@ -252,7 +269,7 @@ function UsersSection({ selfId }: { selfId: string }) {
   const { data, reload } = useLoad<AdminUser[]>('/admin/users');
   const [error, setError] = useState('');
   const toggle = async (u: AdminUser) => {
-    if (!u.blocked && !window.confirm(`Block ${u.name}? They are signed out everywhere right away.`)) return;
+    if (!u.blocked && !window.confirm(t('Block {name}? They are signed out everywhere right away.', { name: u.name }))) return;
     setError('');
     try {
       await api.post(`/admin/users/${u.id}/block`, { blocked: !u.blocked });
@@ -263,18 +280,18 @@ function UsersSection({ selfId }: { selfId: string }) {
   };
   return (
     <>
-      <Header title="People" />
+      <Header title={t('People')} />
       <section className={`${glass} flex flex-col gap-2 px-5 py-4`}>
         {error && <p className="text-sm text-[#EBC892]">{error}</p>}
         {(data ?? []).map((u) => (
           <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-[14px] bg-white/[0.04] px-4 py-3">
             <div className="min-w-0 flex-1">
-              <div className="font-medium">{u.name}{u.id === selfId ? ' (you)' : ''}{u.role === 'admin' ? ' · admin' : ''}</div>
+              <div className="font-medium">{u.name}{u.id === selfId ? ` (${t('you')})` : ''}{u.role === 'admin' ? ` · ${t('admin')}` : ''}</div>
               <div className="truncate text-xs text-[#A69DB6]">{u.email} · {formatLastSeen(u.lastSeenAt)}</div>
             </div>
-            {u.blocked && <span className="rounded-full bg-[#E8B97A]/[0.14] px-2.5 py-0.5 text-xs text-[#EBC892]">blocked</span>}
+            {u.blocked && <span className="rounded-full bg-[#E8B97A]/[0.14] px-2.5 py-0.5 text-xs text-[#EBC892]">{t('blocked')}</span>}
             {u.role !== 'admin' && (
-              <button onClick={() => toggle(u)} className="rounded-lg px-2 py-1 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">{u.blocked ? 'Unblock' : 'Block'}</button>
+              <button onClick={() => toggle(u)} className="rounded-lg px-2 py-1 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">{u.blocked ? t('Unblock') : t('Block')}</button>
             )}
           </div>
         ))}
@@ -287,16 +304,16 @@ function AgentsSection() {
   const { data } = useLoad<AdminAgent[]>('/admin/agents');
   return (
     <>
-      <Header title="Agents" eyebrow="AI agents connected to this server, and who owns them" />
+      <Header title={t('Agents')} eyebrow={t('AI agents connected to this server, and who owns them')} />
       <section className={`${glass} flex flex-col gap-2 px-5 py-4`}>
-        {(data ?? []).length === 0 && <p className="text-sm text-[#A69DB6]">No agents yet.</p>}
+        {(data ?? []).length === 0 && <p className="text-sm text-[#A69DB6]">{t('No agents yet.')}</p>}
         {(data ?? []).map((a) => (
           <div key={a.id} className="flex items-center gap-3 rounded-[14px] bg-white/[0.04] px-4 py-3">
             <div className="min-w-0 flex-1">
               <div className="font-medium">{a.name}</div>
-              <div className="text-xs text-[#A69DB6]">owner: {a.ownerName}</div>
+              <div className="text-xs text-[#A69DB6]">{t('owner')}: {a.ownerName}</div>
             </div>
-            <span className="text-xs text-[#A69DB6]">{a.lastUsedAt ? `active ${new Date(a.lastUsedAt).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : 'never connected'}</span>
+            <span className="text-xs text-[#A69DB6]">{a.lastUsedAt ? t('active {date}', { date: new Date(a.lastUsedAt).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) }) : t('never connected')}</span>
           </div>
         ))}
       </section>
@@ -308,7 +325,7 @@ function AuditSection() {
   const { data } = useLoad<AuditEvent[]>('/admin/audit?limit=100');
   return (
     <>
-      <Header title="Activity log" eyebrow="Sign-ins, invites, blocks and agent keys" />
+      <Header title={t('Activity log')} eyebrow={t('Sign-ins, invites, blocks and agent keys')} />
       <section className={`${glass} px-5 py-4`}>
         <EventList events={data ?? []} />
       </section>

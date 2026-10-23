@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import api from '../../services/api';
 import { getSupportedMimeType, getExtension } from '../../utils/voice';
+import { t } from '../../i18n';
 
 interface VoiceRecorderProps {
   onSend: (voiceUrl: string, voiceDuration: number) => void;
@@ -129,7 +130,7 @@ export default function VoiceRecorder({ onSend, onCancel, isCancelling }: VoiceR
     return (
       <div className="flex items-center gap-2 bg-gray-200 dark:bg-gray-800 rounded-2xl px-4 py-2">
         <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        <span className="text-sm text-gray-500">Uploading...</span>
+        <span className="text-sm text-gray-500">{t('Uploading…')}</span>
       </div>
     );
   }
@@ -150,14 +151,14 @@ export default function VoiceRecorder({ onSend, onCancel, isCancelling }: VoiceR
       </div>
       {typeof isCancelling !== 'undefined' ? (
         <span className={`text-[10px] whitespace-nowrap transition-colors ${isCancelling ? 'text-red-500' : 'text-gray-400'}`}>
-          {isCancelling ? 'Release to cancel' : 'Slide to cancel'}
+          {isCancelling ? t('Release to cancel') : t('Slide to cancel')}
         </span>
       ) : (
         <button
           type="button"
           onClick={stopRecording}
           className="w-8 h-8 bg-primary text-on-primary rounded-full flex items-center justify-center shrink-0"
-          aria-label="Stop recording"
+          aria-label={t('Stop recording')}
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
             <rect x="6" y="6" width="4" height="12" /><rect x="14" y="6" width="4" height="12" />

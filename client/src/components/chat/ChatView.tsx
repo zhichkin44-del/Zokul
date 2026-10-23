@@ -6,11 +6,13 @@ import Avatar from '../common/Avatar';
 import TypingIndicator from './TypingIndicator';
 import MessageActions from './MessageActions';
 import AgentCard from './AgentCard';
+import RichText from './RichText';
 import { formatFileSize } from '../../utils/format';
 import ReplyQuote from './ReplyQuote';
 import VoicePlayer from './VoicePlayer';
 import ImageViewer from './ImageViewer';
 import '../animations.css';
+import { t } from '../../i18n';
 
 interface ChatViewProps {
   messages: Message[];
@@ -33,7 +35,7 @@ function formatTime(date: Date) {
   const diff = now.getTime() - date.getTime();
   const days = Math.floor(diff / 86400000);
   if (days === 0) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  if (days === 1) return 'Yesterday';
+  if (days === 1) return t('Yesterday');
   return date.toLocaleDateString([], { day: 'numeric', month: 'short' });
 }
 
@@ -194,7 +196,7 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Loading messages...</div>
+        <div className="animate-pulse text-gray-400">{t('Loading messages…')}</div>
       </div>
     );
   }
@@ -216,8 +218,8 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           </div>
-          <p className="text-sm text-gray-500">No messages yet</p>
-          <p className="text-xs text-gray-400 mt-1">Send a message to start</p>
+          <p className="text-sm text-gray-500">{t('No messages yet')}</p>
+          <p className="text-xs text-gray-400 mt-1">{t('Send a message to start')}</p>
         </div>
       </div>
     );
@@ -305,11 +307,11 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                           </span>
                           <span className="min-w-0">
                             <span className="block font-medium truncate">{msg.file.name}</span>
-                            <span className={`block text-xs ${isMine ? 'text-on-primary/70' : 'text-gray-500'}`}>{formatFileSize(msg.file.size)} · Download</span>
+                            <span className={`block text-xs ${isMine ? 'text-on-primary' : 'text-gray-500'}`}>{formatFileSize(msg.file.size)} · {t('Download')}</span>
                           </span>
                         </a>
                       )}
-                      {msg.text && <p className="whitespace-pre-wrap break-words">{msg.text}</p>}
+                      {msg.text && <RichText text={msg.text} mine={isMine} />}
                     </div>
                     {actionsMsg === msg.id && (
                       <MessageActions
@@ -326,14 +328,14 @@ export default function ChatView({ messages, currentUserId, currentUserName, par
                   <span className="text-[10px] text-gray-400 mt-0.5 px-1 flex items-center gap-1">
                     {isMine && (
                       msg.readBy && msg.readBy.length > 0 ? (
-                        <span className="flex items-center gap-0.5 text-primary">
-                          <svg viewBox="0 0 20 16" className="w-3.5 h-3 fill-current"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/><path d="M18.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L7.22 9.78a.75.75 0 1 1 1.06-1.06l3.25 3.25 6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
+                        <span className="flex items-center gap-0.5 text-primary-dark dark:text-primary">
+                          <svg aria-hidden="true" viewBox="0 0 20 16" className="w-4 h-3.5 fill-current"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/><path d="M18.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L7.22 9.78a.75.75 0 1 1 1.06-1.06l3.25 3.25 6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
                           <span className="italic">
-                            {participants.length > 2 ? `Read ${msg.readBy.length}` : 'Read'}
+                            {participants.length > 2 ? t('Read by {n}', { n: msg.readBy.length }) : t('Read')}
                           </span>
                         </span>
                       ) : (
-                        <svg viewBox="0 0 16 16" className="w-3 h-3 fill-current"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
+                        <svg aria-hidden="true" viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-current"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
                       )
                     )}
                     {msg.isEdited && <span className="italic">edited</span>}

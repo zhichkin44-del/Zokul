@@ -13,7 +13,8 @@ import AgentsModal, { BotIcon } from './agents/AgentsModal';
 import SearchPanel from './chat/SearchPanel';
 import ChatInfoModal from './chat/ChatInfoModal';
 import { formatLastSeen } from '../utils/format';
-import { BellOffIcon } from './common/Icons';
+import { BellIcon, BellOffIcon } from './common/Icons';
+import { plural, t } from '../i18n';
 import { usePushSubscription } from '../hooks/usePushSubscription';
 import { useDraft } from '../hooks/useDraft';
 import { ChatProvider } from '../contexts/ChatContext';
@@ -51,6 +52,9 @@ function HomePageInner() {
   const { handleTyping } = useTyping(selectedChat?.id || null);
   const { isOnline, lastSeenOf } = usePresence(user?.id);
   const [showInfo, setShowInfo] = useState(false);
+  // The notification hint can be dismissed; remembered on this device.
+  const [pushHintHidden, setPushHintHidden] = useState(() => { try { return localStorage.getItem('zokul-push-hint') === 'hidden'; } catch { return false; } });
+  const hidePushHint = () => { setPushHintHidden(true); try { localStorage.setItem('zokul-push-hint', 'hidden'); } catch { /* ignore */ } };
   const [showSearch, setShowSearch] = useState(false);
   const { count: unreadCount, markRead } = useUnread(selectedChat?.id || null);
   const { socket } = useSocket();
@@ -201,7 +205,7 @@ function HomePageInner() {
 
   const otherUser = selectedChat?.participants.find((p) => p.id !== user?.id);
   const isGroupChat = selectedChat?.isGroup === true;
-  const displayChatName = isGroupChat ? (selectedChat?.name || 'Group') : (otherUser?.name || 'Unknown');
+  const displayChatName = isGroupChat ? (selectedChat?.name || t('Group')) : (otherUser?.name || t('Unknown'));
   const otherOnline = isOnline(otherUser?.id || '');
   const canDeleteChat = !isGroupChat || selectedChat?.creatorId === user?.id;
 
@@ -233,6 +237,7 @@ function HomePageInner() {
   return (
     <AppLayout>
       <div className="flex h-full">
+        <h1 className="sr-only">Zokul</h1>
         <aside className={`${showSidebar ? 'flex' : 'hidden'} md:flex w-full md:w-80 flex-col bg-gray-100 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800`}>
           <div className="px-4 pt-3 pb-3">
             <button
@@ -247,23 +252,24 @@ function HomePageInner() {
                 <div className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
                   {user?.name || 'User'}
                 </div>
-                <div className="text-[11px] text-green-500 font-medium">Online</div>
+                <div className="text-[11px] text-green-800 dark:text-green-400 font-medium">{t('Online')}</div>
               </div>
               <span className="shrink-0 hidden min-[360px]:inline-flex items-center gap-1.5"><span className="w-6 h-6 rounded-lg bg-primary text-on-primary text-xs font-semibold flex items-center justify-center" aria-hidden="true">Z</span><span className="font-display text-[15px] font-semibold text-gray-900 dark:text-gray-100">Zokul</span></span>
             </button>
           </div>
           <div className="mx-4 border-t border-gray-200 dark:border-gray-800" />
-          {pushStatus === 'default' && (
-            <button
-              onClick={enablePush}
-              className="mx-4 mt-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-xs font-medium text-left hover:bg-primary/15 transition-colors"
-            >
-              Enable notifications to get new messages when Zokul is closed
-            </button>
+          {pushStatus === 'default' && !pushHintHidden && (
+            <div className="mx-4 mt-2 flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 text-primary-dark dark:text-primary text-xs">
+              <BellIcon />
+              <span className="flex-1">{t('Get notified about new messages')}</span>
+              <button onClick={enablePush} className="font-semibold underline underline-offset-2">{t('Turn on')}</button>
+              <button onClick={hidePushHint} className="px-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200" aria-label={t('Not now')}>✕</button>
+            </div>
           )}
-          {pushStatus === 'needs-install' && (
-            <div className="mx-4 mt-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs">
-              To get notifications on iPhone: Share → Add to Home Screen, then open Zokul from the icon
+          {pushStatus === 'needs-install' && !pushHintHidden && (
+            <div className="mx-4 mt-2 flex items-start gap-2 px-3 py-2 rounded-xl bg-gray-200/60 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs">
+              <span className="flex-1">{t('To get notifications on iPhone: Share → Add to Home Screen, then open Zokul from the icon')}</span>
+              <button onClick={hidePushHint} className="px-1" aria-label={t('Not now')}>✕</button>
             </div>
           )}
           <ChatList
@@ -284,8 +290,8 @@ function HomePageInner() {
                     ? 'text-primary bg-gray-200 dark:bg-gray-800'
                     : 'text-gray-500 hover:text-primary dark:hover:text-primary hover:bg-gray-200 dark:hover:bg-gray-800'
                 }`}
-                title="New Chat"
-                aria-label="New Chat"
+                title={t('New chat')}
+                aria-label={t('New chat')}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
                   <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
@@ -306,7 +312,7 @@ function HomePageInner() {
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                       <circle cx="12" cy="7" r="4" />
                     </svg>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Personal chat</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('Personal chat')}</span>
                   </button>
                   <div className="border-t border-gray-200 dark:border-gray-700/50" />
                   <button
@@ -320,7 +326,7 @@ function HomePageInner() {
                       <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Group chat</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('Group chat')}</span>
                   </button>
                 </div>
               )}
@@ -328,8 +334,8 @@ function HomePageInner() {
             <button
               onClick={() => setShowAgents(true)}
               className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              title="AI agents"
-              aria-label="AI agents"
+              title={t('AI agents')}
+              aria-label={t('AI agents')}
             >
               <BotIcon />
             </button>
@@ -337,8 +343,8 @@ function HomePageInner() {
               <Link
                 to="/admin"
                 className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                title="Admin panel"
-                aria-label="Admin panel"
+                title={t('Admin panel')}
+                aria-label={t('Admin panel')}
               >
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" /><path d="m9 12 2 2 4-4" /></svg>
               </Link>
@@ -346,8 +352,8 @@ function HomePageInner() {
             <button
               onClick={toggleTheme}
               className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary dark:hover:text-primary transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-              aria-label="Toggle theme"
+              title={theme === 'dark' ? t('Light mode') : t('Dark mode')}
+              aria-label={theme === 'dark' ? t('Light mode') : t('Dark mode')}
             >
               {theme === 'dark' ? (
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
@@ -362,8 +368,8 @@ function HomePageInner() {
             <button
               onClick={logout}
               className="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              title="Log out"
-              aria-label="Log out"
+              title={t('Log out')}
+              aria-label={t('Log out')}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -373,14 +379,15 @@ function HomePageInner() {
             </button>
           </div>
         </aside>
-        <section className={`${!showSidebar || selectedChat ? 'flex' : 'hidden'} md:flex flex-1 flex-col bg-gray-100 dark:bg-gray-900`}>
+        <section className={`${!showSidebar || selectedChat ? 'flex' : 'hidden'} md:flex flex-1 min-w-0 flex-col bg-gray-100 dark:bg-gray-900`}>
           {selectedChat ? (
             <>
               <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 bg-gray-100 dark:bg-gray-900">
                 <button
                   onClick={handleBack}
                   className="md:hidden w-8 h-8 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex items-center justify-center"
-                  title="Back"
+                  title={t('Back')}
+                  aria-label={t('Back')}
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                     <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
@@ -396,22 +403,22 @@ function HomePageInner() {
                   )}
                   {!isGroupChat && !otherUser?.isAgent && <OnlineDot online={otherOnline} />}
                 </div>
-                <button type="button" onClick={() => setShowInfo(true)} className="flex-1 min-w-0 text-left" aria-label={isGroupChat ? 'Group info' : 'Profile'}>
+                <button type="button" onClick={() => setShowInfo(true)} className="flex-1 min-w-0 text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" title={isGroupChat ? t('Group info') : t('Profile')}>
                   <div className="font-display font-semibold text-[15px] truncate">
                     {displayChatName}
-                    {selectedChat.muted && <span className="ml-1.5 inline-flex align-middle text-gray-400" title="Notifications off"><BellOffIcon /></span>}
+                    {selectedChat.muted && <span className="ml-1.5 inline-flex align-middle text-gray-400" title={t('Notifications off')}><BellOffIcon /></span>}
                   </div>
                   <div className="text-xs text-gray-400 truncate">
                     {isGroupChat
-                      ? `${selectedChat.participants.length} members`
-                      : otherUser?.isAgent ? 'AI agent' : otherOnline ? 'Online' : formatLastSeen(lastSeenOf(otherUser?.id || '', otherUser?.lastSeenAt))}
+                      ? `${selectedChat.participants.length} ${plural(selectedChat.participants.length, t('member'), t('members'), t('members_many'))}`
+                      : otherUser?.isAgent ? t('AI agent') : otherOnline ? t('Online') : formatLastSeen(lastSeenOf(otherUser?.id || '', otherUser?.lastSeenAt))}
                   </div>
                 </button>
                 <button
                   onClick={() => setShowSearch((v) => !v)}
                   className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700/50"
-                  title="Search in chat"
-                  aria-label="Search in chat"
+                  title={t('Search in chat')}
+                  aria-label={t('Search in chat')}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
                 </button>
@@ -419,8 +426,8 @@ function HomePageInner() {
                   <button
                     onClick={() => setShowChatActions((v) => !v)}
                     className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                    title="Chat actions"
-                    aria-label="Chat actions"
+                    title={t('Chat actions')}
+                    aria-label={t('Chat actions')}
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                       <circle cx="12" cy="5" r="1.5" />
@@ -431,7 +438,7 @@ function HomePageInner() {
                   {showChatActions && (
                     <div className="absolute right-0 top-full mt-1 w-52 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-20">
                       <button onClick={() => { setShowChatActions(false); setShowInfo(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left" role="menuitem">
-                        <span className="text-sm font-medium">{isGroupChat ? 'Group info' : 'Profile'}</span>
+                        <span className="text-sm font-medium">{isGroupChat ? t('Group info') : t('Profile')}</span>
                       </button>
                       <button
                         onClick={async () => {
@@ -442,7 +449,7 @@ function HomePageInner() {
                         className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left"
                         role="menuitem"
                       >
-                        <span className="text-sm font-medium">{selectedChat.muted ? 'Turn notifications on' : 'Mute notifications'}</span>
+                        <span className="text-sm font-medium">{selectedChat.muted ? t('Turn notifications on') : t('Mute notifications')}</span>
                       </button>
                       {canDeleteChat && (
                       <button
@@ -453,7 +460,7 @@ function HomePageInner() {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5 text-red-500 shrink-0">
                           <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
                         </svg>
-                        <span className="text-sm font-medium text-red-500">Delete chat</span>
+                        <span className="text-sm font-medium text-red-600 dark:text-red-400">{t('Delete chat')}</span>
                       </button>
                       )}
                     </div>
@@ -501,10 +508,17 @@ function HomePageInner() {
               />
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <div className="text-center">
-                <p className="text-lg mb-1">Select a chat</p>
-                <p className="text-sm">or create a new one</p>
+            <div className="flex-1 flex items-center justify-center px-6">
+              <div className="text-center max-w-xs">
+                <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-primary/10 text-primary-dark dark:text-primary flex items-center justify-center" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="w-7 h-7"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                </div>
+                <h2 className="font-display text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">{t('Pick a chat to start')}</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">{t('Your chats with people and AI agents live on the left.')}</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <button onClick={() => setShowCreate(true)} className="px-4 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium hover:bg-primary-dark">{t('New chat')}</button>
+                  <button onClick={() => setShowAgents(true)} className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-800">{t('Connect an agent')}</button>
+                </div>
               </div>
             </div>
           )}
@@ -541,14 +555,14 @@ function HomePageInner() {
       {deleteConfirmChatId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setDeleteConfirmChatId(null)}>
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-5 w-72" onClick={(e) => e.stopPropagation()}>
-            <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Delete chat?</p>
-            <p className="text-xs text-gray-500 mb-4">This cannot be undone.</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t('Delete chat?')}</p>
+            <p className="text-xs text-gray-500 mb-4">{t('This cannot be undone.')}</p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setDeleteConfirmChatId(null)}
                 className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium"
               >
-                Cancel
+                {t('Cancel')}
               </button>
               <button
                 onClick={() => {
@@ -556,9 +570,9 @@ function HomePageInner() {
                   setDeleteConfirmChatId(null);
                   setShowChatActions(false);
                 }}
-                className="px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 font-medium"
+                className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
               >
-                Delete
+                {t('Delete')}
               </button>
             </div>
           </div>

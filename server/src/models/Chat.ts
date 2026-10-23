@@ -20,7 +20,9 @@ function toMessage(row: ChatRow): Message | undefined {
     id: row.last_message_id,
     chatId: row.id,
     senderId: row.last_message_sender_id || '',
-    text: row.last_message_text || (row.last_message_file_name ? `📎 ${row.last_message_file_name}` : undefined),
+    text: row.last_message_text || undefined,
+    // The list shows a file icon and the name; the file itself is not needed here.
+    file: row.last_message_file_name ? { url: '', name: row.last_message_file_name, size: 0, mime: '' } : undefined,
     imageUrl: row.last_message_image_url || undefined,
     createdAt: row.last_message_created_at || row.created_at,
   };

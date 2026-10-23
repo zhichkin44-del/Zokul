@@ -4,6 +4,7 @@ import { useCreateChat } from '../../hooks/useChat';
 import Avatar from '../common/Avatar';
 import { Chat, User } from '../../types';
 import { Socket } from 'socket.io-client';
+import { t } from '../../i18n';
 
 interface CreateGroupModalProps {
   open: boolean;
@@ -79,7 +80,7 @@ export default function CreateGroupModal({ open, onClose, onCreated, socket }: C
       onClose();
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { error?: string } } };
-      setError(axiosErr.response?.data?.error || 'Failed to create group');
+      setError(axiosErr.response?.data?.error || t('Failed to create group'));
     } finally {
       setCreating(false);
     }
@@ -93,7 +94,7 @@ export default function CreateGroupModal({ open, onClose, onCreated, socket }: C
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-black/40" onKeyDown={(e) => e.key === 'Escape' && onClose()}>
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden" role="dialog" aria-modal="true" aria-label="Create group">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold">New Group</h2>
+          <h2 className="font-display text-xl font-semibold">{t('New group')}</h2>
         </div>
 
         <div className="p-4 space-y-3">
@@ -101,8 +102,8 @@ export default function CreateGroupModal({ open, onClose, onCreated, socket }: C
             type="text"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
-            placeholder="Group name"
-            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder={t('Group name')}
+            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
 
           {selected.length > 0 && (
@@ -124,17 +125,17 @@ export default function CreateGroupModal({ open, onClose, onCreated, socket }: C
             type="text"
             value={query}
             onChange={(e) => handleQuery(e.target.value)}
-            placeholder="Search users to add..."
-            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder={t('Search people…')}
+            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
 
         <div className="max-h-60 overflow-y-auto">
           {pending && (
-            <div className="p-4 text-center text-gray-400 text-sm">Searching...</div>
+            <div className="p-4 text-center text-gray-400 text-sm">{t('Searching…')}</div>
           )}
           {!pending && query && results.length === 0 && (
-            <div className="p-4 text-center text-gray-400 text-sm">No users found</div>
+            <div className="p-4 text-center text-gray-400 text-sm">{t('No one found')}</div>
           )}
           {results.map((user) => (
             <button
@@ -161,15 +162,13 @@ export default function CreateGroupModal({ open, onClose, onCreated, socket }: C
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-          >
-            Cancel
-          </button>
+          >{t('Cancel')}</button>
           <button
             onClick={handleCreate}
             disabled={!canCreate || creating}
-            className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+            className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium disabled:bg-gray-200 disabled:text-gray-500 dark:disabled:bg-gray-700 dark:disabled:text-gray-400 transition-colors"
           >
-            {creating ? 'Creating...' : `Create Group (${selected.length})`}
+            {creating ? t('Creating…') : t('Create group ({n})', { n: selected.length })}
           </button>
         </div>
       </div>

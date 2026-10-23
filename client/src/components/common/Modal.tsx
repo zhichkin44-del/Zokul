@@ -26,7 +26,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
       <div ref={ref} className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-sm mx-4 overflow-hidden">
         {title && (
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold">{title}</h2>
+            <h2 className="font-display text-xl font-semibold">{title}</h2>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
                 <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />

@@ -3,6 +3,7 @@ import { useSearchUsers, useCreateChat } from '../../hooks/useChat';
 import Avatar from '../common/Avatar';
 import { Chat, User } from '../../types';
 import { Socket } from 'socket.io-client';
+import { t } from '../../i18n';
 
 interface CreateChatModalProps {
   open: boolean;
@@ -54,7 +55,7 @@ export default function CreateChatModal({ open, onClose, onCreated, socket }: Cr
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 bg-black/40" onKeyDown={(e) => e.key === 'Escape' && onClose()}>
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden" role="dialog" aria-modal="true" aria-label="New chat">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold">New Chat</h2>
+          <h2 className="font-display text-xl font-semibold">{t('New chat')}</h2>
         </div>
         <div className="p-4">
           <input
@@ -62,19 +63,19 @@ export default function CreateChatModal({ open, onClose, onCreated, socket }: Cr
             type="text"
             value={query}
             onChange={(e) => handleQuery(e.target.value)}
-            placeholder="Search users..."
-            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder={t('Search people…')}
+            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
         <div className="max-h-80 overflow-y-auto">
           {pending && (
-            <div className="p-4 text-center text-gray-400 text-sm">Searching...</div>
+            <div className="p-4 text-center text-gray-400 text-sm">{t('Searching…')}</div>
           )}
           {!pending && query && results.length === 0 && (
-            <div className="p-4 text-center text-gray-400 text-sm">No users found</div>
+            <div className="p-4 text-center text-gray-400 text-sm">{t('No one found')}</div>
           )}
           {!query && !pending && (
-            <div className="p-4 text-center text-gray-400 text-sm">Type to search users</div>
+            <div className="p-4 text-center text-gray-400 text-sm">{t('Type a name to find people')}</div>
           )}
           {results.map((user) => (
             <button
@@ -95,9 +96,7 @@ export default function CreateChatModal({ open, onClose, onCreated, socket }: Cr
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-          >
-            Cancel
-          </button>
+          >{t('Cancel')}</button>
         </div>
       </div>
     </div>
