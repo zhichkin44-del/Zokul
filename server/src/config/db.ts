@@ -176,6 +176,14 @@ export async function migrate(): Promise<void> {
       WHERE id = (SELECT id FROM users WHERE is_agent IS NOT TRUE ORDER BY created_at LIMIT 1)
         AND NOT EXISTS (SELECT 1 FROM users WHERE role = 'admin')
     `);
+    // Owner-only admin with mandatory two-factor sign-in.
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_secret TEXT`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_pending TEXT`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN NOT NULL DEFAULT false`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_last_step BIGINT`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_recovery TEXT[]`);
+    // At most one admin, enforced by the database itself.
+    await client.query(`CREATE UNIQUE INDEX IF NOT EXISTS users_single_admin ON users ((role)) WHERE role = 'admin'`);
     console.log('Migration completed successfully');
   } finally {
     client.release();

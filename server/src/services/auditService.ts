@@ -4,7 +4,9 @@ import { logger } from '../utils/logger';
 export type AuditAction =
   | 'login' | 'login_failed' | 'login_blocked' | 'register' | 'password_changed'
   | 'invite_created' | 'invite_revoked' | 'user_blocked' | 'user_unblocked'
-  | 'agent_created' | 'agent_token_rotated' | 'agent_deleted';
+  | 'agent_created' | 'agent_token_rotated' | 'agent_deleted'
+  | 'admin_2fa_enabled' | 'admin_2fa_failed' | 'admin_unlocked' | 'admin_locked' | 'password_reset_issued' | 'password_reset_used' | 'account_deleted'
+  | 'owner_changed' | 'admin_2fa_reset';
 
 // Security journal shown in the admin panel. Never fails the action itself.
 export async function logEvent(actorId: string | null, action: AuditAction, details?: Record<string, unknown>): Promise<void> {

@@ -1,3 +1,22 @@
+# Project Health
+
+Last reviewed: 2026-10-23 · Branch: `integrate/foundation` (local)
+
+| Check | Status | Notes |
+|---|---|---|
+| Server tests | Passing (101) | jest |
+| Client tests | Passing (30) | vitest |
+| Build / typecheck | Passing | client + server |
+| Dependencies | 0 known vulnerabilities | npm audit, server + client |
+| Accessibility | 0 axe violations | 20 screens, light + dark |
+| Security audit | Done | `docs/SECURITY_AUDIT_V1.md` |
+| Real-phone push | Not verified | needs HTTPS deployment |
+| Backups | Script only | schedule + restore test pending |
+
+---
+
+Older notes below are history (July 2026).
+
 ﻿# Project Health
 
 Last reviewed: 2026-07-17

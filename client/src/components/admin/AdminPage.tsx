@@ -4,6 +4,8 @@ import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatFileSize, formatLastSeen } from '../../utils/format';
 import { t } from '../../i18n';
+import AdminGate from './AdminGate';
+import { glass, serif, field, primaryButton } from './style';
 
 // Server administration in its own "glass lavender" look (fixed, not themed):
 // muted violet glass over a warm, lamp-lit background.
@@ -34,11 +36,12 @@ const ACTION_TEXT: Record<string, string> = {
   register: 'joined', password_changed: 'changed password', invite_created: 'created an invite',
   invite_revoked: 'revoked an invite', user_blocked: 'blocked a person', user_unblocked: 'unblocked a person',
   agent_created: 'added an agent', agent_token_rotated: 'issued a new agent token', agent_deleted: 'deleted an agent',
+  admin_2fa_enabled: 'turned on two-factor sign-in', admin_2fa_failed: 'entered a wrong admin code',
+  admin_unlocked: 'opened the admin panel', admin_locked: 'locked the admin panel',
+  password_reset_issued: 'issued a password reset link', password_reset_used: 'reset their password', account_deleted: 'deleted their account',
+  owner_changed: 'became the owner (changed on the server)', admin_2fa_reset: 'had two-factor sign-in reset on the server',
 };
-const WARN = new Set(['login_failed', 'login_blocked', 'user_blocked']);
-
-const glass = 'rounded-[20px] border border-white/[0.08] bg-white/[0.045] backdrop-blur-xl';
-const serif = { fontFamily: "'Source Serif 4', Georgia, serif" };
+const WARN = new Set(['login_failed', 'login_blocked', 'user_blocked', 'admin_2fa_failed', 'owner_changed', 'admin_2fa_reset']);
 
 export default function AdminPage() {
   const { user } = useAuth();
@@ -50,6 +53,7 @@ export default function AdminPage() {
       <div aria-hidden="true" className="pointer-events-none absolute -left-32 -top-40 h-[620px] w-[620px] rounded-full bg-[radial-gradient(closest-side,rgba(150,128,200,0.30),transparent)]" />
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-52 -right-20 h-[640px] w-[640px] rounded-full bg-[radial-gradient(closest-side,rgba(232,185,122,0.16),transparent)]" />
       <div className="relative mx-auto flex max-w-6xl flex-wrap gap-4 p-4">
+        <AdminGate>{(lock) => (<>
         <nav aria-label={t('Admin sections')} className={`${glass} flex w-full flex-col gap-1 p-3 md:w-56`}>
           <div className="flex items-center gap-2.5 px-2 pb-4 pt-1">
             <div className="flex h-8 w-8 items-center justify-center rounded-[11px] border border-[#CFC3F0]/25 bg-[#A99BD6]/20 font-semibold text-[#E6DEFF]" style={serif}>Z</div>
@@ -70,7 +74,10 @@ export default function AdminPage() {
               </button>
             ))}
           </div>
-          <Link to="/" className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-sm font-medium text-[#ECE7F2] hover:bg-white/[0.08] md:mt-auto">← {t('Back to chats')}</Link>
+          <div className="mt-3 grid grid-cols-2 gap-1 md:mt-auto md:flex md:flex-col">
+            <button onClick={lock} className="rounded-xl px-3 py-2.5 text-sm text-[#C9C1D6] hover:bg-white/[0.04]">🔒 {t('Lock')}</button>
+            <Link to="/" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-sm font-medium text-[#ECE7F2] hover:bg-white/[0.08]">← {t('Back to chats')}</Link>
+          </div>
         </nav>
         <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-4">
           {section === 'overview' && <OverviewSection name={user.name} onGo={setSection} />}
@@ -79,6 +86,7 @@ export default function AdminPage() {
           {section === 'agents' && <AgentsSection />}
           {section === 'audit' && <AuditSection />}
         </main>
+        </>)}</AdminGate>
       </div>
     </div>
   );
@@ -127,7 +135,7 @@ function OverviewSection({ name, onGo }: { name: string; onGo: (s: Section) => v
   return (
     <>
       <Header eyebrow={`${greeting}, ${name}`} title={calm ? t('All quiet') : t('Needs attention')} action={
-        <button onClick={() => onGo('invites')} className="h-10 rounded-[13px] border border-[#CFC3F0]/30 bg-[#A99BD6]/20 px-4 text-sm font-medium text-[#F1ECFA] hover:bg-[#A99BD6]/30">{t('Invite someone')}</button>
+        <button onClick={() => onGo('invites')} className={primaryButton}>{t('Invite someone')}</button>
       } />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label={t('People')} value={data?.people ?? '–'} note={data ? t('{n} online', { n: data.peopleOnline }) : undefined} />
@@ -218,7 +226,6 @@ function InvitesSection() {
     try { await navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* selectable */ }
   };
 
-  const field = 'h-10 rounded-xl border border-white/[0.08] bg-white/[0.05] px-3 text-sm text-[#ECE7F2] placeholder:text-[#7F778F] focus:outline-none focus:ring-2 focus:ring-[#A99BD6]/50';
   const STATE: Record<Invite['state'], string> = { active: 'bg-[#E8B97A]/[0.14] text-[#EBC892]', used: 'bg-[#9FCB98]/[0.12] text-[#B9DDB3]', expired: 'bg-white/[0.06] text-[#A69DB6]', revoked: 'bg-white/[0.06] text-[#A69DB6]' };
 
   return (
@@ -234,7 +241,7 @@ function InvitesSection() {
         <label className="flex w-24 flex-col gap-1 text-xs text-[#A69DB6]">{t('Days')}
           <input type="number" min={1} max={30} value={days} onChange={(e) => setDays(Number(e.target.value))} className={field} />
         </label>
-        <button type="submit" className="h-10 rounded-[13px] border border-[#CFC3F0]/30 bg-[#A99BD6]/20 px-4 text-sm font-medium text-[#F1ECFA] hover:bg-[#A99BD6]/30">{t('Create invite')}</button>
+        <button type="submit" className={primaryButton}>{t('Create invite')}</button>
         {error && <p className="w-full text-sm text-[#EBC892]">{error}</p>}
         {link && (
           <div className="w-full rounded-xl border border-[#E8B97A]/25 bg-[#E8B97A]/[0.08] p-3 text-sm">
@@ -325,7 +332,7 @@ function AuditSection() {
   const { data } = useLoad<AuditEvent[]>('/admin/audit?limit=100');
   return (
     <>
-      <Header title={t('Activity log')} eyebrow={t('Sign-ins, invites, blocks and agent keys')} />
+      <Header title={t('Activity log')} eyebrow={t('Sign-ins, invites, blocks, agent keys and admin access')} />
       <section className={`${glass} px-5 py-4`}>
         <EventList events={data ?? []} />
       </section>
