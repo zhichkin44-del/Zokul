@@ -15,7 +15,7 @@ interface Overview {
   messagesToday: number; agentMessagesToday: number; activeInvites: number; uploadsBytes: number;
 }
 interface Invite { id: string; label: string; maxUses: number; uses: number; expiresAt: string; state: 'active' | 'used' | 'expired' | 'revoked' }
-interface AdminUser { id: string; name: string; email: string; role: 'admin' | 'user'; blocked: boolean; lastSeenAt?: string }
+interface AdminUser { id: string; name: string; email: string; role: 'admin' | 'user'; blocked: boolean; deleted?: boolean; lastSeenAt?: string }
 interface AdminAgent { id: string; name: string; ownerName: string; lastUsedAt?: string }
 interface AuditEvent { id: string; at: string; action: string; actorName?: string; details?: Record<string, unknown> }
 interface Health { database: boolean; redis: boolean; push: boolean }
@@ -275,6 +275,19 @@ function InvitesSection() {
 function UsersSection({ selfId }: { selfId: string }) {
   const { data, reload } = useLoad<AdminUser[]>('/admin/users');
   const [error, setError] = useState('');
+  const [reset, setReset] = useState<{ name: string; link: string } | null>(null);
+  const [copied, setCopied] = useState(false);
+  const issueReset = async (u: AdminUser) => {
+    if (!window.confirm(t('Make a password reset link for {name}? Their old password stops working once they use it.', { name: u.name }))) return;
+    setError('');
+    try {
+      const res = await api.post<{ token: string }>(`/admin/users/${u.id}/reset-link`);
+      setReset({ name: u.name, link: `${window.location.origin}/reset#${res.data.token}` });
+      setCopied(false);
+    } catch (err) {
+      setError(t((err as ApiError).response?.data?.error || 'Could not make the link'));
+    }
+  };
   const toggle = async (u: AdminUser) => {
     if (!u.blocked && !window.confirm(t('Block {name}? They are signed out everywhere right away.', { name: u.name }))) return;
     setError('');
@@ -290,15 +303,27 @@ function UsersSection({ selfId }: { selfId: string }) {
       <Header title={t('People')} />
       <section className={`${glass} flex flex-col gap-2 px-5 py-4`}>
         {error && <p className="text-sm text-[#EBC892]">{error}</p>}
+        {reset && (
+          <div className="rounded-xl border border-[#E8B97A]/25 bg-[#E8B97A]/[0.08] p-3 text-sm">
+            <div className="mb-2 text-xs text-[#EBC892]">{t('Reset link for {name}. Valid for 24 hours, works once, shown only now.', { name: reset.name })}</div>
+            <div className="flex flex-wrap items-center gap-2">
+              <code className="min-w-0 flex-1 select-all break-all text-[12px] text-[#ECE7F2]">{reset.link}</code>
+              <button type="button" onClick={() => navigator.clipboard.writeText(reset.link).then(() => setCopied(true)).catch(() => {})} className="rounded-lg px-3 py-1.5 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">{copied ? t('Copied ✓') : t('Copy')}</button>
+            </div>
+          </div>
+        )}
         {(data ?? []).map((u) => (
           <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-[14px] bg-white/[0.04] px-4 py-3">
             <div className="min-w-0 flex-1">
-              <div className="font-medium">{u.name}{u.id === selfId ? ` (${t('you')})` : ''}{u.role === 'admin' ? ` · ${t('admin')}` : ''}</div>
-              <div className="truncate text-xs text-[#A69DB6]">{u.email} · {formatLastSeen(u.lastSeenAt)}</div>
+              <div className={`font-medium ${u.deleted ? 'text-[#A69DB6]' : ''}`}>{u.deleted ? t('Deleted account') : u.name}{u.id === selfId ? ` (${t('you')})` : ''}{u.role === 'admin' ? ` · ${t('owner')}` : ''}</div>
+              {!u.deleted && <div className="truncate text-xs text-[#A69DB6]">{u.email} · {formatLastSeen(u.lastSeenAt)}</div>}
             </div>
-            {u.blocked && <span className="rounded-full bg-[#E8B97A]/[0.14] px-2.5 py-0.5 text-xs text-[#EBC892]">{t('blocked')}</span>}
-            {u.role !== 'admin' && (
-              <button onClick={() => toggle(u)} className="rounded-lg px-2 py-1 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">{u.blocked ? t('Unblock') : t('Block')}</button>
+            {u.blocked && !u.deleted && <span className="rounded-full bg-[#E8B97A]/[0.14] px-2.5 py-0.5 text-xs text-[#EBC892]">{t('blocked')}</span>}
+            {u.role !== 'admin' && !u.deleted && (
+              <>
+                <button onClick={() => issueReset(u)} className="rounded-lg px-2 py-1 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">{t('Reset password')}</button>
+                <button onClick={() => toggle(u)} className="rounded-lg px-2 py-1 text-xs text-[#CFC3F0] hover:bg-white/[0.06]">{u.blocked ? t('Unblock') : t('Block')}</button>
+              </>
             )}
           </div>
         ))}

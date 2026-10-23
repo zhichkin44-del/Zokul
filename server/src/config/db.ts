@@ -184,6 +184,20 @@ export async function migrate(): Promise<void> {
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_recovery TEXT[]`);
     // At most one admin, enforced by the database itself.
     await client.query(`CREATE UNIQUE INDEX IF NOT EXISTS users_single_admin ON users ((role)) WHERE role = 'admin'`);
+    // Deleted accounts are anonymized, not removed, so conversations stay readable.
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ`);
+    // One-time password reset links issued by the owner (only hashes stored).
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS password_resets (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+        token_hash CHAR(64) UNIQUE NOT NULL,
+        expires_at TIMESTAMPTZ NOT NULL,
+        used_at TIMESTAMPTZ,
+        created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
     console.log('Migration completed successfully');
   } finally {
     client.release();

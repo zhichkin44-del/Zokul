@@ -8,13 +8,13 @@ import { pool } from '../config/db';
 import { consumeInvite, InviteError } from './inviteService';
 import { logEvent } from './auditService';
 
-const SALT_ROUNDS = 10;
+export const SALT_ROUNDS = 10;
 
 const MIN_PASSWORD_LENGTH = 8;
 // bcrypt only reads the first 72 bytes; longer input is refused, not silently cut.
 const MAX_PASSWORD_BYTES = 72;
 
-function validatePassword(password: unknown): asserts password is string {
+export function validatePassword(password: unknown): asserts password is string {
   if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
     throw new Error('Password must be at least 8 characters');
   }

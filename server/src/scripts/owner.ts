@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { pool } from '../config/db';
 import { logEvent } from '../services/auditService';
 
@@ -7,6 +8,7 @@ import { logEvent } from '../services/auditService';
 //   docker compose exec server node dist/scripts/owner.js status
 //   docker compose exec server node dist/scripts/owner.js transfer <email>
 //   docker compose exec server node dist/scripts/owner.js reset-2fa
+//   docker compose exec server node dist/scripts/owner.js reset-password
 //
 // Every change signs the affected people out everywhere (token_version + 1)
 // and makes the owner set up two-factor sign-in again.
@@ -52,13 +54,28 @@ async function reset2fa() {
   console.log(`Done: two-factor sign-in reset for ${r.rows[0].email}. Sign in again and set it up anew.`);
 }
 
+// Forgotten owner password: a one-time link, valid for 1 hour.
+async function resetPassword() {
+  const r = await pool.query(`SELECT id, email FROM users WHERE role = 'admin'`);
+  if (!r.rows[0]) throw new Error('No owner yet');
+  const token = `rst_${crypto.randomBytes(32).toString('base64url')}`;
+  await pool.query('DELETE FROM password_resets WHERE user_id = $1', [r.rows[0].id]);
+  await pool.query(
+    `INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES ($1, $2, NOW() + INTERVAL '1 hour')`,
+    [r.rows[0].id, crypto.createHash('sha256').update(token).digest('hex')]
+  );
+  await logEvent(r.rows[0].id, 'password_reset_issued', { via: 'server' });
+  console.log(`Open within 1 hour (add your site address in front): /reset#${token}`);
+}
+
 async function main() {
   const [command, arg] = process.argv.slice(2);
   if (command === 'status') await status();
   else if (command === 'transfer' && arg) await transfer(arg);
   else if (command === 'reset-2fa') await reset2fa();
+  else if (command === 'reset-password') await resetPassword();
   else {
-    console.log('Usage: owner.js status | transfer <email> | reset-2fa');
+    console.log('Usage: owner.js status | transfer <email> | reset-2fa | reset-password');
     process.exitCode = 2;
   }
 }

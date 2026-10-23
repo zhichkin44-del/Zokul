@@ -6,7 +6,9 @@ import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import HomePage from './components/HomePage';
 import AdminPage from './components/admin/AdminPage';
-import { getLang, setLang, t, useLang } from './i18n';
+import { t, useLang } from './i18n';
+import { LanguageSwitch } from './components/common/LanguageSwitch';
+import ResetPasswordPage from './components/auth/ResetPasswordPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -37,21 +39,6 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function LanguageSwitch() {
-  const lang = getLang();
-  const option = (code: 'ru' | 'en', label: string) => (
-    <button
-      type="button"
-      onClick={() => setLang(code)}
-      aria-pressed={lang === code}
-      className={`px-2.5 py-1 rounded-lg text-sm ${lang === code ? 'bg-gray-200 dark:bg-gray-800 font-medium text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}`}
-    >
-      {label}
-    </button>
-  );
-  return <div className="flex gap-1" aria-label="Language">{option('ru', 'Русский')}{option('en', 'English')}</div>;
-}
-
 export default function App() {
   // Changing the language re-mounts the app so every t() call re-renders.
   const lang = useLang();
@@ -62,6 +49,7 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<PublicRoute><AuthLayout><LoginForm /></AuthLayout></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><AuthLayout><RegisterForm /></AuthLayout></PublicRoute>} />
+          <Route path="/reset" element={<AuthLayout><ResetPasswordPage /></AuthLayout>} />
           <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="/*" element={
             <ProtectedRoute>

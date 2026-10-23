@@ -50,10 +50,11 @@ export async function overview() {
 
 export async function listUsers() {
   const result = await pool.query(`
-    SELECT id, name, email, role, blocked, created_at, last_seen_at
-    FROM users WHERE is_agent IS NOT TRUE ORDER BY created_at`);
+    SELECT id, name, email, role, blocked, created_at, last_seen_at, deleted_at
+    FROM users WHERE is_agent IS NOT TRUE ORDER BY deleted_at NULLS FIRST, created_at`);
   return result.rows.map((r) => ({
-    id: r.id, name: r.name, email: r.email, role: r.role, blocked: r.blocked, createdAt: r.created_at, lastSeenAt: r.last_seen_at,
+    id: r.id, name: r.name, email: r.deleted_at ? '' : r.email, role: r.role, blocked: r.blocked,
+    deleted: !!r.deleted_at, createdAt: r.created_at, lastSeenAt: r.last_seen_at,
   }));
 }
 
@@ -62,7 +63,7 @@ export async function setBlocked(adminId: string, userId: string, blocked: boole
   if (userId === adminId) throw new AdminError('You cannot block yourself');
   const result = await pool.query(
     `UPDATE users SET blocked = $2, token_version = token_version + 1
-     WHERE id = $1 AND is_agent IS NOT TRUE AND role <> 'admin' RETURNING name`,
+     WHERE id = $1 AND is_agent IS NOT TRUE AND role <> 'admin' AND deleted_at IS NULL RETURNING name`,
     [userId, blocked]
   );
   if (result.rows.length === 0) throw new AdminError('User not found', 404);
@@ -75,7 +76,7 @@ export async function listAgents() {
     SELECT a.id, a.name, a.created_at, o.name AS owner_name,
            (SELECT MAX(t.last_used_at) FROM agent_tokens t WHERE t.agent_id = a.id) AS last_used_at
     FROM users a JOIN users o ON o.id = a.owner_id
-    WHERE a.is_agent ORDER BY a.created_at`);
+    WHERE a.is_agent AND a.deleted_at IS NULL ORDER BY a.created_at`);
   return result.rows.map((r) => ({ id: r.id, name: r.name, ownerName: r.owner_name, createdAt: r.created_at, lastUsedAt: r.last_used_at }));
 }
 

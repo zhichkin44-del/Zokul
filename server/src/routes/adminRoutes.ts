@@ -6,6 +6,7 @@ import * as inviteService from '../services/inviteService';
 import { logEvent, recentEvents } from '../services/auditService';
 import rateLimit from 'express-rate-limit';
 import * as adminAuth from '../services/adminAuthService';
+import * as accountService from '../services/accountService';
 
 // Server administration. Every request re-checks the admin role in the
 // database; non-admins get a plain 404 (the panel's existence is not revealed).
@@ -95,6 +96,10 @@ router.get('/users', wrap(async (_req, res) => { res.json(await adminService.lis
 router.post('/users/:id/block', wrap(async (req, res) => {
   await adminService.setBlocked(req.userId!, req.params.id, req.body?.blocked === true);
   res.json({ blocked: req.body?.blocked === true });
+}));
+
+router.post('/users/:id/reset-link', wrap(async (req, res) => {
+  res.status(201).json(await accountService.issueResetLink(req.userId!, req.params.id));
 }));
 
 router.get('/agents', wrap(async (_req, res) => { res.json(await adminService.listAgents()); }));

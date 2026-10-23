@@ -25,6 +25,16 @@ export const changePasswordLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Reset links: 10 failed tries per 15 minutes per address (a token has 256 random bits anyway).
+export const resetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many attempts, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+});
+
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,

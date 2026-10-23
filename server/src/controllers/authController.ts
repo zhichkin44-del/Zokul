@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import * as authService from '../services/authService';
+import * as accountService from '../services/accountService';
 import * as UserModel from '../models/User';
 import { config } from '../config/app';
 
@@ -65,6 +66,34 @@ export async function changePassword(req: AuthRequest, res: Response, next: Next
       return;
     }
     await authService.changePassword(req.userId!, oldPassword, newPassword);
+    res.clearCookie('token', { path: '/' });
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function checkReset(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    res.json(await accountService.checkResetLink(req.body?.token));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function useReset(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    await accountService.useResetLink(req.body?.token, req.body?.password);
+    res.clearCookie('token', { path: '/' });
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteAccount(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    await accountService.deleteAccount(req.userId!, req.body?.password);
     res.clearCookie('token', { path: '/' });
     res.json({ ok: true });
   } catch (err) {

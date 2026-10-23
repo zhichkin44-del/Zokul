@@ -29,6 +29,7 @@ export default function LoginForm() {
       <button type="submit" disabled={loading} className={primaryButton}>
         {loading ? t('Signing in…') : t('Sign in')}
       </button>
+      <p className="text-center text-xs text-gray-500 dark:text-gray-400">{t('Forgot your password? Ask the server owner for a reset link.')}</p>
       <p className="text-center text-sm text-gray-600 dark:text-gray-400">
         {t('No account?')}{' '}
         <Link to="/register" className="font-medium text-primary-dark dark:text-primary underline underline-offset-2">{t('Join with an invite')}</Link>

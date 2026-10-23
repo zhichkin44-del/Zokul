@@ -6,6 +6,7 @@ import { GroupError } from '../services/groupService';
 import { InviteError } from '../services/inviteService';
 import { AdminError } from '../services/adminService';
 import { AdminAuthError } from '../services/adminAuthService';
+import { AccountError } from '../services/accountService';
 
 export function errorMiddleware(err: Error, _req: Request, res: Response, _next: NextFunction): void {
   logger(err.message, 'error');
@@ -15,7 +16,7 @@ export function errorMiddleware(err: Error, _req: Request, res: Response, _next:
     res.status(400).json({ error: 'Invalid id' });
     return;
   }
-  if (err instanceof GroupError || err instanceof AdminError || err instanceof AdminAuthError) {
+  if (err instanceof GroupError || err instanceof AdminError || err instanceof AdminAuthError || err instanceof AccountError) {
     res.status(err.status).json({ error: err.message });
     return;
   }
