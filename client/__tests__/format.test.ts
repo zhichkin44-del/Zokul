@@ -11,7 +11,13 @@ describe('formatLastSeen', () => {
     expect(formatLastSeen(ago(5), now)).toBe('Last seen 5 min ago');
     expect(formatLastSeen(ago(120), now)).toMatch(/^Last seen today at /);
     expect(formatLastSeen(ago(20 * 60), now)).toMatch(/^Last seen yesterday at /);
-    expect(formatLastSeen(ago(5 * 24 * 60), now)).toMatch(/^Last seen \d/);
+    // Older visits show the short date in the runtime locale; build the expected value the same way
+    // so the assertion does not depend on the machine's locale or on the current calendar date.
+    const olderDate = new Date(now.getTime() - 5 * 24 * 60 * 60000).toLocaleDateString([], {
+      day: 'numeric',
+      month: 'short',
+    });
+    expect(formatLastSeen(ago(5 * 24 * 60), now)).toBe(`Last seen ${olderDate}`);
   });
 });
 
