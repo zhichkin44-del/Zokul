@@ -56,8 +56,6 @@ jobs:
           NODE_ENV: test
           DATABASE_URL: postgresql://zokul:zokul@localhost:5432/zokul
           JWT_SECRET: test-secret
-          VAPID_PUBLIC_KEY: REDACTED
-          VAPID_PRIVATE_KEY: REDACTED
 
   client:
     runs-on: ubuntu-latest

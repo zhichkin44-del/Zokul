@@ -1,0 +1,91 @@
+name: Install check
+
+# Follows the README "Installation" steps on a clean runner, then runs the tests.
+# Separate from ci.yml, which is unchanged.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  linux:
+    name: Installation (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Create .env (README step)
+        run: |
+          cd server
+          npm ci
+          node scripts/generate-env.mjs > ../.env
+
+      - name: Start the stack (README step)
+        run: docker compose -f docker-compose.local.yml up -d --build
+
+      - name: Wait for the app to answer
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost/ > /dev/null; then echo "app is up"; exit 0; fi
+            sleep 2
+          done
+          docker compose -f docker-compose.local.yml logs
+          exit 1
+
+      - name: Server tests (README step)
+        working-directory: server
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
+          JWT_SECRET: test-secret
+        run: npm test
+
+      - name: Client tests (README step)
+        working-directory: client
+        run: |
+          npm ci
+          npm test
+
+      - name: Stop the stack
+        if: always()
+        run: docker compose -f docker-compose.local.yml down
+
+  windows:
+    name: Installation (windows-latest, without Docker)
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Create .env (README step)
+        run: |
+          cd server
+          npm ci
+          node scripts/generate-env.mjs > ../.env
+
+      - name: Server tests (README step)
+        working-directory: server
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
+          JWT_SECRET: test-secret
+        run: npm test
+
+      - name: Client tests (README step)
+        working-directory: client
+        run: |
+          npm ci
+          npm test
