@@ -1,37 +1,37 @@
 # Deploy Guide — Zokul Production
 
-## 1. Commit changes (в D:\zokul\)
+## 1. Commit changes (in D:\zokul\)
 
 ```powershell
 git add -A
-git commit -m "ZOKUL-XXX - краткое описание"
+git commit -m "ZOKUL-XXX - short description"
 ```
 
-## 2. Проверить локальный билд
+## 2. Check the local build
 
 ```powershell
 docker compose -f docker-compose.prod.yml build
-# Если ошибки — фиксить до деплоя
+# If there are errors — fix them before deploying
 ```
 
-## 3. Подготовить release-пакет
+## 3. Prepare the release package
 
 ```powershell
 .\scripts\prepare-release.ps1
-# Копирует чистый код в D:\zokul-deploy\, сохраняя ssl/ и .env
+# Copies clean code to D:\zokul-deploy\, preserving ssl/ and .env
 ```
 
-## 4. Залить на GitHub (production ветка)
+## 4. Push to GitHub (production branch)
 
 ```powershell
 cd D:\zokul-deploy
 git add -A
 git commit -m "ZOKUL-XXX production"
-git remote add origin https://github.com/alexandrz-007/zokul.git  # если ещё не добавлен
+git remote add origin https://github.com/example/zokul.git  # only if not added yet
 git push origin master:production --force
 ```
 
-## 5. Развернуть на сервере
+## 5. Deploy on the server
 
 ```bash
 ssh root@zokul.example.com
@@ -41,95 +41,95 @@ git reset --hard origin/production
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-## Быстрая проверка после деплоя
+## Quick check after deployment
 
 ```bash
 curl -k https://zokul.example.com/api/health
-curl -k -i https://zokul.example.com/api/auth/me  # ожидается 401 (не 429)
+curl -k -i https://zokul.example.com/api/auth/me  # expected: 401 (not 429)
 ```
 
-## Проверка Service Worker / PWA после деплоя
+## Service Worker / PWA check after deployment
 
-Открыть https://zokul.example.com в обычной вкладке (без `?v=...`):
-- Сайт должен загрузиться и работать
-- DevTools → Application → Service Workers → статус `activated and is running` (или `deactivated` после unregister)
+Open https://zokul.example.com in a normal tab (without `?v=...`):
+- The site should load and work
+- DevTools → Application → Service Workers → status `activated and is running` (or `deactivated` after unregister)
 
-На iPhone/Safari:
-- Открыть https://zokul.example.com — должно работать без `?v=clean3`
-- Закрыть Safari, открыть снова — должно работать
-- Если сбросить кэш: Safari → Settings → Safari → Advanced → Website Data → Remove All
+On iPhone/Safari:
+- Open https://zokul.example.com — it should work without `?v=clean3`
+- Close Safari, open it again — it should still work
+- To clear the cache: Safari → Settings → Safari → Advanced → Website Data → Remove All
 
-**Если сайт не грузится:** открыть `https://zokul.example.com/login?v=clean` — bypass SW.
+**If the site does not load:** open `https://zokul.example.com/login?v=clean` — this bypasses the SW.
 
-## Cloudflare Tunnel — основной вход без VPN (ZOKUL-NET-001)
+## Cloudflare Tunnel — main entry without VPN (ZOKUL-NET-001)
 
-Провайдер блокирует прямой TLS до публичного IP сервера (`203.0.113.10:443`), поэтому без VPN сайт недоступен. Cloudflare Tunnel делает сайт доступным без VPN: трафик идёт до Cloudflare, а не до публичного IP.
+The ISP blocks direct TLS to the server's public IP (`203.0.113.10:443`), so without a VPN the site is unavailable. A Cloudflare Tunnel makes the site reachable without a VPN: traffic goes to Cloudflare, not to the public IP.
 
-### Шаг А. Создать туннель в Cloudflare (через UI)
+### Step A. Create the tunnel in Cloudflare (via the UI)
 
-1. Зайти в **Cloudflare Zero Trust** → **Networks** → **Tunnels** → **Create a tunnel**.
-2. Назвать `zokul`.
-3. В шаге установки выбрать **Docker** и скопировать **tunnel token** (строка вида `eyJ...`).
-4. Добавить **Public Hostname**:
+1. Go to **Cloudflare Zero Trust** → **Networks** → **Tunnels** → **Create a tunnel**.
+2. Name it `zokul`.
+3. In the installation step choose **Docker** and copy the **tunnel token** (a string starting with `eyJ...`).
+4. Add a **Public Hostname**:
    - Subdomain: `zokul`, Domain: `example.com`
    - Type: `HTTPS`, URL: `https://localhost:443`
-   - (Cloudflare сам пропишет DNS CNAME `zokul.example.com → <tunnel-id>.cfargotunnel.com`)
-5. Сохранить.
+   - (Cloudflare will create the DNS CNAME `zokul.example.com → <tunnel-id>.cfargotunnel.com` automatically)
+5. Save.
 
-> Если Cloudflare ругается на сертификат локального nginx, в config туннеля добавить `originRequest: noTLSVerify: true` (безопасно — это только локальный хоп до localhost:443, где certbot-сертификат валиден).
+> If Cloudflare complains about the local nginx certificate, add `originRequest: noTLSVerify: true` to the tunnel config (this is safe — it only covers the local hop to localhost:443, where the certbot certificate is valid).
 
-### Шаг Б. Запустить туннель на сервере
+### Step B. Run the tunnel on the server
 
-Токен хранится в `~/zokul/.env` (уже в preserve, не коммитится):
+The token is stored in `~/zokul/.env` (already in the preserved set, not committed):
 
 ```bash
 ssh root@<server>
 cd ~/zokul
-echo "CF_TUNNEL_TOKEN=<token из шага А>" >> .env
+echo "CF_TUNNEL_TOKEN=<token from step A>" >> .env
 docker compose -f docker-compose.prod.yml up -d tunnel
 ```
 
-Проверка: `docker logs $(docker compose -f docker-compose.prod.yml ps -q tunnel)` → `Registered tunnel connection`.
+Check: `docker logs $(docker compose -f docker-compose.prod.yml ps -q tunnel)` → `Registered tunnel connection`.
 
-### Шаг В. Проверка без VPN
+### Step C. Check without VPN
 
-На клиенте **без VPN**:
+On a client **without VPN**:
 
 ```powershell
 curl.exe -s -o /dev/null -w "%{http_code}" https://zokul.example.com
-# ожидается: 200
+# expected: 200
 ```
 
-И в браузере без VPN: `https://zokul.example.com` загружается, логин/регистрация работают.
+And in a browser without VPN: `https://zokul.example.com` loads, login/registration works.
 
-Прямой `443` остаётся как fallback (работает с VPN). Закрывать его не нужно.
+Direct `443` remains as a fallback (works with VPN). Do not close it.
 
-## PWA_SWITCH — выбор реализации Service Worker (PWA-PROPER-001)
+## PWA_SWITCH — choosing the Service Worker implementation (PWA-PROPER-001)
 
-Service Worker выбирается на этапе сборки. Две реализации:
+The Service Worker is chosen at build time. Two implementations:
 
-- `client/sw.kill.ts` — **emergency-killer** (network-only fetch + удаление всех кэшей + unregister). Очищает старые Safari/iPhone кэши. **Это production-default**, пока стабильность не подтверждена.
-- `client/sw.pwa.ts` — **proper PWA** (precache только hashed assets через `precacheAndRoute(self.__WB_MANIFEST)`, network-only для navigation/`/api/*`/`/socket.io/*`/`/uploads/*`, versioned cache cleanup на activate). НЕ агрессивный offline-кэш.
+- `client/sw.kill.ts` — **emergency-killer** (network-only fetch + deletion of all caches + unregister). Clears old Safari/iPhone caches. **This is the production default** until stability is confirmed.
+- `client/sw.pwa.ts` — **proper PWA** (precache only hashed assets via `precacheAndRoute(self.__WB_MANIFEST)`, network-only for navigation/`/api/*`/`/socket.io/*`/`/uploads/*`, versioned cache cleanup on activate). NOT an aggressive offline cache.
 
-Скрипт `client/scripts/select-sw.mjs` копирует нужную реализацию в `client/sw.ts` по аргументу `kill`/`proper`.
+The script `client/scripts/select-sw.mjs` copies the chosen implementation to `client/sw.ts` based on the argument `kill`/`proper`.
 
-### Emergency deploy (по умолчанию)
+### Emergency deploy (default)
 
 ```powershell
 cd D:\zokul\client
 npm run build:kill   # = sw:kill + vite build
 ```
 
-### Proper PWA deploy (только после ручной проверки Safari/iPhone)
+### Proper PWA deploy (only after manual Safari/iPhone verification)
 
 ```powershell
 cd D:\zokul\client
 npm run build:proper # = sw:proper + vite build
 ```
 
-> `vite.config.ts` остаётся с `filename: 'sw.ts'` — select-sw подменяет содержимое перед билдом.
-> nginx `no-store` для `/sw.js`, `/registerSW.js`, `/manifest.webmanifest` сохраняется в обоих вариантах (см. `client/nginx.conf`).
+> `vite.config.ts` keeps `filename: 'sw.ts'` — select-sw replaces the contents before the build.
+> The nginx `no-store` rule for `/sw.js`, `/registerSW.js`, `/manifest.webmanifest` is kept in both variants (see `client/nginx.conf`).
 
-### Когда переключать на proper
+### When to switch to proper
 
-Только после того, как emergency-killer простоял 1-2 production-деплоя и ручная проверка на iPhone/Safari подтвердила: первый заход, reload (без вечной загрузки), закрыть/открыть, login/logout, socket reconnect — всё ок. Тогда собрать `build:proper` и задеплоить.
+Only after the emergency-killer has run for 1–2 production deployments and manual checks on iPhone/Safari confirm: first load, reload (no endless loading), close/reopen, login/logout, socket reconnect — all OK. Then build `build:proper` and deploy it.

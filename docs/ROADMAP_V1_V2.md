@@ -1,63 +1,63 @@
-# Zokul — план версий 1.0 и 2.0
+# Zokul — roadmap for versions 1.0 and 2.0
 
-Утверждено владельцем 2026-10-22. Принципы: всё бесплатно, код не публикуется на GitHub,
-безопасность важнее скорости, каждая часть проверяется тестами и вживую.
+Approved by the owner on 2026-10-22. Principles: everything is free, code is not published on GitHub,
+security matters more than speed, and every part is verified by tests and in live use.
 
-## Модель чатов (общая для обеих версий)
+## Chat model (shared by both versions)
 
-Один тип «чат», участники двух видов: **люди** и **агенты**.
+One "chat" type, with two kinds of participants: **people** and **agents**.
 
-1. Личный чат с человеком.
-2. Личный чат с агентом — создаётся вместе с агентом (уже есть).
-3. **Комната проекта** — группа людей и агентов. Отличается только настройками:
-   какие агенты допущены, кто подтверждает действия, как агенты реагируют.
+1. Direct chat with a person.
+2. Direct chat with an agent — created together with the agent (already exists).
+3. **Project room** — a group of people and agents. It differs only in its settings:
+   which agents are allowed, who confirms actions, and how agents react.
 
-## Версия 1.0 — «не стыдно показать и пользоваться»
+## Version 1.0 — "presentable and usable"
 
-### Этап 1. Функции мессенджера — ✅ готово (2026-10-22)
-- «Был(а) в сети в …» (время последнего захода).
-- Поиск по сообщениям (сервер есть — нужен интерфейс).
-- Файлы: документы и логи с ограничением размера и безопасной отдачей.
-- Отключение уведомлений для отдельного чата.
-- Профиль собеседника; управление группой (переименовать, добавить/убрать участника).
-- Агенты в комнатах проекта: можно добавить своего агента в группу, он пишет туда
-  статусы, вопросы и карточки передачи (читать и обсуждать — это уже 2.0).
+### Stage 1. Messenger features — done (2026-10-22)
+- "Online within …" (time of the last visit).
+- Message search (the server supports it — the interface is needed).
+- Files: documents and logs with a size limit and safe delivery.
+- Per-chat notification muting.
+- Counterpart profile; group management (rename, add/remove a member).
+- Agents in project rooms: you can add your own agent to a group; it posts
+  statuses, questions, and handoff cards there (reading and discussing them is already part of 2.0).
 
-### Этап 2. Дизайн — ✅ готово (Paper + тёплая тёмная тема, админка «glass lavender»)
-- Обновлённый интерфейс под «рабочий инструмент для людей и ИИ-агентов».
-- Варианты показываются владельцу до внедрения.
+### Stage 2. Design — done (Paper + warm dark theme, "glass lavender" admin panel)
+- Updated interface for "a working tool for people and AI agents".
+- Variants are shown to the owner before rollout.
 
-### Этап 3. Безопасность (аудит перед выкладкой) — ✅ готово, отчёт: docs/SECURITY_AUDIT_V1.md
-- Закрытая регистрация: вход только по приглашению.
-- Загруженные файлы и фото — только для участников чата (сейчас доступны по ссылке).
-- Заголовки безопасности (CSP и др.), cookie, CORS, лимиты запросов, проверка типов файлов.
-- Секреты только в `.env` на сервере, новые ключи push для боевого сервера.
-- `npm audit` и обновление уязвимых зависимостей; база не торчит наружу; резервные копии.
-- Итог: отчёт аудита со списком проверенного.
+### Stage 3. Security (audit before release) — done, report: docs/SECURITY_AUDIT_V1.md
+- Closed registration: sign-in only by invitation.
+- Uploaded files and photos — only for chat participants (previously reachable by direct link).
+- Security headers (CSP and others), cookies, CORS, request limits, file type checks.
+- Secrets only in `.env` on the server, new push keys for the production server.
+- `npm audit` and updating vulnerable dependencies; the database is not exposed; backups.
+- Result: an audit report listing what was checked.
 
-### Этап 4. Выкладка на сервер — ⏸ отложено владельцем (2026-10-23)
-- Бесплатный вариант хостинга (выбор с владельцем), HTTPS.
-- Проверка push на реальном iPhone и Android.
-- Инструкция «как поднять Zokul у себя».
+### Stage 4. Server deployment — postponed by the owner (2026-10-23)
+- Free hosting option (to be chosen with the owner), HTTPS.
+- Push verification on a real iPhone and Android device.
+- Instructions for "how to run Zokul yourself".
 
-### Этап 5. Презентация — ⏸ отложено владельцем (черновик страницы есть, не опубликован)
-- Страница Zokul на личном сайте, README, скриншоты, короткое видео.
-- **Сюрприз:** отдельная презентация версии 2.0 (рой агентов) — концепция и макеты.
+### Stage 5. Presentation — postponed by the owner (draft page exists, not published)
+- Zokul page on a personal site, README, screenshots, a short video.
+- **Surprise:** a separate presentation of version 2.0 (agent swarm) — concept and mockups.
 
-## Версия 2.0 — рой агентов (главная фишка)
+## Version 2.0 — agent swarm (the main feature)
 
-**Подготовлено к старту, ждёт команды владельца.** Подробный план и срезы: `docs/V2_SWARM_PLAN.md`.
+**Prepared to start, waiting for the owner's go-ahead.**
 
-Цель: агенты работают командой в комнате проекта и за счёт разделения ролей и проверок
-делают работу грамотнее и безопаснее одиночного агента.
+Goal: agents work as a team in a project room, and through role separation and checks
+do the work more carefully and safely than a single agent.
 
-- **Роли и личности:** у каждого бота роль, характер, системный промпт, свой набор инструментов.
-- **Узкая зона ответственности:** бот может делать только то, что разрешено его роли.
-- **Чек-пойнты:** работа идёт этапами, на каждом — проверка ботом-ревьюером
-  и/или подтверждение человеком кнопкой.
-- **Агенты читают комнату:** реагируют на @упоминания и задачи с общей доски.
-- **Защита:** лимиты ходов и расходов, стоп-кран, защита от бесконечных переписок ботов,
-  журнал действий, ключи моделей только на сервере.
-- **Модели:** бесплатные модели через ключ OpenRouter (или аналог).
-- **Демо-сценарий:** ИИ-редакция — исследователь, автор, редактор, фактчекер готовят
-  новостной пост, публикация в Telegram только после «Да» владельца.
+- **Roles and personalities:** each bot has a role, a character, a system prompt, and its own set of tools.
+- **Narrow scope of responsibility:** a bot may only do what its role allows.
+- **Checkpoints:** work proceeds in stages; each stage is checked by a reviewer bot
+  and/or confirmed by a person with a button.
+- **Agents read the room:** they react to @mentions and to tasks from the shared board.
+- **Protection:** turn and cost limits, an emergency stop, protection against endless bot-to-bot conversations,
+  an action log, model keys only on the server.
+- **Models:** free models via an OpenRouter key (or an equivalent).
+- **Demo scenario:** an AI newsroom — a researcher, a writer, an editor, and a fact-checker prepare
+  a news post; publication to Telegram happens only after the owner's "Yes".

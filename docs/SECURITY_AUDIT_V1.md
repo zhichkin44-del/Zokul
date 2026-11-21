@@ -1,69 +1,69 @@
-# Zokul — аудит безопасности версии 1.0
+# Zokul — security audit of version 1.0
 
-Дата: 2026-10-22 · Ветка: `integrate/foundation` (локально) · Проверял: Claude Code (Opus 5.5)
+Date: 2026-10-22 · Branch: `integrate/foundation` (local) · Reviewed by: Claude Code (Opus 5.5)
 
-## Как проверяли
+## How it was checked
 
-- Чтение всего серверного кода по классам уязвимостей OWASP: вход и сессии, права доступа,
-  загрузка и отдача файлов, XSS, инъекции, перебор, утечки данных, заголовки безопасности.
-- `npm audit` для сервера и клиента.
-- Каждая находка подтверждалась атакой на живом сервере (Docker) до и после исправления;
-  на исправления написаны автотесты (сервер 101, клиент 26 тестов).
+- Reading the entire server code by OWASP vulnerability class: sign-in and sessions, access rights,
+  file upload and delivery, XSS, injection, brute force, data leaks, security headers.
+- `npm audit` for the server and the client.
+- Each finding was confirmed by an attack on a live server (Docker) before and after the fix;
+  automated tests were written for the fixes (server 101 tests, client 26 tests).
 
-## Найдено и исправлено
+## Found and fixed
 
-| # | Уязвимость | Риск | Исправление |
+| # | Vulnerability | Risk | Fix |
 |---|---|---|---|
-| 1 | Загрузка HTML/JS под видом «голосового»: расширение бралось из имени файла → скрипт открывался на адресе Zokul (stored XSS, кража сессий) | Критический | Расширение по проверенному MIME-типу; документы — белый список, скачивание как вложение, `CSP: sandbox` |
-| 2 | Фото, голосовые и файлы доступны любому по прямой ссылке без входа | Высокий | Отдача только вошедшим участникам чата, где файл отправлен; аватарки — вошедшим |
-| 3 | Регистрация открыта для всех | Высокий | Только по приглашению (одноразовые ссылки, лимит использований, срок, хранится хэш); первый человек — администратор |
-| 4 | Любой участник мог добавлять/удалять людей (даже в личный чат), переименовывать и удалять группу | Высокий | Действия только у создателя и только в группах; выход — у каждого |
-| 5 | Поиск личного чата находил общую группу → личные сообщения (и агентов) могли уйти в группу | Высокий | Поиск только по личным чатам |
-| 6 | Нет заголовков безопасности у страницы приложения | Высокий | CSP, запрет встраивания, nosniff, Referrer-Policy, Permissions-Policy, HSTS (прод), скрыта версия nginx |
-| 7 | Проверка сессии «открывалась» при ошибке базы; сокет не учитывал отзыв сессии | Высокий | Fail-closed; сокет проверяет версию сессии; удалённые и заблокированные аккаунты отключаются сразу |
-| 8 | Смена пароля не работала совсем (и не выходила из других сессий) | Высокий | Исправлено; смена пароля завершает все другие сессии |
-| 9 | Ссылки на внешние картинки/голосовые/аватарки → слежка за IP читателей | Средний | Принимаются только собственные загрузки сервера |
-| 10 | Ответ на сообщение из чужого чата показывал его текст | Средний | Ответ только на сообщение того же чата |
-| 11 | Статус «в сети» и email видны всем пользователям сервера | Средний | Статус — только тем, с кем есть общий чат; чужие email не отдаются |
-| 12 | Можно писать чужому агенту и добавлять его к себе | Средний | Агента приглашает только владелец |
-| 13 | Нет ограничений: длина сообщения, размер выдачи, пароль 6 символов, нет проверки email | Средний | 10 000 символов, не больше 100 сообщений за запрос, пароль 8–72 байта, проверка email и имени |
-| 14 | JWT без фиксированного алгоритма; слабый секрет допускался | Средний | Только HS256; в production сервер не стартует со слабым секретом |
-| 15 | Пароль базы в production зашит в `docker-compose.prod.yml` | Средний | Берётся из `.env`; без него запуск отказывается |
-| 16 | Таблицы лимитов запросов в памяти росли бесконечно | Низкий | Периодическая очистка |
-| 17 | Уязвимые зависимости: 10 на сервере (1 критическая), 5 в клиенте | — | Обновлено; неиспользуемый `uuid` удалён; React Router 6 → 7. Итог: **0 уязвимостей** |
-| 18 | Шрифты грузились с серверов Google (утечка факта посещения) | Низкий | Шрифты встроены в приложение |
+| 1 | HTML/JS uploaded disguised as a "voice message": the extension was taken from the file name → script ran on the Zokul origin (stored XSS, session theft) | Critical | Extension taken from the verified MIME type; documents on an allowlist, downloaded as attachments, `CSP: sandbox` |
+| 2 | Photos, voice messages, and files were reachable by anyone with a direct link, without signing in | High | Served only to signed-in participants of the chat where the file was sent; avatars — to signed-in users |
+| 3 | Registration was open to everyone | High | Invitation only (one-time links, usage limit, expiry, only a hash is stored); the first person is the administrator |
+| 4 | Any participant could add/remove people (even in a direct chat), rename, and delete the group | High | Actions only for the creator and only in groups; leaving is available to everyone |
+| 5 | Searching a direct chat found the shared group → personal messages (and agents) could end up in the group | High | Search only across direct chats |
+| 6 | No security headers on the application page | High | CSP, framing denied, nosniff, Referrer-Policy, Permissions-Policy, HSTS (prod), nginx version hidden |
+| 7 | The session check "passed" when the database failed; the socket ignored session revocation | High | Fail-closed; the socket checks the session version; deleted and blocked accounts are disconnected immediately |
+| 8 | Password change did not work at all (and did not sign out other sessions) | High | Fixed; a password change ends all other sessions |
+| 9 | Links to external images/voice messages/avatars → tracking of readers' IP addresses | Medium | Only the server's own uploads are accepted |
+| 10 | Replying to a message from another chat showed its text | Medium | Replies only to messages in the same chat |
+| 11 | "Online" status and email were visible to all users of the server | Medium | Status only to people who share a chat; other people's emails are not returned |
+| 12 | One could message another user's agent and add it to oneself | Medium | Only the owner can invite their agent |
+| 13 | No limits: message length, response size, 6-character passwords, no email validation | Medium | 10,000 characters, no more than 100 messages per request, password 8–72 bytes, email and name validation |
+| 14 | JWT without a fixed algorithm; a weak secret was allowed | Medium | HS256 only; in production the server refuses to start with a weak secret |
+| 15 | The production database password was hard-coded in `docker-compose.prod.yml` | Medium | Read from `.env`; startup is refused without it |
+| 16 | Rate-limit tables in memory grew without bound | Low | Periodic cleanup |
+| 17 | Vulnerable dependencies: 10 on the server (1 critical), 5 in the client | — | Updated; unused `uuid` removed; React Router 6 → 7. Result: **0 vulnerabilities** |
+| 18 | Fonts were loaded from Google servers (leaking the fact of a visit) | Low | Fonts bundled into the application |
 
-## Добавлено для контроля
+## Added for control
 
-- Панель администратора (`/admin`, только роль admin, повторная проверка роли на каждый запрос):
-  приглашения, люди с блокировкой, агенты, журнал действий, состояние сервера.
-- Журнал безопасности: входы, неудачные входы, регистрации, приглашения, блокировки,
-  смена пароля, создание агентов и выпуск их ключей.
-- **Админка только для владельца, с обязательной двухфакторной защитой** (2026-10-23):
-  - В базе может быть только один админ — это ограничение самой базы данных, в интерфейсе нет кнопки «сделать админом».
-  - Пароля мало: админка открывается кодом из приложения-аутентификатора на телефоне (стандарт TOTP, RFC 6238).
-    Каждый код срабатывает один раз; 6 неверных кодов — пауза 15 минут.
-  - 10 резервных кодов на случай потери телефона, каждый одноразовый, в базе хранятся только их хэши.
-  - Через 15 минут без действий админка закрывается сама; кнопка «Закрыть админку» — сразу.
-  - Сменить владельца или сбросить 2FA можно только с доступом к серверу:
+- Administrator panel (`/admin`, admin role only, role re-checked on every request):
+  invitations, blocked people, agents, action log, server status.
+- Security log: sign-ins, failed sign-ins, registrations, invitations, blocks,
+  password changes, agent creation, and issuance of their keys.
+- **Admin panel for the owner only, with mandatory two-factor protection** (2026-10-23):
+  - The database may contain only one admin — this is a constraint of the database itself; the interface has no "make admin" button.
+  - A password alone is not enough: the admin panel opens with a code from an authenticator app on the phone (TOTP standard, RFC 6238).
+    Each code works once; 6 wrong codes — a 15-minute pause.
+  - 10 backup codes in case the phone is lost, each one-time; only their hashes are stored in the database.
+  - After 15 minutes without activity the admin panel closes itself; the "Close admin panel" button closes it immediately.
+  - The owner can be changed or 2FA reset only with access to the server:
     `docker compose exec server node dist/scripts/owner.js status | transfer <email> | reset-2fa`.
-- **Сброс пароля** — только одноразовой ссылкой от владельца (24 часа, хранится лишь хэш, после сброса человек выходит
-  везде). Владелец свой пароль восстанавливает только с сервера: `owner.js reset-password`.
-- **Удаление аккаунта** — сам человек, с паролем. Данные обезличиваются, ключи его агентов удаляются, сообщения
-  остаются в чатах как «Удалённый аккаунт».
-- `server/scripts/generate-env.mjs` — генерирует новые секреты и ключи push для боевого сервера.
+- **Password reset** — only via a one-time link from the owner (24 hours, only a hash is stored; after the reset the person is signed out
+  everywhere). The owner recovers their own password only from the server: `owner.js reset-password`.
+- **Account deletion** — initiated by the person themselves, with their password. The data is anonymized, the keys of their agents are deleted, and messages
+  remain in chats as "Deleted account".
+- `server/scripts/generate-env.mjs` — generates new secrets and push keys for the production server.
 
-## Что важно знать (честно)
+## What to know (honestly)
 
-- **Это не сквозное шифрование.** Владелец сервера технически может прочитать переписку.
-  Честная формулировка: «свой сервер, вход по приглашению, данные никуда не уходят».
-- Ключи push в `docker-compose.local.yml` и тестах — только для локальной разработки.
-  На боевом сервере — новые из `generate-env.mjs`.
-- `style-src 'unsafe-inline'` в CSP оставлен ради встроенных стилей React; скрипты — только свои.
-- Внешний независимый аудит не проводился; для публичного запуска стоит заказать.
+- **This is not end-to-end encryption.** The server owner can technically read the conversations.
+  Honest wording: "your own server, sign-in by invitation, data goes nowhere else."
+- The push keys in `docker-compose.local.yml` and in the tests are for local development only.
+  On the production server — new ones from `generate-env.mjs`.
+- `style-src 'unsafe-inline'` in the CSP is kept for React's inline styles; scripts — only our own.
+- No independent external audit has been performed; one should be commissioned before a public launch.
 
-## Перед выкладкой на сервер
+## Before deploying to the server
 
-1. `node server/scripts/generate-env.mjs > .env` на сервере (не в репозиторий).
-2. HTTPS-сертификат, проверка заголовков (`curl -I`), проверка push на iPhone и Android.
-3. Резервное копирование базы (`scripts/backup-db.sh`) по расписанию.
+1. `node server/scripts/generate-env.mjs > .env` on the server (not in the repository).
+2. HTTPS certificate, header check (`curl -I`), push check on iPhone and Android.
+3. Database backup (`scripts/backup-db.sh`) on a schedule.

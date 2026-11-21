@@ -1,34 +1,34 @@
 # Proper PWA — Test Deploy & Rollback Guide (PWA-PROPER-001)
 
-Код лежит в ветке `feature/pwa-proper`. Production сейчас на emergency-killer.
-Эта инструкция — для ОДНОГО тестового деплоя proper PWA с последующим ручным
-тестированием на iPhone/Safari. Если тест провален — откат (см. блок Rollback).
+The code lives on the branch `feature/pwa-proper`. Production is currently on the emergency-killer.
+This guide is for ONE test deployment of the proper PWA, followed by manual
+testing on iPhone/Safari. If the test fails — roll back (see the Rollback block).
 
-## A. Подготовка (локально, D:\zokul)
+## A. Preparation (locally, D:\zokul)
 
 ```powershell
 cd D:\zokul\client
 
-# 1. Переключить SW на proper-реализацию
+# 1. Switch the SW to the proper implementation
 npm run sw:proper
 
-# 2. Собрать proper-билд (sw:proper уже вызван внутри build:proper, но явный шаг безопасен)
+# 2. Build the proper bundle (sw:proper is already called inside build:proper, but the explicit step is safe)
 npm run build:proper
-# ожидается: dist/sw.js ~43 kB, precache 7 entries, __WB_MANIFEST consumed
+# expected: dist/sw.js ~43 kB, precache 7 entries, __WB_MANIFEST consumed
 
-# 3. Проверить, что sw.ts действительно proper (опционально)
+# 3. Check that sw.ts is really the proper one (optional)
 Select-String -Path sw.ts -Pattern "precacheAndRoute\("
 ```
 
-## B. Деплой в production
+## B. Deploy to production
 
 ```powershell
 cd D:\zokul
-# закоммитить переключение (sw.ts теперь proper) — только в рамках теста
+# commit the switch (sw.ts is now proper) — only as part of this test
 git add -A
 git commit -m "PWA-PROPER test deploy - sw:proper"
 
-# собрать release-пакет (сохраняет ssl/ и .env)
+# build the release package (keeps ssl/ and .env)
 .\scripts\prepare-release.ps1
 
 cd D:\zokul-deploy
@@ -38,7 +38,7 @@ git push origin master:production --force
 ```
 
 ```bash
-# На сервере
+# On the server
 ssh root@zokul.example.com
 cd ~/zokul
 git fetch origin
@@ -46,40 +46,40 @@ git reset --hard origin/production
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-## C. curl-проверки после деплоя (с сервера)
+## C. curl checks after deployment (from the server)
 
 ```bash
-# SW и manifest — no-store (не кешируются браузером агрессивно)
+# SW and manifest — no-store (not aggressively cached by the browser)
 curl -kI https://localhost/sw.js
 curl -kI https://localhost/registerSW.js
 curl -kI https://localhost/manifest.webmanifest
-# ожидаем: Cache-Control: no-store, no-cache, ...
+# expected: Cache-Control: no-store, no-cache, ...
 
-# API НЕ кешируется (всегда свежий)
+# API is NOT cached (always fresh)
 curl -k https://localhost/api/health
 curl -kI https://localhost/api/auth/me
 
-# Socket.io не кешируется (polling handshake)
+# Socket.io is not cached (polling handshake)
 curl -k "https://localhost/socket.io/?EIO=4&transport=polling"
 ```
 
-## D. Что проверить на iPhone / Safari
+## D. What to check on iPhone / Safari
 
-1. Первый заход на https://zokul.example.com — сайт грузится.
-2. Reload (F5 / pull-to-refresh) — НЕТ вечной загрузки, контент свежий.
-3. Закрыть Safari полностью, открыть снова — работает.
-4. Login / Logout — сессия не ломается (auth-ответы не из кэша).
-5. Socket reconnect — после потери сети чат переподключается (socket.io не кеширован).
-6. DevTools (Mac Safari) → Develop → Service Worker → статус activated, precache
-   содержит хешированные /assets/*, НЕТ закешированных /api/*.
+1. First visit to https://zokul.example.com — the site loads.
+2. Reload (F5 / pull-to-refresh) — NO endless loading, content is fresh.
+3. Fully close Safari, reopen it — it works.
+4. Login / Logout — the session does not break (auth responses are not served from cache).
+5. Socket reconnect — after a network loss the chat reconnects (socket.io is not cached).
+6. DevTools (Mac Safari) → Develop → Service Worker → status activated, precache
+   contains hashed /assets/*, and NO cached /api/*.
 
-Если всё ок — оставляем proper. Если НЕТ — Rollback (ниже).
+If everything is OK — keep the proper version. If NOT — Rollback (below).
 
-## E. Rollback / Remediation (если proper PWA снова виснет на Safari)
+## E. Rollback / Remediation (if the proper PWA hangs on Safari again)
 
 ```powershell
 cd D:\zokul\client
-npm run sw:kill          # вернуть killer в sw.ts
+npm run sw:kill          # put the killer back into sw.ts
 
 cd D:\zokul
 git add -A
@@ -101,15 +101,15 @@ git reset --hard origin/production
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-Killer удалит старые кэши и unregister SW — Safari снова рабочий без ручной очистки данных.
+The killer removes the old caches and unregisters the SW — Safari works again without manually clearing site data.
 
-## F. Вернуть рабочее дерево в killer после теста (обязательно)
+## F. Return the working tree to the killer after the test (mandatory)
 
-Независимо от результата теста, локально оставляем дерево на killer:
+Regardless of the test result, leave the local tree on the killer:
 
 ```powershell
 cd D:\zokul\client
 npm run sw:kill
 cd D:\zokul
-git status      # должно быть чисто (sw.ts уже killer)
+git status      # should be clean (sw.ts is already the killer)
 ```
