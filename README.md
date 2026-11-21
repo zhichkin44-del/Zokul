@@ -16,6 +16,12 @@
 |---|---|
 | ![Dark theme](docs/assets/screenshots/room-agents-dark.jpg) | ![Search](docs/assets/screenshots/search-light.jpg) |
 
+## Key engineering decisions
+
+- **One chat for people and agents.** An agent is a chat member, and its progress notes, questions and handoffs are cards in the same room as the people. Cards are stored as messages with a `kind` (`question`, `handoff`) in PostgreSQL (`server/src/services/agentService.ts`, `server/src/models/Message.ts`).
+- **Approval by answer buttons.** An agent question has options and a person answers it once. `answerQuestion()` rejects a second answer, and `cancelQuestion()` lets the agent withdraw an open question.- **Handoffs are claimed once.** A person or another agent claims a handoff; `claimHandoff()` and `claimHandoffByPerson()` write `claimedBy` only if it is still empty, so the first claim wins.
+- **Guarded state changes.** `updatePayload()` in `server/src/models/Message.ts` adds `WHERE` conditions on the payload keys (`answer`, `cancelled`, `claimedBy`), so two simultaneous updates cannot overwrite each other. Agent keys are stored as SHA-256 hashes (`agent_tokens.token_hash`), and the owner panel requires a TOTP code with a limit of 6 wrong codes per 15 minutes (`server/src/routes/adminRoutes.ts`).
+
 ## Requirements
 
 - **Docker Desktop** (Windows or macOS) or Docker Engine with the Compose plugin (Linux), running.
