@@ -88,7 +88,7 @@ cd server && npm ci && npm test
 cd client && npm ci && npm test
 ```
 
-Counts measured on 2026-11-21 (Node 24, Windows 11): server **127 of 127 tests passed** in 19 suites; client **29 of 30 passed**. One client test (`format.test.ts`, "describes recent and older visits") fails: it expects a year-like output that the current date format does not produce. The same result was measured on the original code before any changes.
+Counts measured with Node 24 on Windows 11: server **127 of 127 tests passed** in 19 suites (2026-11-21); client **30 of 30 passed** in 7 files (2026-11-25). The client date test (`format.test.ts`) was made locale-independent in commit 722ccdb.
 
 ## Project structure
 
